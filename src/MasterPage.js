@@ -3,9 +3,8 @@
 // @author Andrew
 
 var React = require('react');
-import isLoggedIn from './Utilities.js'
-//import {Button} from 'react-bootstrap';
-import { Link, hashHistory } from 'react-router';
+//import isLoggedIn from './Utilities.js'
+import { hashHistory } from 'react-router';
 
 export default class MasterPage extends React.Component {
 

@@ -3,7 +3,7 @@
 // @author Andrew
 
 var React = require('react');
-import {Form, FormGroup, Col, Button, ControlLabel, FormControl} from 'react-bootstrap';
+import {Form, FormGroup, Col, Button, ControlLabel, FormControl, Alert} from 'react-bootstrap';
 import { hashHistory } from 'react-router';
 
 export default class LoginPage extends React.Component {
@@ -11,28 +11,43 @@ export default class LoginPage extends React.Component {
     super(props);
     this.state = {
       _username: "",
-      _password: ""
+      _password: "",
+      _alert_both: false
     }
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
   }
   handleUsernameChange(e) {
-    this.state._username = e.target.value;
+    this.setState({_username: e.target.value});
   }
   handlePasswordChange(e) {
-    this.state._password = e.target.value;
+    this.setState({_password: e.target.value});
   }
+  createAlert(txt) {
+    return (
+      <Alert bsStyle="danger">
+        <h4>Invalid {txt}!</h4>
+      </Alert>
+    )
+  }
+
   handleClick() {
+    this.setState({_alert_both: false});
     var xhttp = new XMLHttpRequest();
     var clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy'
+    if (this.state._username.length < 1 || this.state._password.length < 1){
+      this.setState({_alert_both: true});
+      return null;
+    }
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
-    xhttp.open("POST", "http://127.0.0.1:8000/o/token/", false);
+    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", false);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(request_str);
     var response = JSON.parse(xhttp.responseText);
     if (xhttp.status === 401 || xhttp.status === 500){
       console.log('Unauthorized!!');
+      this.setState({_alert_both: true});
     }
     else{
       localStorage.token = response['access_token'];
@@ -44,6 +59,8 @@ export default class LoginPage extends React.Component {
   render() {
 
     return(
+  <div>
+  {this.state._alert_both ? this.createAlert("username/password") : <h3></h3>}
   <Form horizontal>
     <FormGroup controlId="formHorizontalEmail">
       <Col componentClass={ControlLabel} smOffset={3} sm={2}>
@@ -71,6 +88,7 @@ export default class LoginPage extends React.Component {
       </Col>
     </FormGroup>
   </Form>
+  </div>
 )
   }
 
