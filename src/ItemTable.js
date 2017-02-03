@@ -3,7 +3,6 @@
 // @author Andrew Sun
 
 var React = require('react');
-var ReactDOM = require('react-dom');
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -27,11 +26,11 @@ class ItemTable extends React.Component {
 
 
     render() {
-      const options = {
-        onRowMouseOver: function(row){
-          row.style.cursor='pointer';
-        }
-      }
+      // const options = {
+      //   onRowMouseOver: function(row){
+      //     row.style.cursor='pointer';
+      //   }
+      // }
 
         return(
             <BootstrapTable ref="table1" data={this.state._products} striped hover>

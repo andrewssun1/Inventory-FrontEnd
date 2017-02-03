@@ -2,14 +2,31 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import UserTabs from './UserTabs'
 import LoginPage from './LoginPage'
+import MasterPage from './MasterPage'
+import isLoggedIn from './Utilities.js'
 import { Router, IndexRoute, Route, hashHistory } from 'react-router';
 
 
+function requireAuth(nextState, replace){
+  if (!localStorage.token) {
+    replace({
+      pathname: '/login'
+    })
+  }
+}
+
+const stuff = (
+  <Router history={hashHistory}>
+    <Route path='/' component={MasterPage}>
+      <Route path='/login' component={LoginPage}></Route>
+      <Route onEnter={requireAuth}>
+        <Route path='/userpage' component={UserTabs}></Route>
+      </Route>
+    </Route>
+  </Router>
+);
 
 ReactDOM.render(
-  <Router history={hashHistory}>
-    <Route path='/' component={LoginPage}></Route>
-
-  </Router>,
+stuff,
   document.getElementById('root')
 );

@@ -3,8 +3,8 @@
 // @author Andrew
 
 var React = require('react');
-var ReactDOM = require('react-dom');
-import {Form, FormGroup, Col, Button, ControlLabel, FormControl} from 'react-bootstrap'
+import {Form, FormGroup, Col, Button, ControlLabel, FormControl} from 'react-bootstrap';
+import { hashHistory } from 'react-router';
 
 export default class LoginPage extends React.Component {
   constructor(props) {
@@ -24,8 +24,6 @@ export default class LoginPage extends React.Component {
     this.state._password = e.target.value;
   }
   handleClick() {
-    // console.log(this.state._username);
-    // console.log(this.state._password);
     var xhttp = new XMLHttpRequest();
     var clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy'
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
@@ -33,6 +31,14 @@ export default class LoginPage extends React.Component {
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(request_str);
     var response = JSON.parse(xhttp.responseText);
+    if (xhttp.status === 401 || xhttp.status === 500){
+      console.log('Unauthorized!!');
+    }
+    else{
+      localStorage.token = response['access_token'];
+      hashHistory.push('/userpage');
+      console.log(localStorage.token);
+    }
     console.log(response);
   }
   render() {
