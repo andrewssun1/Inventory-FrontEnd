@@ -32,6 +32,16 @@ export default class LoginPage extends React.Component {
     )
   }
 
+  componentDidMount() {
+    document.getElementById("formHorizontalPassword")
+      .addEventListener("keyup", function(event) {
+          event.preventDefault();
+          if (event.keyCode === 13) {
+              document.getElementById("submitButton").click();
+          }
+      });
+  }
+
   handleClick() {
     this.setState({_alert_both: false});
     var xhttp = new XMLHttpRequest();
@@ -82,7 +92,7 @@ export default class LoginPage extends React.Component {
 
     <FormGroup>
       <Col smOffset={5} sm={2}>
-        <Button type="button" onClick={this.handleClick}>
+        <Button id="submitButton" type="button" onClick={this.handleClick}>
           Sign in
         </Button>
       </Col>
