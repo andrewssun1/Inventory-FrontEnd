@@ -73,6 +73,9 @@ class ItemTable extends React.Component {
   }
 
   listToTags(s){
+    if (!s || s.length === 0){
+      return null;
+    }
     var splitted = s.split(",");
     var returnList = [];
     for (var i = 0; i < splitted.length; i++){
@@ -92,12 +95,23 @@ class ItemTable extends React.Component {
           console.log('POST Failed!!');
         }
         else{
+          for (var key in row){
+            if (row[key] === ""){
+              row[key] = null;
+            }
+          }
           row.quantity = parseInt(row.quantity);
           var a = JSON.parse(JSON.stringify(row)); // deep clone object
           this.state._products.push(row);
           a.tags = this.listToTags(a.tags);
           delete a.id;
-          xhttp.send(JSON.stringify(a));
+          var jsonResult = JSON.stringify(a);
+          xhttp.send(jsonResult);
+          //console.log(jsonResult);
+          var response = JSON.parse(xhttp.responseText);
+          console.log("Getting Response");
+          console.log(response);
+          row.id = response.id;
         }
     }
     console.log(this.state._products);
@@ -105,9 +119,15 @@ class ItemTable extends React.Component {
 
   onDeleteRow(rows) {
     if(rows){
+      for (var i = 0; i < rows.length; i++){
+        xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/"+rows[i], false);
+        xhttp.setRequestHeader("Content-Type", "application/json");
+        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+        xhttp.send();
+      }
       this.setState({
         _products: this.state._products.filter((product) => {
-          return rows.indexOf(product.name) === -1;
+          return rows.indexOf(product.id) === -1;
         })
       })
     }
@@ -147,7 +167,7 @@ class ItemTable extends React.Component {
         return(
 
             this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={true} selectRow={selectRow} data={this.state._products} deleteRow striped hover>
-                <TableHeaderColumn isKey dataField='id' hidden hiddenOnInsert autoValue={true}>id</TableHeaderColumn>
+                <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
                 <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
                 <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
                 <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
