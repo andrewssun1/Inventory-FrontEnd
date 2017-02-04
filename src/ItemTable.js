@@ -30,6 +30,7 @@ class ItemTable extends React.Component {
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
+    console.log(this.state._products[0].tags[0]);
   }
 
   componentWillMount() {
@@ -72,25 +73,35 @@ class ItemTable extends React.Component {
     return returnString;
   }
 
-  listToTags(lst){
-    var splitted = lst.split(",");
+  listToTags(s){
+    var splitted = s.split(",");
     var returnList = [];
     for (var i = 0; i < splitted.length; i++){
-      var tags = new Object();
-      tags.tag = splitted[i].trim();
-      returnList.push(JSON.stringify(tags));
+      var tags = {};
+      tags["tag"] = splitted[i].trim();
+      returnList.push(tags);
     }
     return returnList;
   }
 
   onAddRow(row) {
     if (row){
-        this.state._products.push(row);
-        // xhttp.open("POST", "https://asap-test.colab.duke.edu/api/item/", false);
-        // if (xhttp.status === 401 || xhttp.status === 500){
-        //   console.log('POST Failed!!');
-        // }
-        // xhttp.send(this.state._products);
+        xhttp.open("POST", "https://asap-test.colab.duke.edu/api/item/", false);
+        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+        if (xhttp.status === 401 || xhttp.status === 500){
+          console.log('POST Failed!!');
+        }
+        else{
+          row.quantity = parseInt(row.quantity);
+          var a = JSON.parse(JSON.stringify(row)); // deep clone object
+          this.state._products.push(row);
+          a.tags = this.listToTags(a.tags);
+          delete a.id;
+          console.log(a.tags[0]);
+          console.log(a);
+          xhttp.send(a);
+        }
     }
     console.log(this.state._products);
   }
@@ -106,6 +117,20 @@ class ItemTable extends React.Component {
     console.log(rows);
   }
 
+  quantityValidator(value) {
+    const nan = isNaN(parseInt(value, 10));
+    if (nan) {
+      return 'Quantity must be a integer!';
+    }
+    return true;
+  }
+
+  nameValidator(value) {
+    if (!value || value === ""){
+      return "Name must be at least one character!"
+    }
+    return true;
+  }
 
     render() {
       // const options = {
@@ -125,9 +150,9 @@ class ItemTable extends React.Component {
         return(
 
             this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={true} selectRow={selectRow} data={this.state._products} deleteRow striped hover>
-                <TableHeaderColumn isKey dataField='id' hidden>id</TableHeaderColumn>
-                <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
-                <TableHeaderColumn dataField='quantity'>Quantity</TableHeaderColumn>
+                <TableHeaderColumn isKey dataField='id' hidden hiddenOnInsert autoValue={true}>id</TableHeaderColumn>
+                <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
+                <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
                 <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
                 <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
                 <TableHeaderColumn dataField='location'>Location</TableHeaderColumn>
