@@ -30,7 +30,6 @@ class ItemTable extends React.Component {
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
-    console.log(this.state._products[0].tags[0]);
   }
 
   componentWillMount() {
@@ -87,7 +86,7 @@ class ItemTable extends React.Component {
   onAddRow(row) {
     if (row){
         xhttp.open("POST", "https://asap-test.colab.duke.edu/api/item/", false);
-        xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         if (xhttp.status === 401 || xhttp.status === 500){
           console.log('POST Failed!!');
@@ -98,9 +97,7 @@ class ItemTable extends React.Component {
           this.state._products.push(row);
           a.tags = this.listToTags(a.tags);
           delete a.id;
-          console.log(a.tags[0]);
-          console.log(a);
-          xhttp.send(a);
+          xhttp.send(JSON.stringify(a));
         }
     }
     console.log(this.state._products);
