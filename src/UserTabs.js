@@ -4,6 +4,7 @@
 
 import ItemTable from './ItemTable';
 import { checkAuthAndAdmin } from './Utilities';
+import LogComponent from './LogComponent/LogComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -56,6 +57,9 @@ export default class UserTabs extends React.Component {
                  <NavItem eventKey="requests">
                    Requests
                  </NavItem>
+                 <NavItem eventKey="logs">
+                   Logs
+                 </NavItem>
                  <NavItem eventKey="settings">
                    Settings
                  </NavItem>
@@ -71,6 +75,9 @@ export default class UserTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
                    Requests go here
+                 </Tab.Pane>
+                 <Tab.Pane eventKey="logs">
+                   <LogComponent ref="logComp"></LogComponent>
                  </Tab.Pane>
                  <Tab.Pane eventKey="settings">
                    Settings go here
