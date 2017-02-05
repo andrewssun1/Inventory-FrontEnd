@@ -14,7 +14,7 @@ export default class MasterPage extends React.Component {
   }
 
   componentWillMount() {
-    !!localStorage.token ? hashHistory.push('/userpage') : hashHistory.push('/login');
+    !!localStorage.token ? (localStorage.isAdmin ? hashHistory.push('adminpage') : hashHistory.push('/userpage')) : hashHistory.push('/login');
     }
 
   handleLoginButton(e){

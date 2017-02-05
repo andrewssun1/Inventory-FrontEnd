@@ -2,7 +2,8 @@
 // creation of some simple tabs
 // @author Andrew
 
-import ItemTable from './ItemTable'
+import ItemTable from './ItemTable';
+import { checkAuthAndAdmin } from './Utilities';
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -63,7 +64,7 @@ export default class UserTabs extends React.Component {
              <Col sm={8}>
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
-                   Home page goes here
+                   You are in the user homepage. Welcome {localStorage.username}!
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
                      <ItemTable ref="table1"></ItemTable>

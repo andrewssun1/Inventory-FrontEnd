@@ -9,6 +9,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 import { hashHistory } from 'react-router';
+import { checkAuthAndAdmin } from './Utilities';
 
 var xhttp = new XMLHttpRequest();
 
@@ -33,22 +34,13 @@ class ItemTable extends React.Component {
   }
 
   componentWillMount() {
-    // Get all items
-    xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
-    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    if (xhttp.status === 401 || xhttp.status === 500){
-      if(!!localStorage.token){
-        delete localStorage.token;
-      }
-      this.setState({
-        _loginState: false
-      });
-      hashHistory.push('/login');
-      return null;
-    }
-    else{
+
+    if (checkAuthAndAdmin()){
+      // Get all items
+      xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
+      xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+      xhttp.send();
       var response = JSON.parse(xhttp.responseText);
       this.setState({
         _products: response.results
@@ -59,6 +51,34 @@ class ItemTable extends React.Component {
             }
         });
     }
+    else{
+      this.setState({
+        _loginState: false
+      });
+    }
+
+    // // Checks auth
+    // if (xhttp.status === 401 || xhttp.status === 500){
+    //   if(!!localStorage.token){
+    //     delete localStorage.token;
+    //   }
+    //   this.setState({
+    //     _loginState: false
+    //   });
+    //   hashHistory.push('/login');
+    //   return null;
+    // }
+    // else{
+    //   var response = JSON.parse(xhttp.responseText);
+    //   this.setState({
+    //     _products: response.results
+    //   }, () => {
+    //     for (var i = 0; i < this.state._products.length; i++){
+    //           console.log(this.tagsToListString(this.state._products[i].tags));
+    //           this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
+    //         }
+    //     });
+    // }
   }
 
   tagsToListString(tags) {

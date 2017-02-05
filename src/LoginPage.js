@@ -43,28 +43,44 @@ export default class LoginPage extends React.Component {
   }
 
   handleClick() {
+    // Makes sure it's not alerting
     this.setState({_alert_both: false});
+
+    // Create the http request to do REST calls
     var xhttp = new XMLHttpRequest();
-    var clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy'
+    const clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy';
+
+    // Validate username/password - trigger alert if invalid
     if (this.state._username.length < 1 || this.state._password.length < 1){
       this.setState({_alert_both: true});
       return null;
     }
+
+    // REST call parameters
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
     xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", false);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(request_str);
     var response = JSON.parse(xhttp.responseText);
+
+    // 401 = unauthorized; 500 = internal server error
     if (xhttp.status === 401 || xhttp.status === 500){
       console.log('Unauthorized!!');
       this.setState({_alert_both: true});
     }
+    // Login successful
     else{
+      // put access token in local storage and check whether it's user or admin
       localStorage.token = response['access_token'];
-      hashHistory.push('/userpage');
-      console.log(localStorage.token);
+      xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", false);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+      xhttp.send();
+      var userResponse = JSON.parse(xhttp.responseText);
+      localStorage.username = userResponse.username;
+      localStorage.isAdmin = userResponse.is_staff;
+      localStorage.isAdmin ? hashHistory.push('/adminpage') : hashHistory.push('/userpage');
     }
-    console.log(response);
   }
   render() {
 
