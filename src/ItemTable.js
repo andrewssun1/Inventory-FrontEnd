@@ -7,14 +7,7 @@ var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
-import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl} from 'react-bootstrap'
-// var Modal = Bootstrap.Modal;
-// var Button = Bootstrap.Button;
-// var Form = Bootstrap.Form;
-// var FormGroup = Bootstrap.FormGroup;
-// var Col = Bootstrap.Col;
-// var ControlLabel = Bootstrap.ControlLabel;
-// var FormControl = Bootstrap.FormControl;
+import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin } from './Utilities';

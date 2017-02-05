@@ -68,12 +68,14 @@ export default class LoginPage extends React.Component {
         // 401 = unauthorized; 500 = internal server error
         if (xhttp.status === 401 || xhttp.status === 500){
           console.log('Unauthorized!!!!!');
-          this.setState({_alert_both: true});
+          localStorage.alert = true;
+          // this.setState({_alert_both: true});
         }
         // Login successful
         else{
           // put access token in local storage and check whether it's user or admin
           localStorage.token = response['access_token'];
+          localStorage.alert = false
           console.log(localStorage.token);
           xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", true);
 
@@ -83,7 +85,7 @@ export default class LoginPage extends React.Component {
                 console.log(userResponse);
                 localStorage.username = userResponse.username;
                 localStorage.isAdmin = userResponse.is_staff;
-                (localStorage.isAdmin == "true") ? hashHistory.push('/adminpage') : hashHistory.push('/userpage');
+                hashHistory.push('/main');
               }
             }
           xhttp.setRequestHeader("Content-Type", "application/json");
@@ -92,12 +94,13 @@ export default class LoginPage extends React.Component {
         }
       }
     }
+    this.setState({_alert_both: localStorage.alert == "true"});
   }
   render() {
 
     return(
   <div>
-  {this.state._alert_both ? this.createAlert("username/password") : <h3></h3>}
+  {this.state._alert_both ? this.createAlert("username/password") : null}
   <Form horizontal>
     <FormGroup controlId="formHorizontalEmail">
       <Col componentClass={ControlLabel} smOffset={3} sm={2}>

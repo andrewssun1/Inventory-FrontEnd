@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import UserTabs from './UserTabs'
-import AdminTabs from './AdminTabs'
+import ApplicationTabs from './ApplicationTabs'
 import LoginPage from './LoginPage'
 import MasterPage from './MasterPage'
 import isLoggedIn from './Utilities.js'
@@ -21,8 +20,7 @@ const stuff = (
     <Route path='/' component={MasterPage}>
       <Route path='/login' component={LoginPage}></Route>
       <Route onEnter={requireAuth}>
-        <Route path='/userpage' component={UserTabs}></Route>
-        <Route path='/adminpage' component={AdminTabs}></Route>
+        <Route path='/main' component={ApplicationTabs}></Route>
       </Route>
     </Route>
   </Router>
