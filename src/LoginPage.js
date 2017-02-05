@@ -58,28 +58,39 @@ export default class LoginPage extends React.Component {
 
     // REST call parameters
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
-    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", false);
+    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(request_str);
-    var response = JSON.parse(xhttp.responseText);
+    xhttp.onreadystatechange = function () {
+      if (xhttp.readyState === 4){
+        var response = JSON.parse(xhttp.responseText);
 
-    // 401 = unauthorized; 500 = internal server error
-    if (xhttp.status === 401 || xhttp.status === 500){
-      console.log('Unauthorized!!');
-      this.setState({_alert_both: true});
-    }
-    // Login successful
-    else{
-      // put access token in local storage and check whether it's user or admin
-      localStorage.token = response['access_token'];
-      xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", false);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      xhttp.send();
-      var userResponse = JSON.parse(xhttp.responseText);
-      localStorage.username = userResponse.username;
-      localStorage.isAdmin = userResponse.is_staff;
-      localStorage.isAdmin ? hashHistory.push('/adminpage') : hashHistory.push('/userpage');
+        // 401 = unauthorized; 500 = internal server error
+        if (xhttp.status === 401 || xhttp.status === 500){
+          console.log('Unauthorized!!!!!');
+          this.setState({_alert_both: true});
+        }
+        // Login successful
+        else{
+          // put access token in local storage and check whether it's user or admin
+          localStorage.token = response['access_token'];
+          console.log(localStorage.token);
+          xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", true);
+
+          xhttp.onreadystatechange = function() {
+              if (xhttp.readyState === 4) {
+                var userResponse = JSON.parse(xhttp.responseText);
+                console.log(userResponse);
+                localStorage.username = userResponse.username;
+                localStorage.isAdmin = userResponse.is_staff;
+                (localStorage.isAdmin == "true") ? hashHistory.push('/adminpage') : hashHistory.push('/userpage');
+              }
+            }
+          xhttp.setRequestHeader("Content-Type", "application/json");
+          xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+          xhttp.send();
+        }
+      }
     }
   }
   render() {

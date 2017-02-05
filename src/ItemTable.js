@@ -4,11 +4,10 @@
 
 var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
-var Bootstrap = require('react-bootstrap');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
-import { hashHistory } from 'react-router';
+// import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin } from './Utilities';
 
 var xhttp = new XMLHttpRequest();
@@ -37,7 +36,7 @@ class ItemTable extends React.Component {
     if (checkAuthAndAdmin()){
       // GET request to get all items from database
       xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
-      xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       xhttp.send();
       var response = JSON.parse(xhttp.responseText);
@@ -47,7 +46,7 @@ class ItemTable extends React.Component {
         _products: response.results
       }, () => {
         for (var i = 0; i < this.state._products.length; i++){
-              console.log(this.tagsToListString(this.state._products[i].tags));
+              // console.log(this.tagsToListString(this.state._products[i].tags));
               this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
             }
         });
@@ -125,7 +124,7 @@ class ItemTable extends React.Component {
           row.id = response.id;
         }
     }
-    console.log(this.state._products);
+    // console.log(this.state._products);
   }
 
   onDeleteRow(rows) {
@@ -142,7 +141,7 @@ class ItemTable extends React.Component {
         })
       })
     }
-    console.log(rows);
+    // console.log(rows);
   }
 
   // Makes sure quantity is an integer
@@ -164,9 +163,11 @@ class ItemTable extends React.Component {
 
     render() {
 
-      const selectRow = {
+      const isAdmin = (localStorage.isAdmin == "true");
+
+      const selectRow = isAdmin ? {
         mode: 'checkbox' //radio or checkbox
-      };
+      } : {};
 
       const options = {
         onAddRow: this.onAddRow,
@@ -175,7 +176,8 @@ class ItemTable extends React.Component {
 
         return(
 
-            this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={true} selectRow={selectRow} data={this.state._products} deleteRow striped hover>
+            this.state._loginState ? (
+              <BootstrapTable ref="table1" options={options} insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} striped hover>
                 <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
                 <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
                 <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>

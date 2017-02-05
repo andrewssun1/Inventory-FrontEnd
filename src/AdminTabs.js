@@ -18,7 +18,7 @@ export default class AdminTabs extends React.Component {
 
   constructor(props) {
   super(props);
-  console.log("hellooooo")
+  console.log("hellooooo!")
   this.state = {
     key: 2
   };
