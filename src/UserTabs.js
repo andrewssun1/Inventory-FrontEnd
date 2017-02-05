@@ -5,7 +5,6 @@
 import ItemTable from './ItemTable'
 
 var React = require('react');
-var ReactDOM = require('react-dom');
 var ReactBootstrap = require('react-bootstrap');
 
 var Tab = ReactBootstrap.Tab;
