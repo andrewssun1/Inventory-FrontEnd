@@ -7,7 +7,6 @@ import LogComponent from './LogComponent/LogComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-
 var Tab = ReactBootstrap.Tab;
 var Row = ReactBootstrap.Row;
 var Col = ReactBootstrap.Col;
