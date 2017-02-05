@@ -141,6 +141,12 @@ class ItemTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      name: null,
+      quantity: 0,
+      model_number: 0,
+      description: null,
+      location: null,
+      tags: null,
       _products: [{
         "id": 111111111,
         "name": "siva",
@@ -154,9 +160,7 @@ class ItemTable extends React.Component {
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
-
-    this.onRowSelect= this.onRowSelect.bind(this);
-    this.formatTags = this.formatTags.bind(this);
+    this.onRowClick = this.onRowClick.bind(this);
   }
 
   componentWillMount() {
@@ -189,6 +193,10 @@ class ItemTable extends React.Component {
   }
 
   tagsToListString(tags) {
+    if(tags == null) {
+      return;
+    }
+
     var returnString = "";
     for (var i = 0; i < tags.length; i++){
       returnString = returnString.concat(tags[i].tag);
@@ -276,22 +284,7 @@ class ItemTable extends React.Component {
     return true;
   }
 
-  formatTags() {
-    if(this.state.tags == null) {
-      return "";
-    }
-    var result = "";
-    var count;
-    for(count = 0; count < this.state.tags.length; count++) {
-      result = result + this.state.tags[count].tag;
-      if(count < this.state.tags.length - 1) {
-        result = result + ", ";
-      }
-    }
-    return result;
-  }
-
-  onRowSelect(row, isSelected, e) {
+  onRowClick(row, isSelected, e) {
     this.setState({name: row.name});
     this.setState({quantity: row.quantity});
     this.setState({model_number: row.model_number});
@@ -306,15 +299,13 @@ class ItemTable extends React.Component {
     //TODO: Configure options to change cursor when hovering over row
 
     const selectRow = {
-      mode: 'checkbox', //radio or checkbox
-      clickToSelect: false,
-      onSelect: this.onRowSelect,
-      hideSelectColumn: true
+      mode: 'checkbox'
     };
 
     const options = {
       onAddRow: this.onAddRow,
-      onDeleteRow: this.onDeleteRow
+      onDeleteRow: this.onDeleteRow,
+      onRowClick: this.onRowClick
     }
 
     return(
@@ -331,7 +322,7 @@ class ItemTable extends React.Component {
 
       <ItemDetail  ref={(child) => { this._child = child; }}
         name={this.state.name} quantity={this.state.quantity} model_number={this.state.model_number}
-        description={this.state.description} location={this.state.location} tags={this.formatTags()}/>
+        description={this.state.description} location={this.state.location} tags={this.tagsToListString(this.state.tags)}/>
       </div>
 
     )
