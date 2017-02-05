@@ -14,7 +14,6 @@ var FormGroup = ReactBootstrap.FormGroup;
 var Col = ReactBootstrap.Col;
 var ControlLabel = ReactBootstrap.ControlLabel;
 var FormControl = ReactBootstrap.FormControl;
-var Checkbox = ReactBootstrap.Checkbox;
 
 class EditFormElement extends React.Component {
   constructor(props) {
@@ -36,7 +35,7 @@ class EditFormElement extends React.Component {
       {this.props.label}
       </Col>
       <Col sm={10}>
-      <FormControl type={this.props.type} value={this.state.value} onChange={this.handleChange}/>
+      <FormControl componentClass={this.props.componentClass} type={this.props.type} value={this.state.value} onChange={this.handleChange}/>
       </Col>
       </FormGroup>
     )
@@ -95,7 +94,7 @@ class ItemDetail extends React.Component {
         <EditFormElement controlId="formHorizontalQuantity" label="Quantity" type="number" initialValue={this.props.quantity}/>
         <EditFormElement controlId="formHorizontalModelNumber" label="Model Number" type="number" initialValue={this.props.model_number}/>
         <EditFormElement controlId="formHorizontalLocation" label="Location" type="text" initialValue={this.props.location}/>
-        <EditFormElement controlId="formHorizontalDescription" label="Description" type="text" initialValue={this.props.description}/>
+        <EditFormElement controlId="formHorizontalDescription" label="Description" type="text" initialValue={this.props.description} componentClass="textarea"/>
         </Form>
         :
         <div>
