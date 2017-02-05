@@ -15,7 +15,11 @@ class LogComponent extends React.Component {
             action_map: new Map(),
             action_list: [],
             action_filter_obj: {},
-            _loginState: true
+            _loginState: true,
+            currentPage: 1,
+            totalDataSize: 0,
+            sizePerPage: 30,
+            currentFilterURL: null
         };
     }
 
@@ -44,7 +48,8 @@ class LogComponent extends React.Component {
                 response.results[i].timestamp = moment(response.results[i].timestamp).format('lll')
             }
             this.setState({
-                data: response.results
+                data: response.results,
+                totalDataSize: response.count
             });
         }
     }
@@ -116,15 +121,35 @@ class LogComponent extends React.Component {
     onFilterChange(filterObj) {
         if (Object.keys(filterObj).length === 0) {
             this.getRequestForLog(null);
+            this.setState({
+                currentFilterURL: null
+            });
             return;
         }
-        var action__tag = this.state.action_filter_obj[filterObj["action_tag"]["value"]];
-        this.getRequestForLog("?action__tag=" + action__tag)
+        var filter_url_param = "?action__tag=" + this.state.action_filter_obj[filterObj["action_tag"]["value"]];
+        this.getRequestForLog(filter_url_param);
+        this.setState({
+            currentPage:1,
+            currentFilterURL: filter_url_param
+        })
+    }
+
+    onPageChange(page, sizePerPage) {
+        var page_argument = "page=" + page;
+        var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
+        console.log(url_param);
+        this.getRequestForLog(url_param);
+        this.setState({
+            currentPage: page
+        })
     }
 
     render(){
         return(
-            <LogTable ref="logTable" onFilterChange={ this.onFilterChange.bind(this) } onAddRow={ this.onAddRow.bind(this) } { ...this.state }/>
+            <LogTable ref="logTable"
+                      onPageChange={ this.onPageChange.bind(this) }
+                      onFilterChange={ this.onFilterChange.bind(this) }
+                      onAddRow={ this.onAddRow.bind(this) } { ...this.state }/>
         )
     }
 

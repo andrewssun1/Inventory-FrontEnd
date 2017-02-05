@@ -11,9 +11,14 @@ class LogTable extends React.Component {
                             data={ this.props.data }
                             remote={ true }
                             insertRow={ true }
-                            pagination={ false }
+                            pagination={ true }
+                            fetchInfo={ { dataTotalSize: this.props.totalDataSize } }
                             options={ { onAddRow: this.props.onAddRow,
-                                        onFilterChange: this.props.onFilterChange
+                                        onFilterChange: this.props.onFilterChange,
+                                        onPageChange: this.props.onPageChange,
+                                        sizePerPageList: [ 30 ],
+                                        sizePerPage: this.props.sizePerPage,
+                                        page: this.props.currentPage
                             } }
                             striped hover>
                 <TableHeaderColumn dataField='id' isKey hidden hiddenOnInsert autoValue={true}>Id</TableHeaderColumn>
