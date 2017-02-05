@@ -34,14 +34,15 @@ class ItemTable extends React.Component {
   }
 
   componentWillMount() {
-
     if (checkAuthAndAdmin()){
-      // Get all items
+      // GET request to get all items from database
       xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
       xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
       xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       xhttp.send();
       var response = JSON.parse(xhttp.responseText);
+
+      // Since setState is async, need to pass it a callback function
       this.setState({
         _products: response.results
       }, () => {
@@ -51,36 +52,15 @@ class ItemTable extends React.Component {
             }
         });
     }
+    // auth failed
     else{
       this.setState({
         _loginState: false
       });
     }
-
-    // // Checks auth
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   if(!!localStorage.token){
-    //     delete localStorage.token;
-    //   }
-    //   this.setState({
-    //     _loginState: false
-    //   });
-    //   hashHistory.push('/login');
-    //   return null;
-    // }
-    // else{
-    //   var response = JSON.parse(xhttp.responseText);
-    //   this.setState({
-    //     _products: response.results
-    //   }, () => {
-    //     for (var i = 0; i < this.state._products.length; i++){
-    //           console.log(this.tagsToListString(this.state._products[i].tags));
-    //           this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
-    //         }
-    //     });
-    // }
   }
 
+  // Converts JSON tags to a comma-separated string of tags
   tagsToListString(tags) {
     var returnString = "";
     for (var i = 0; i < tags.length; i++){
@@ -92,6 +72,7 @@ class ItemTable extends React.Component {
     return returnString;
   }
 
+  // Converts a comma-separated string of tags to a JSON object
   listToTags(s){
     if (!s || s.length === 0){
       return null;
@@ -107,30 +88,40 @@ class ItemTable extends React.Component {
   }
 
   onAddRow(row) {
-    if (row){
+    if (checkAuthAndAdmin() && row){
+      // Set up the POST request
         xhttp.open("POST", "https://asap-test.colab.duke.edu/api/item/", false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+
+      // POST request returns an error
         if (xhttp.status === 401 || xhttp.status === 500){
           console.log('POST Failed!!');
         }
+      // POST request able to continue
         else{
+          // If the value of the item is empty, we need to
+          // set it to null instead of empty string (defined by the database)
           for (var key in row){
             if (row[key] === ""){
               row[key] = null;
             }
           }
+          // Changes row quantity str to int
           row.quantity = parseInt(row.quantity);
-          var a = JSON.parse(JSON.stringify(row)); // deep clone object
+
+          // Deep clone the object so we don't have to convert the tags twice
+          var a = JSON.parse(JSON.stringify(row));
           this.state._products.push(row);
+
+          // Formats the row to a JSON object to send to database
           a.tags = this.listToTags(a.tags);
-          delete a.id;
+          delete a.id; // deletes id since object does not need it
           var jsonResult = JSON.stringify(a);
+
+          // Send the row and parse the response
           xhttp.send(jsonResult);
-          //console.log(jsonResult);
           var response = JSON.parse(xhttp.responseText);
-          console.log("Getting Response");
-          console.log(response);
           row.id = response.id;
         }
     }
@@ -138,7 +129,7 @@ class ItemTable extends React.Component {
   }
 
   onDeleteRow(rows) {
-    if(rows){
+    if(checkAuthAndAdmin() && rows){
       for (var i = 0; i < rows.length; i++){
         xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/"+rows[i], false);
         xhttp.setRequestHeader("Content-Type", "application/json");
@@ -154,6 +145,7 @@ class ItemTable extends React.Component {
     console.log(rows);
   }
 
+  // Makes sure quantity is an integer
   quantityValidator(value) {
     const nan = isNaN(parseInt(value, 10));
     if (nan) {
@@ -162,6 +154,7 @@ class ItemTable extends React.Component {
     return true;
   }
 
+  // Makes sure name has at least one character
   nameValidator(value) {
     if (!value || value === ""){
       return "Name must be at least one character!"
@@ -170,11 +163,7 @@ class ItemTable extends React.Component {
   }
 
     render() {
-      // const options = {
-      //   onRowMouseOver: function(row){
-      //     row.style.cursor='pointer';
-      //   }
-      // }
+
       const selectRow = {
         mode: 'checkbox' //radio or checkbox
       };
