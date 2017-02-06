@@ -66,7 +66,7 @@ class ItemDetail extends React.Component {
     // <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
     return (
       <div>
-      <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
+      <MakeRequestModal item_id={this.props.row.id} item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
       {this.state.isEditing ?
