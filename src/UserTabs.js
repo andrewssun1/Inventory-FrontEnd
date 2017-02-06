@@ -8,7 +8,6 @@ import RequestComponent from './RequestComponent/RequestComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-
 var Tab = ReactBootstrap.Tab;
 var Row = ReactBootstrap.Row;
 var Col = ReactBootstrap.Col;
