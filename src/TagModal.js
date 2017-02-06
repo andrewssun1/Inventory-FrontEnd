@@ -23,6 +23,7 @@ class TagModal extends React.Component {
     this.handleSelectChangeIncluded = this.handleSelectChangeIncluded.bind(this);
     this.handleSelectChangeExcluded = this.handleSelectChangeExcluded.bind(this);
     this.handleOptionChange = this.handleOptionChange.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
   }
 
   componentDidMount() {
@@ -70,6 +71,15 @@ class TagModal extends React.Component {
     });
   }
 
+  handleSearch() {
+    console.log(this.state.includedValue);
+    console.log(this.state.excludedValue);
+    var includedString = this.state.includedValue.length === 0 ? "" : "tag_included=" + this.state.includedValue + "&";
+    var excludedString = this.state.excludedValue.length === 0 ? "" : "tag_excluded=" + this.state.excludedValue + "&";
+    var completeString = includedString + excludedString + "operator=" + this.state.selectedOption;
+    console.log(completeString);
+  }
+
   render() {
     //TODO: Add in image
     return (
@@ -80,6 +90,8 @@ class TagModal extends React.Component {
   				<h3 className="section-heading">Search Tags</h3>
           <h5 className="section-heading">Included Tags</h5>
   				<Select multi simpleValue value={this.state.includedValue} placeholder="Select tag(s)" options={this.state.tagOptions} onChange={this.handleSelectChangeIncluded} />
+          <div className="text-center">
+          <p>  </p>
           <ButtonGroup>
           <Radio inline value="AND" checked={this.state.selectedOption === "AND"} onChange={this.handleOptionChange}>
               AND
@@ -89,6 +101,7 @@ class TagModal extends React.Component {
               OR
               </Radio>
           </ButtonGroup>
+          </div>
           <h5 className="section-heading">Excluded Tags</h5>
           <Select multi simpleValue value={this.state.excludedValue} placeholder="Select tag(s)" options={this.state.tagOptions} onChange={this.handleSelectChangeExcluded} />
         </div>
@@ -96,7 +109,7 @@ class TagModal extends React.Component {
       </Modal.Body>
       <Modal.Footer>
         <div>
-        <Button bsStyle="primary">Search</Button>
+        <Button onClick={this.handleSearch} bsStyle="primary">Search</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Cancel</Button>
         </div>
       </Modal.Footer>
