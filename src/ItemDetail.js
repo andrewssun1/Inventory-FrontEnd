@@ -5,6 +5,7 @@ var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from './TextEntryFormElement';
 import MakeRequestModal from './MakeRequestModal';
+import ViewRequestModal from './ViewRequestModal';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -14,7 +15,7 @@ class ItemDetail extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      isAdmin: true,
+      isAdmin: false,
       isEditing: false
     }
     this.openModal = this.openModal.bind(this);
@@ -62,6 +63,7 @@ class ItemDetail extends React.Component {
     if(this.props.row == null) {
       return (null);
     }
+    // <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
     return (
       <div>
       <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />

@@ -24,9 +24,6 @@ class MakeRequestModal extends React.Component {
   }
 
   closeModal() {
-    if(this.state.isEditing) {
-      this.toggleEditing();
-    }
     this.setState({showModal: false});
   }
 
