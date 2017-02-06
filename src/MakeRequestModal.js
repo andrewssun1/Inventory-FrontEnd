@@ -47,6 +47,7 @@ class MakeRequestModal extends React.Component {
       console.log("Getting Response");
       console.log(response);
     }
+    this.closeModal();
   }
 
   render() {
