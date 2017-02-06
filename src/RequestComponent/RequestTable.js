@@ -8,8 +8,9 @@ class RequestTable extends React.Component {
         return(
             <BootstrapTable ref="logTable"
                             data={ this.props.data }
-                            remote={true }
+                            remote={ true }
                             pagination={ true }
+                            search={ true }
                             fetchInfo={ { dataTotalSize: this.props.totalDataSize } }
                             options={ this.props.options }
                             selectRow={ this.props.selectRowProp }
@@ -17,7 +18,7 @@ class RequestTable extends React.Component {
                 <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
                 <TableHeaderColumn dataField='item_name' width="150">Item</TableHeaderColumn>
                 <TableHeaderColumn dataField='quantity' width="80">Quantity</TableHeaderColumn>
-                <TableHeaderColumn dataField='status' width="150" editable={ false }>Status</TableHeaderColumn>
+                <TableHeaderColumn dataField='status' width="150" filter={ { type: 'SelectFilter', options: this.props.filterFields.status } } editable={ false }>Status</TableHeaderColumn>
                 <TableHeaderColumn dataField='timestamp' width="170"  editable={ false }>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
             </BootstrapTable>

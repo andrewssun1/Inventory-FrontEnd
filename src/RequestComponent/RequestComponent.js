@@ -20,6 +20,14 @@ class RequestComponent extends React.Component {
             unselectable: [],
             selected: []
         }
+
+        this.filterFields = {
+            status: {
+                0: 'outstanding',
+                1: 'approved',
+                2: 'denied'
+            }
+        };
     }
 
     componentWillMount(){
@@ -105,12 +113,48 @@ class RequestComponent extends React.Component {
         }
     }
 
+    onSearchChange(searchText, colInfos, multiColumnSearch) {
+        if(searchText==''){
+            this.setState({
+                currentSearchURL: null
+            });
+            this.getAllRequests();
+        }
+        else{
+            var url_parameter = "?search=" + searchText;
+            this.setState({
+                currentSearchURL: url_parameter
+            });
+            this.getAllRequests(url_parameter);
+        }
+    }
+
+    onFilterChange(filterObj) {
+        if (Object.keys(filterObj).length === 0) {
+            this.setState({
+                currentFilterURL: null
+            });
+            this.getAllRequests(null)
+        }
+        else{
+            var url_parameter = "?";
+            if(filterObj.status != null){
+                url_parameter = url_parameter + "status=" + this.filterFields.status[filterObj.status.value];
+            }
+            this.getAllRequests(url_parameter)
+        }
+    }
+
     render(){
         const options = {
             onPageChange: this.onPageChange.bind(this),
             sizePerPageList: [ 30 ],
             sizePerPage: 30,
             page: this.state.currentPage,
+            onSearchChange: this.onSearchChange.bind(this),
+            searchDelayTime: 500,
+            clearSearch: true,
+            onFilterChange: this.onFilterChange.bind(this),
         };
 
         const selectRowProp = {
@@ -118,13 +162,13 @@ class RequestComponent extends React.Component {
             clickToSelect: true,
             unselectable: this.state.unselectable,
             onSelect: this.onRowSelect.bind(this),
-            onSelectAll: this.onSelectAll.bind(this)
+            onSelectAll: this.onSelectAll.bind(this),
         };
 
         return(
             <div>
                 <RequestButton ref="requestButton" { ...this.state}/>
-                <RequestTable ref="requestTable" selectRowProp={selectRowProp} options={options}{ ...this.state }/>
+                <RequestTable ref="requestTable" filterFields={this.filterFields} selectRowProp={selectRowProp} options={options}{ ...this.state }/>
             </div>
         )
     }
