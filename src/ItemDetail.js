@@ -4,6 +4,8 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from './TextEntryFormElement';
+import MakeRequestModal from './MakeRequestModal';
+import ViewRequestModal from './ViewRequestModal';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -13,13 +15,14 @@ class ItemDetail extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      isAdmin: true,
+      isAdmin: false,
       isEditing: false
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
     this.saveEdits = this.saveEdits.bind(this);
+    this.requestItem = this.requestItem.bind(this);
   }
 
   openModal() {
@@ -34,7 +37,6 @@ class ItemDetail extends React.Component {
   }
 
   toggleEditing() {
-    console.log(this.props.row.tags);
     this.setState({isEditing: !this.state.isEditing});
   }
 
@@ -50,16 +52,23 @@ class ItemDetail extends React.Component {
     this.toggleEditing();
   }
 
+  requestItem() {
+    this.closeModal();
+    this._requestModal.openModal();
+    console.log('request clicked');
+  }
+
   render() {
     //TODO: Add in image
     if(this.props.row == null) {
       return (null);
     }
+    // <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
     return (
       <div>
+      <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
-
       {this.state.isEditing ?
         <Form horizontal>
         <TextEntryFormElement controlId="formHorizontalName" label="Name" type="text"
@@ -100,7 +109,10 @@ class ItemDetail extends React.Component {
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
         :
+        <div>
+        <Button onClick={this.requestItem} bsStyle="primary">Request</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
+        </div>
       }
       </Modal.Footer>
       </Bootstrap.Modal>
