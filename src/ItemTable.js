@@ -32,38 +32,44 @@ class ItemTable extends React.Component {
         "location": "Hudson",
         "tags": [{"tag": "first tag"}, {"tag": "second tag"}]
       }],
-      _loginState: true
+      _loginState: true,
+      currentSearchURL: null
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
   }
 
-  componentWillMount() {
-    if (checkAuthAndAdmin()){
-      // GET request to get all items from database
-      xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      xhttp.send();
-      var response = JSON.parse(xhttp.responseText);
+  getAllItem(url_parameter){
+      if (checkAuthAndAdmin()){
+          // GET request to get all items from database
+          var url = url_parameter == null ? "https://asap-test.colab.duke.edu/api/item/" : "https://asap-test.colab.duke.edu/api/item/" + url_parameter;
+          xhttp.open("GET", url, false);
+          xhttp.setRequestHeader("Content-Type", "application/json");
+          xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+          xhttp.send();
+          var response = JSON.parse(xhttp.responseText);
 
-      // Since setState is async, need to pass it a callback function
-      this.setState({
-        _products: response.results
-      }, () => {
-        for (var i = 0; i < this.state._products.length; i++){
-              // console.log(this.tagsToListString(this.state._products[i].tags));
-              this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
-            }
-        });
-    }
-    // auth failed
-    else{
-      this.setState({
-        _loginState: false
-      });
-    }
+          // Since setState is async, need to pass it a callback function
+          this.setState({
+              _products: response.results
+          }, () => {
+              for (var i = 0; i < this.state._products.length; i++){
+                  // console.log(this.tagsToListString(this.state._products[i].tags));
+                  this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
+              }
+          });
+      }
+      // auth failed
+      else{
+          this.setState({
+              _loginState: false
+          });
+      }
+  }
+
+  componentWillMount() {
+    this.getAllItem(null)
   }
 
   // Converts JSON tags to a comma-separated string of tags
@@ -178,6 +184,22 @@ class ItemTable extends React.Component {
     this._child.openModal();
   }
 
+    onSearchChange(searchText, colInfos, multiColumnSearch) {
+        if(searchText==''){
+            this.setState({
+                currentSearchURL: null
+            });
+            this.getAllItem(null);
+        }
+        else{
+            var url_parameter = "?search=" + searchText;
+            this.setState({
+                currentSearchURL: url_parameter
+            });
+            this.getAllItem(url_parameter);
+        }
+    }
+
   render() {
 
     //TODO: Configure options to change cursor when hovering over row
@@ -191,12 +213,15 @@ class ItemTable extends React.Component {
     const options = {
       onAddRow: this.onAddRow,
       onDeleteRow: this.onDeleteRow,
-      onRowClick: this.onRowClick
-    }
+      onRowClick: this.onRowClick,
+      onSearchChange: this.onSearchChange.bind(this),
+      searchDelayTime: 500,
+      clearSearch: true,
+    };
 
     return(
       <div>
-      {this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} striped hover>
+      {this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
