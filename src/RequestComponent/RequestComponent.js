@@ -79,7 +79,7 @@ class RequestComponent extends React.Component {
         var page_argument = "page=" + page;
         var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
         url_param = this.state.currentSearchURL == null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
-        this.getRequestForLog(url_param);
+        this.getAllRequests(url_param);
         this.setState({
             currentPage: page
         })
@@ -175,7 +175,6 @@ class RequestComponent extends React.Component {
         return(
             <div>
                 <RequestButton ref="requestButton" { ...this.state}/>
-
                 <RequestTable ref="requestTable" filterFields={this.filterFields}
                 selectRowProp={selectRowProp} options={options}{ ...this.state }
                 updateCallback={this} ref={(child) => { this._requestTable = child; }}/>
