@@ -12,7 +12,6 @@ class ViewRequestModal extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      isAdmin: false,
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -42,6 +41,8 @@ class ViewRequestModal extends React.Component {
   }
 
   render() {
+    const isAdmin = (localStorage.isAdmin == "true");
+
     return (
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
@@ -51,17 +52,18 @@ class ViewRequestModal extends React.Component {
       <p> Reason: {this.props.reason} </p>
       </Modal.Body>
       <Modal.Footer>
-      {this.isAdmin ?
-      <div>
-      <Button onClick={this.cancel} bsStyle="danger">Cancel Request</Button>
-      <Button onClick={this.closeModal} >Close</Button>
-      </div>
-      :
+      {isAdmin ?
       <div>
       <Button onClick={this.approve} bsStyle="success">Approve Request</Button>
       <Button onClick={this.deny} bsStyle="danger">Deny Request</Button>
       <Button onClick={this.closeModal} >Close</Button>
-      </div>}
+      </div>
+      :
+      <div>
+      <Button onClick={this.cancel} bsStyle="danger">Cancel Request</Button>
+      <Button onClick={this.closeModal} >Close</Button>
+      </div>
+      }
       </Modal.Footer>
       </Bootstrap.Modal>
       </div>

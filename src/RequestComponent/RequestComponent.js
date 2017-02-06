@@ -28,6 +28,8 @@ class RequestComponent extends React.Component {
                 2: 'denied'
             }
         };
+
+        this.onRowClick = this.onRowClick.bind(this);
     }
 
     componentWillMount(){
@@ -145,6 +147,10 @@ class RequestComponent extends React.Component {
         }
     }
 
+    onRowClick(row, isSelected, e) {
+      this._requestTable.onRowClick(row, isSelected, e);
+    }
+
     render(){
         const options = {
             onPageChange: this.onPageChange.bind(this),
@@ -155,11 +161,12 @@ class RequestComponent extends React.Component {
             searchDelayTime: 500,
             clearSearch: true,
             onFilterChange: this.onFilterChange.bind(this),
+            onRowClick: this.onRowClick
         };
 
         const selectRowProp = {
             mode: 'checkbox',
-            clickToSelect: true,
+            clickToSelect: false,
             unselectable: this.state.unselectable,
             onSelect: this.onRowSelect.bind(this),
             onSelectAll: this.onSelectAll.bind(this),
@@ -168,7 +175,8 @@ class RequestComponent extends React.Component {
         return(
             <div>
                 <RequestButton ref="requestButton" { ...this.state}/>
-                <RequestTable ref="requestTable" filterFields={this.filterFields} selectRowProp={selectRowProp} options={options}{ ...this.state }/>
+                <RequestTable ref="requestTable" filterFields={this.filterFields} selectRowProp={selectRowProp} options={options}{ ...this.state } ref={(child) => { this._requestTable = child; }}/>
+
             </div>
         )
     }
