@@ -43,34 +43,64 @@ export default class LoginPage extends React.Component {
   }
 
   handleClick() {
+    // Makes sure it's not alerting
     this.setState({_alert_both: false});
+
+    // Create the http request to do REST calls
     var xhttp = new XMLHttpRequest();
-    var clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy'
+    const clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy';
+
+    // Validate username/password - trigger alert if invalid
     if (this.state._username.length < 1 || this.state._password.length < 1){
       this.setState({_alert_both: true});
       return null;
     }
+
+    // REST call parameters
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
-    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", false);
+    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send(request_str);
-    var response = JSON.parse(xhttp.responseText);
-    if (xhttp.status === 401 || xhttp.status === 500){
-      console.log('Unauthorized!!');
-      this.setState({_alert_both: true});
+    xhttp.onreadystatechange = function () {
+      if (xhttp.readyState === 4){
+        var response = JSON.parse(xhttp.responseText);
+
+        // 401 = unauthorized; 500 = internal server error
+        if (xhttp.status === 401 || xhttp.status === 500){
+          console.log('Unauthorized!!!!!');
+          localStorage.alert = true;
+          // this.setState({_alert_both: true});
+        }
+        // Login successful
+        else{
+          // put access token in local storage and check whether it's user or admin
+          localStorage.token = response['access_token'];
+          localStorage.alert = false
+          console.log(localStorage.token);
+          xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", true);
+
+          xhttp.onreadystatechange = function() {
+              if (xhttp.readyState === 4) {
+                var userResponse = JSON.parse(xhttp.responseText);
+                console.log(userResponse);
+                localStorage.username = userResponse.username;
+                localStorage.isAdmin = userResponse.is_staff;
+                hashHistory.push('/main');
+              }
+            }
+          xhttp.setRequestHeader("Content-Type", "application/json");
+          xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+          xhttp.send();
+        }
+      }
     }
-    else{
-      localStorage.token = response['access_token'];
-      hashHistory.push('/userpage');
-      console.log(localStorage.token);
-    }
-    console.log(response);
+    this.setState({_alert_both: localStorage.alert == "true"});
   }
   render() {
 
     return(
   <div>
-  {this.state._alert_both ? this.createAlert("username/password") : <h3></h3>}
+  {this.state._alert_both ? this.createAlert("username/password") : null}
   <Form horizontal>
     <FormGroup controlId="formHorizontalEmail">
       <Col componentClass={ControlLabel} smOffset={3} sm={2}>

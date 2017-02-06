@@ -6,10 +6,14 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var Bootstrap = require('react-bootstrap');
 import ItemDetail from './ItemDetail';
+
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
-import { hashHistory } from 'react-router';
+import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl} from 'react-bootstrap';
+
+// import { hashHistory } from 'react-router';
+import { checkAuthAndAdmin } from './Utilities';
 
 var xhttp = new XMLHttpRequest();
 
@@ -36,34 +40,33 @@ class ItemTable extends React.Component {
   }
 
   componentWillMount() {
-    // Get all items
-    xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
-    xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    if (xhttp.status === 401 || xhttp.status === 500){
-      if(!!localStorage.token){
-        delete localStorage.token;
-      }
-      this.setState({
-        _loginState: false
-      });
-      hashHistory.push('/login');
-      return null;
-    }
-    else{
+    if (checkAuthAndAdmin()){
+      // GET request to get all items from database
+      xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/", false);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+      xhttp.send();
       var response = JSON.parse(xhttp.responseText);
+
+      // Since setState is async, need to pass it a callback function
       this.setState({
         _products: response.results
       }, () => {
         for (var i = 0; i < this.state._products.length; i++){
-          console.log(this.tagsToListString(this.state._products[i].tags));
-          this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
-        }
+              // console.log(this.tagsToListString(this.state._products[i].tags));
+              this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
+            }
+        });
+    }
+    // auth failed
+    else{
+      this.setState({
+        _loginState: false
       });
     }
   }
 
+  // Converts JSON tags to a comma-separated string of tags
   tagsToListString(tags) {
     if(tags == null) {
       return;
@@ -79,6 +82,7 @@ class ItemTable extends React.Component {
     return returnString;
   }
 
+  // Converts a comma-separated string of tags to a JSON object
   listToTags(s){
     if (!s || s.length === 0){
       return null;
@@ -94,34 +98,41 @@ class ItemTable extends React.Component {
   }
 
   addOrUpdateRow(row, requestType, itemID) {
-    if (row){
+    if (row){ // should we check for auth/admin here? yes right?
       xhttp.open(requestType, "https://asap-test.colab.duke.edu/api/item/" + itemID, false);
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       if (xhttp.status === 401 || xhttp.status === 500){
         console.log('POST Failed!!');
       }
-      else{
-        for (var key in row){
-          if (row[key] === ""){
-            row[key] = null;
+      // POST request able to continue
+        else{
+          // If the value of the item is empty, we need to
+          // set it to null instead of empty string (defined by the database)
+          for (var key in row){
+            if (row[key] === ""){
+              row[key] = null;
+            }
           }
-        }
-        row.quantity = parseInt(row.quantity);
-        var a = JSON.parse(JSON.stringify(row)); // deep clone object
-        this.state._products.push(row);
-        a.tags = this.listToTags(a.tags);
-        delete a.id;
-        var jsonResult = JSON.stringify(a);
-        xhttp.send(jsonResult);
-        //console.log(jsonResult);
-        var response = JSON.parse(xhttp.responseText);
-        console.log("Getting Response");
-        console.log(response);
-        row.id = response.id;
+          // Changes row quantity str to int
+          row.quantity = parseInt(row.quantity);
+
+          // Deep clone the object so we don't have to convert the tags twice
+          var a = JSON.parse(JSON.stringify(row));
+          this.state._products.push(row);
+
+          // Formats the row to a JSON object to send to database
+          a.tags = this.listToTags(a.tags);
+          delete a.id; // deletes id since object does not need it
+          var jsonResult = JSON.stringify(a);
+
+          // Send the row and parse the response
+          xhttp.send(jsonResult);
+          var response = JSON.parse(xhttp.responseText);
+          row.id = response.id;
       }
     }
-    console.log(this.state._products);
+    // console.log(this.state._products);
   }
 
   onAddRow(row) {
@@ -129,7 +140,7 @@ class ItemTable extends React.Component {
   }
 
   onDeleteRow(rows) {
-    if(rows){
+    if(checkAuthAndAdmin() && rows){
       for (var i = 0; i < rows.length; i++){
         xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/"+rows[i], false);
         xhttp.setRequestHeader("Content-Type", "application/json");
@@ -142,9 +153,10 @@ class ItemTable extends React.Component {
         })
       })
     }
-    console.log(rows);
+    // console.log(rows);
   }
 
+  // Makes sure quantity is an integer
   quantityValidator(value) {
     const nan = isNaN(parseInt(value, 10));
     if (nan) {
@@ -153,6 +165,7 @@ class ItemTable extends React.Component {
     return true;
   }
 
+  // Makes sure name has at least one character
   nameValidator(value) {
     if (!value || value === ""){
       return "Name must be at least one character!"
@@ -169,9 +182,11 @@ class ItemTable extends React.Component {
 
     //TODO: Configure options to change cursor when hovering over row
 
-    const selectRow = {
-      mode: 'checkbox'
-    };
+    const isAdmin = (localStorage.isAdmin == "true");
+
+    const selectRow = isAdmin ? {
+      mode: 'checkbox' //radio or checkbox
+    } : {};
 
     const options = {
       onAddRow: this.onAddRow,
@@ -181,7 +196,7 @@ class ItemTable extends React.Component {
 
     return(
       <div>
-      {this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={true} selectRow={selectRow} data={this.state._products} deleteRow striped hover>
+      {this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>

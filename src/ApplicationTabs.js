@@ -2,7 +2,8 @@
 // creation of some simple tabs
 // @author Andrew
 
-import ItemTable from './ItemTable'
+import ItemTable from './ItemTable';
+import { checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
 import RequestComponent from './RequestComponent/RequestComponent'
 
@@ -14,11 +15,10 @@ var Col = ReactBootstrap.Col;
 var Nav = ReactBootstrap.Nav;
 var NavItem = ReactBootstrap.NavItem;
 
-export default class UserTabs extends React.Component {
+export default class ApplicationTabs extends React.Component {
 
   constructor(props) {
   super(props);
-  console.log("hellooooo")
   this.state = {
     key: 2
   };
@@ -67,7 +67,7 @@ export default class UserTabs extends React.Component {
              <Col sm={8}>
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
-                   Home page goes here
+                   You are in the user homepage. Welcome {localStorage.username}!
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
                      <ItemTable ref="table1"></ItemTable>
