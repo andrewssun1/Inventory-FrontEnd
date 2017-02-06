@@ -6,6 +6,7 @@ import ItemTable from './ItemTable';
 import { checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
 import RequestComponent from './RequestComponent/RequestComponent'
+import TagModal from './TagModal'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -79,7 +80,7 @@ export default class ApplicationTabs extends React.Component {
                    <LogComponent ref="logComp"></LogComponent>
                  </Tab.Pane>
                  <Tab.Pane eventKey="settings">
-                   Settings go here
+                   <TagModal ref="tagmodal"></TagModal>
                  </Tab.Pane>
                </Tab.Content>
              </Col>
