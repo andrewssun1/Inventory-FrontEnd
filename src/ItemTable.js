@@ -33,7 +33,9 @@ class ItemTable extends React.Component {
         "tags": [{"tag": "first tag"}, {"tag": "second tag"}]
       }],
       _loginState: true,
-      currentSearchURL: null
+      currentSearchURL: null,
+      currentPage: 1,
+      totalDataSize: 0
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
@@ -49,15 +51,14 @@ class ItemTable extends React.Component {
           xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
           xhttp.send();
           var response = JSON.parse(xhttp.responseText);
-
-          // Since setState is async, need to pass it a callback function
+          var response_results = response.results
+          for (var i = 0; i < response_results.length; i++){
+              // console.log(this.tagsToListString(response_results[i].tags));
+              response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
+          }
           this.setState({
-              _products: response.results
-          }, () => {
-              for (var i = 0; i < this.state._products.length; i++){
-                  // console.log(this.tagsToListString(this.state._products[i].tags));
-                  this.state._products[i]["tags"] = this.tagsToListString(this.state._products[i].tags);
-              }
+              _products: response_results,
+              totalDataSize: response.count
           });
       }
       // auth failed
@@ -200,6 +201,16 @@ class ItemTable extends React.Component {
         }
     }
 
+    onPageChange(page, sizePerPage) {
+        var page_argument = "page=" + page;
+        var url_param = this.state.currentSearchURL == null ? "?" + page_argument : this.state.currentSearchURL + "&" + page_argument;
+        console.log(url_param);
+        this.getAllItem(url_param);
+        this.setState({
+            currentPage: page
+        })
+    }
+
   render() {
 
     //TODO: Configure options to change cursor when hovering over row
@@ -217,11 +228,15 @@ class ItemTable extends React.Component {
       onSearchChange: this.onSearchChange.bind(this),
       searchDelayTime: 500,
       clearSearch: true,
+      onPageChange: this.onPageChange.bind(this),
+      sizePerPageList: [ 30 ],
+      sizePerPage: 30,
+      page: this.state.currentPage
     };
 
     return(
       <div>
-      {this.state._loginState ? (<BootstrapTable ref="table1" options={options} insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
+      {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
