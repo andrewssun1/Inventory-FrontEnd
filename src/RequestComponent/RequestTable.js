@@ -9,23 +9,21 @@ class RequestTable extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      row: null
+      selectedRequest: 0
     }
     this.onRowClick = this.onRowClick.bind(this);
   }
 
   onRowClick(row, isSelected, e) {
-    this.setState({row: row});
+    this._requestModal.getDetailedRequest(row.id);
     this._requestModal.openModal();
   }
 
     render() {
         return(
           <div>
-          <ViewRequestModal
-          item={(this.state.row != null) ? this.state.row.item_name : ""}
-          quantity={(this.state.row != null) ? this.state.row.quantity : ""}
-          reason={(this.state.row != null) ? this.state.row.reason : ""}
+          <ViewRequestModal id={this.state.selectedRequest}
+          updateCallback={this.props.updateCallback}
           ref={(child) => { this._requestModal = child; }} />
 
             <BootstrapTable ref="logTable"
