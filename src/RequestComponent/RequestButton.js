@@ -65,6 +65,7 @@ class RequestButton extends React.Component {
         }
         else {
             var response = JSON.parse(xhttp.responseText);
+            window.location.reload();
             console.log("about to print response");
             console.log(response);
         }
@@ -86,11 +87,11 @@ class RequestButton extends React.Component {
         }
     }
     render() {
+
         return(
             <div>
                 <button onClick={this.approveClick}>Approve</button>
                 <button onClick={this.denyClick}>Deny</button>
-                <button onClick={this.disburseClick}>Deny</button>
             </div>
         )
     }
