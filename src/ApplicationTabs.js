@@ -5,10 +5,10 @@
 import ItemTable from './ItemTable';
 import { checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
+import RequestComponent from './RequestComponent/RequestComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-
 var Tab = ReactBootstrap.Tab;
 var Row = ReactBootstrap.Row;
 var Col = ReactBootstrap.Col;
@@ -73,7 +73,7 @@ export default class ApplicationTabs extends React.Component {
                      <ItemTable ref="table1"></ItemTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
-                   Requests go here
+                   <RequestComponent ref="requestComponent"></RequestComponent>
                  </Tab.Pane>
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComp"></LogComponent>
