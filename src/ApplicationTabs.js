@@ -42,7 +42,12 @@ export default class ApplicationTabs extends React.Component {
   });
 }
 
+  componentWillMount(){
+    checkAuthAndAdmin()
+  }
+
   render() {
+      const isAdmin = (localStorage.isAdmin == "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">
@@ -57,9 +62,10 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="requests">
                    Requests
                  </NavItem>
-                 <NavItem eventKey="logs">
-                   Logs
-                 </NavItem>
+                   {isAdmin ? (<NavItem eventKey="logs">
+                     Logs
+                   </NavItem>) : null
+                   }
                  <NavItem eventKey="settings">
                    Settings
                  </NavItem>

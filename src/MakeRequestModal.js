@@ -8,6 +8,8 @@ var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 
+var xhttp = new XMLHttpRequest();
+
 class MakeRequestModal extends React.Component {
   constructor(props) {
     super(props);
@@ -28,10 +30,24 @@ class MakeRequestModal extends React.Component {
   }
 
   makeRequest() {
-    //TODO: Post request to back-end
-    console.log(this._itemField.state.value);
-    console.log(this._quantityField.state.value);
-    console.log(this._reasonField.state.value);
+    xhttp.open('POST', "https://asap-test.colab.duke.edu/api/request/", false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    if (xhttp.status === 401 || xhttp.status === 500){
+      console.log('POST Failed!!');
+    }
+    else{
+      var requestBody = {"item_id": this.props.item_id,
+      "quantity": this._quantityField.state.value,
+      "reason":this._reasonField.state.value};
+
+      var jsonResult = JSON.stringify(requestBody);
+      xhttp.send(jsonResult);
+      var response = JSON.parse(xhttp.responseText);
+      console.log("Getting Response");
+      console.log(response);
+    }
+    this.closeModal();
   }
 
   render() {

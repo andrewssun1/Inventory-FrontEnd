@@ -15,7 +15,6 @@ class ItemDetail extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      isAdmin: false,
       isEditing: false
     }
     this.openModal = this.openModal.bind(this);
@@ -63,10 +62,12 @@ class ItemDetail extends React.Component {
     if(this.props.row == null) {
       return (null);
     }
-    // <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
+
+    const isAdmin = (localStorage.isAdmin == "true");
+
     return (
       <div>
-      <MakeRequestModal item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
+      <MakeRequestModal item_id={this.props.row.id} item={this.props.row.name} ref={(child) => { this._requestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
       {this.state.isEditing ?
@@ -97,18 +98,21 @@ class ItemDetail extends React.Component {
 
       </Modal.Body>
       <Modal.Footer>
-      {this.state.isAdmin ?
+      {isAdmin ?
         this.state.isEditing ?
+        //Buttons for an admin in editing mode
         <div>
         <Button onClick={this.saveEdits} bsStyle="primary">Save</Button>
         <Button onClick={this.toggleEditing} bsStyle="danger">Cancel</Button>
         </div>
         :
+        //Buttons for an admin in viewing mode
         <div>
         <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
         :
+        //Buttons for a user
         <div>
         <Button onClick={this.requestItem} bsStyle="primary">Request</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
