@@ -15,7 +15,6 @@ class RequestTable extends React.Component {
   }
 
   onRowClick(row, isSelected, e) {
-    console.log(row.id);
     this._requestModal.getDetailedRequest(row.id);
     this._requestModal.openModal();
   }
