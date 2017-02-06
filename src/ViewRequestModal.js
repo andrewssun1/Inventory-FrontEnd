@@ -14,7 +14,8 @@ class ViewRequestModal extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      requestData: null
+      requestData: null,
+      requestProblemString: ""
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -23,6 +24,7 @@ class ViewRequestModal extends React.Component {
     this.deny = this.deny.bind(this);
     this.patchRequest = this.patchRequest.bind(this);
     this.getDetailedRequest = this.getDetailedRequest.bind(this);
+    this.isOutstanding = this.isOutstanding.bind(this);
   }
 
   getDetailedRequest(id) {
@@ -38,6 +40,11 @@ class ViewRequestModal extends React.Component {
       console.log("Getting Response");
       console.log(response);
       this.setState({requestData: response});
+      if(response.quantity > response.item.quantity) {
+        this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
+      } else {
+        this.setState({requestProblemString: ""});
+      }
     }
   }
 
@@ -62,6 +69,10 @@ class ViewRequestModal extends React.Component {
   deny() {
     console.log('Denying');
     this.patchRequest('deny');
+  }
+
+  isOutstanding() {
+    return (this.state.requestData.status == "outstanding");
   }
 
   patchRequest(type) {
@@ -96,17 +107,19 @@ class ViewRequestModal extends React.Component {
       <p> Item: {this.state.requestData.item.name} </p>
       <p> Quantity: {this.state.requestData.quantity} </p>
       <p> Reason: {this.state.requestData.reason} </p>
+      <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       </Modal.Body>
       <Modal.Footer>
       {isAdmin ?
       <div>
-      <Button onClick={this.approve} bsStyle="success">Approve Request</Button>
-      <Button onClick={this.deny} bsStyle="danger">Deny Request</Button>
+      {(this.isOutstanding() && this.state.requestProblemString == "") ?
+      <Button onClick={this.approve} bsStyle="success">Approve Request</Button> : null}
+      {this.isOutstanding() ? <Button onClick={this.deny} bsStyle="danger">Deny Request</Button> : null}
       <Button onClick={this.closeModal} >Close</Button>
       </div>
       :
       <div>
-      <Button onClick={this.cancel} bsStyle="danger">Cancel Request</Button>
+      {this.isOutstanding() ? <Button onClick={this.cancel} bsStyle="danger">Cancel Request</Button> : null}
       <Button onClick={this.closeModal} >Close</Button>
       </div>
       }
