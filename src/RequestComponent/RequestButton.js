@@ -9,23 +9,22 @@ var xhttp = new XMLHttpRequest();
 class RequestButton extends React.Component {
     constructor(props){
         super(props);
-        console.log("selected is " + this.props.selected)
+        this.state = {
+            requestProblemString: ''
+        };
         this.approveClick = this.approveClick.bind(this);
-        //this.approveRequest = this.approveRequest.bind(this);
         this.denyClick = this.denyClick.bind(this);
-        //this.denyRequest = this.denyRequest.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
-        //this.cancelRequest = this.cancelRequest.bind(this);
         this.patchRequest = this.patchRequest.bind(this);
     }
     componentWillMount() {
-        if (checkAuthAndAdmin()) {
-            console.log("checked auth and amin");
-        }
+        checkAuthAndAdmin()
     }
 
     patchRequest(requestID, type, patchRequestBodyKey, patchRequestBodyValue) {
-        console.log("making request of type " + type);
+        this.setState({
+            requestProblemString: ''
+        })
         var url = "https://asap-test.colab.duke.edu/api/request/" + type + "/" + requestID + "/";
         xhttp.open("PATCH", url, false); //synchronous request
         xhttp.setRequestHeader("Content-Type", "application/json");
@@ -37,7 +36,7 @@ class RequestButton extends React.Component {
             //<Alert message="alert message"></Alert>
             console.log("patch request did not work")
             var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response");
+            console.log("about to print response!");
             console.log(response);
             if(!!localStorage.token){
                 delete localStorage.token;
@@ -48,11 +47,19 @@ class RequestButton extends React.Component {
             hashHistory.push('/login');
             return null;
         }
+        else if(xhttp.status === 405){
+            var response = JSON.parse(xhttp.responseText);
+            console.log(response.detail);
+            this.setState({
+                requestProblemString: response.detail
+            })
+        }
         else {
             var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response");
+            console.log("about to print response!!");
             console.log(response);
         }
+        this.props.cb.resetTable();
     }
 
     approveClick() {
@@ -85,7 +92,9 @@ class RequestButton extends React.Component {
     render() {
         const isAdmin = (localStorage.isAdmin === "true");
         return(
-            isAdmin ?
+            <div>
+                <p style={{color:"red"}}> {this.state.requestProblemString} </p>
+                {isAdmin ?
                 <div>
                     <Bootstrap.ButtonToolbar>
                         <Button onClick={this.approveClick} bsStyle="success">Approve</Button>
@@ -96,7 +105,9 @@ class RequestButton extends React.Component {
                     <Bootstrap.ButtonToolbar>
                         <Button onClick={this.cancelClick} bsStyle="danger">Cancel</Button>
                     </Bootstrap.ButtonToolbar>
-                </div>
+                </div>}
+            </div>
+
 
         )
     }
