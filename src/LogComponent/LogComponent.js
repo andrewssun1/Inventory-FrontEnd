@@ -24,7 +24,7 @@ class LogComponent extends React.Component {
     }
 
     getRequestForLog(url_parameter){
-        var url = url_parameter == null ? "https://asap-test.colab.duke.edu/api/log/" : "https://asap-test.colab.duke.edu/api/log/" + url_parameter;
+        var url = url_parameter == null ? "https://asap-production.colab.duke.edu/api/log/" : "https://asap-production.colab.duke.edu/api/log/" + url_parameter;
         xhttp.open("GET", url, false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
@@ -55,7 +55,7 @@ class LogComponent extends React.Component {
     }
 
     postRequestForLog(action, description){
-        xhttp.open("POST", "https://asap-test.colab.duke.edu/api/log/", false);
+        xhttp.open("POST", "https://asap-production.colab.duke.edu/api/log/", false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         var request = {"action_id": parseInt(this.state.action_map.get(action)), "description": description};
@@ -71,7 +71,7 @@ class LogComponent extends React.Component {
         this.getRequestForLog(null);
 
         //Getting all the actions
-        xhttp.open("GET", "https://asap-test.colab.duke.edu/api/log/action/", false);
+        xhttp.open("GET", "https://asap-production.colab.duke.edu/api/log/action/", false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         xhttp.send();

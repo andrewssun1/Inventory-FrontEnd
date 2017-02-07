@@ -24,7 +24,7 @@ class TagComponent extends React.Component {
 
     onAddRow(row) {
         if (row){ // should we check for auth/admin here? yes right?
-            xhttp.open('POST', "https://asap-test.colab.duke.edu/api/item/tag/", false);
+            xhttp.open('POST', "https://asap-production.colab.duke.edu/api/item/tag/", false);
             xhttp.setRequestHeader("Content-Type", "application/json");
             xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
             var data = {
@@ -52,7 +52,7 @@ class TagComponent extends React.Component {
     onDeleteRow(rows) {
         if(rows){
             for (var i = 0; i < rows.length; i++){
-                xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/tag/"+rows[i], false);
+                xhttp.open("DELETE", "https://asap-production.colab.duke.edu/api/item/tag/"+rows[i], false);
                 xhttp.setRequestHeader("Content-Type", "application/json");
                 xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
                 xhttp.send();

@@ -72,11 +72,11 @@ class MakeRequestModal extends React.Component {
         "receiver": this._receiverField.state.value,
         "disburse_comment": this._reasonField.state.value
     };
-    this.makeAPIPostRequest("https://asap-test.colab.duke.edu/api/request/disburse/", requestBody)
+    this.makeAPIPostRequest("https://asap-production.colab.duke.edu/api/request/disburse/", requestBody)
   }
 
   makeRequest() {
-    this.makeAPIPostRequest("https://asap-test.colab.duke.edu/api/request/",
+    this.makeAPIPostRequest("https://asap-production.colab.duke.edu/api/request/",
         {
           "item_id": this.props.item_id,
           "quantity": this._quantityField.state.value,

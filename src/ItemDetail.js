@@ -76,9 +76,9 @@ class ItemDetail extends React.Component {
     var url;
     console.log(item_name);
     if (localStorage.isAdmin == "true") {
-      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+      url = "https://asap-production.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
     } else {
-      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+      url = "https://asap-production.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
     }
     xhttp.open("GET", url, false);
     xhttp.setRequestHeader("Content-Type", "application/json");

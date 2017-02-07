@@ -63,7 +63,7 @@ export default class LoginPage extends React.Component {
         //localStorage.alert = false
         this.setState({_alert_both: false});
         //console.log(localStorage.token);
-        xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", true);
+        xhttp.open("GET", "https://asap-production.colab.duke.edu/api/user/current/", true);
 
         xhttp.onreadystatechange = function() {
             if (xhttp.readyState === 4) {
@@ -86,7 +86,7 @@ export default class LoginPage extends React.Component {
     this.setState({_alert_both: false});
 
     // Create the http request to do REST calls
-    const clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy';
+    const clientID = 'dLDBmZfoPPE5UHbWXzdbIn2LcBZl9zQbmREPA6KI';
 
     // Validate username/password - trigger alert if invalid
     if (this.state._username.length < 1 || this.state._password.length < 1){
@@ -96,7 +96,7 @@ export default class LoginPage extends React.Component {
 
     // REST call parameters
     var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
-    xhttp.open("POST", "https://asap-test.colab.duke.edu/api/o/token/", true );
+    xhttp.open("POST", "https://asap-production.colab.duke.edu/api/o/token/", true );
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.onreadystatechange = this.readyStateCallback;
     xhttp.send(request_str);

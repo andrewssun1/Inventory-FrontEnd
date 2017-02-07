@@ -36,7 +36,7 @@ class TagModal extends React.Component {
     // Wants to get list of tags every time
     // Do REST API call
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/tag/unique/", false);
+    xhttp.open("GET", "https://asap-production.colab.duke.edu/api/item/tag/unique/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
     xhttp.send();
@@ -92,7 +92,7 @@ class TagModal extends React.Component {
     console.log(completeFormat);
     //this.closeModal();
     // var xhttp = new XMLHttpRequest();
-    // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/?"+completeString, false);
+    // xhttp.open("GET", "https://asap-production.colab.duke.edu/api/item/?"+completeString, false);
     // xhttp.setRequestHeader("Content-Type", "application/json");
     // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
     // xhttp.send();

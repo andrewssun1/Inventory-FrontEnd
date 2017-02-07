@@ -43,7 +43,7 @@ class RequestComponent extends React.Component {
     }
 
     getAllRequests(url_parameter){
-        var url = url_parameter == null ? "https://asap-test.colab.duke.edu/api/request/" : "https://asap-test.colab.duke.edu/api/request/" + url_parameter;
+        var url = url_parameter == null ? "https://asap-production.colab.duke.edu/api/request/" : "https://asap-production.colab.duke.edu/api/request/" + url_parameter;
         xhttp.open("GET", url, false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);

@@ -11,7 +11,7 @@ export function isLoggedIn(){
 export function checkAuthAndAdmin(){
   // Creates request for user
   var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/current/", false);
+  xhttp.open("GET", "https://asap-production.colab.duke.edu/api/user/current/", false);
   xhttp.setRequestHeader("Content-Type", "application/json");
   xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
   xhttp.send();

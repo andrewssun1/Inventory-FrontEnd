@@ -28,7 +28,7 @@ class ViewRequestModal extends React.Component {
   }
 
   getDetailedRequest(id) {
-    xhttp.open('GET', "https://asap-test.colab.duke.edu/api/request/detailed/" + id + "/", false);
+    xhttp.open('GET', "https://asap-production.colab.duke.edu/api/request/detailed/" + id + "/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
     if (xhttp.status === 401 || xhttp.status === 500){
@@ -79,7 +79,7 @@ class ViewRequestModal extends React.Component {
   }
 
   patchRequest(type, requestBody) {
-    xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/request/" + type + "/" + this.state.requestData.id + "/", false);
+    xhttp.open('PATCH', "https://asap-production.colab.duke.edu/api/request/" + type + "/" + this.state.requestData.id + "/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
     if (xhttp.status === 401 || xhttp.status === 500){

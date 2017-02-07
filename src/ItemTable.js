@@ -48,7 +48,7 @@ class ItemTable extends React.Component {
   getAllItem(url_parameter){
       if (checkAuthAndAdmin()){
           // GET request to get all items from database
-          var url = url_parameter == null ? "https://asap-test.colab.duke.edu/api/item/" : "https://asap-test.colab.duke.edu/api/item/" + url_parameter;
+          var url = url_parameter == null ? "https://asap-production.colab.duke.edu/api/item/" : "https://asap-production.colab.duke.edu/api/item/" + url_parameter;
           xhttp.open("GET", url, false);
           xhttp.setRequestHeader("Content-Type", "application/json");
           xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
@@ -110,7 +110,7 @@ class ItemTable extends React.Component {
 
   addOrUpdateRow(row, requestType, itemID) {
     if (row){ // should we check for auth/admin here? yes right?
-      xhttp.open(requestType, "https://asap-test.colab.duke.edu/api/item/" + itemID, false);
+      xhttp.open(requestType, "https://asap-production.colab.duke.edu/api/item/" + itemID, false);
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       if (xhttp.status === 401 || xhttp.status === 500){
@@ -153,7 +153,7 @@ class ItemTable extends React.Component {
   onDeleteRow(rows) {
     if(checkAuthAndAdmin() && rows){
       for (var i = 0; i < rows.length; i++){
-        xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/"+rows[i], false);
+        xhttp.open("DELETE", "https://asap-production.colab.duke.edu/api/item/"+rows[i], false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         xhttp.send();
@@ -261,7 +261,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='location'>Location</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
-      <TableHeaderColumn dataField='tags_data' hidden>tags_data</TableHeaderColumn>
+      <TableHeaderColumn dataField='tags_data' hiddenOnInsert hidden editable={ false }>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 
       <ItemDetail  ref={(child) => { this._child = child; }}

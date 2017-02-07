@@ -26,7 +26,7 @@ export default class ManageUsers extends React.Component {
   componentWillMount() {
     if (checkAuthAndAdmin()){
         // GET request to get all items from database
-        xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/", false);
+        xhttp.open("GET", "https://asap-production.colab.duke.edu/api/user/", false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         if (xhttp.status === 401 || xhttp.status === 500){
@@ -61,7 +61,7 @@ export default class ManageUsers extends React.Component {
 
   onAddRow(row) {
     if (checkAuthAndAdmin() && row){ // should we check for auth/admin here? yes right?
-      xhttp.open("POST", "https://asap-test.colab.duke.edu/api/user/", false);
+      xhttp.open("POST", "https://asap-production.colab.duke.edu/api/user/", false);
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       if (xhttp.status === 401 || xhttp.status === 500){
@@ -88,7 +88,7 @@ export default class ManageUsers extends React.Component {
 
   onDeleteRow(rows) {
     if(checkAuthAndAdmin() && rows){
-        xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/user/"+rows[0], false);
+        xhttp.open("DELETE", "https://asap-production.colab.duke.edu/api/user/"+rows[0], false);
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
         xhttp.send();

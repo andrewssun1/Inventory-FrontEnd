@@ -25,7 +25,7 @@ class RequestButton extends React.Component {
         this.setState({
             requestProblemString: ''
         })
-        var url = "https://asap-test.colab.duke.edu/api/request/" + type + "/" + requestID + "/";
+        var url = "https://asap-production.colab.duke.edu/api/request/" + type + "/" + requestID + "/";
         xhttp.open("PATCH", url, false); //synchronous request
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
