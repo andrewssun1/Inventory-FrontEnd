@@ -16,10 +16,12 @@ class TagModal extends React.Component {
       showModal: false,
       tagOptions: [],
       includedValue: [],
-      excludedValue: []
+      excludedValue: [],
+      tagSearchResults: []
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.saveModal = this.saveModal.bind(this);
     this.handleSelectChangeIncluded = this.handleSelectChangeIncluded.bind(this);
     this.handleSelectChangeExcluded = this.handleSelectChangeExcluded.bind(this);
     this.handleOptionChange = this.handleOptionChange.bind(this);
@@ -27,7 +29,7 @@ class TagModal extends React.Component {
   }
 
   componentDidMount() {
-    this.openModal();
+    //this.openModal();
   }
 
   openModal() {
@@ -51,6 +53,11 @@ class TagModal extends React.Component {
     this.setState({showModal: true});
   }
 
+  saveModal(){
+    this.props.updateCallback.setState({_products: this.state.tagSearchResults});
+    this.closeModal();
+  }
+
   closeModal() {
     this.setState({showModal: false});
   }
@@ -72,12 +79,44 @@ class TagModal extends React.Component {
   }
 
   handleSearch() {
-    console.log(this.state.includedValue);
-    console.log(this.state.excludedValue);
+    // console.log(this.state.includedValue);
+    // console.log(this.state.excludedValue);
     var includedString = this.state.includedValue.length === 0 ? "" : "tag_included=" + this.state.includedValue + "&";
     var excludedString = this.state.excludedValue.length === 0 ? "" : "tag_excluded=" + this.state.excludedValue + "&";
     var completeString = includedString + excludedString + "operator=" + this.state.selectedOption;
-    console.log(completeString);
+
+    var formatIncluded = this.state.includedValue.length === 0 ? "" : "Included Tags: " + this.state.includedValue + " ";
+    var formatExcluded = this.state.excludedValue.length === 0 ? "" : " Excluded Tags: " + this.state.excludedValue;
+    var completeFormat = formatIncluded + ((includedString===""||excludedString==="") ? "" : this.state.selectedOption) + formatExcluded;
+
+    console.log(completeFormat);
+    //this.closeModal();
+    // var xhttp = new XMLHttpRequest();
+    // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/?"+completeString, false);
+    // xhttp.setRequestHeader("Content-Type", "application/json");
+    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    // xhttp.send();
+    // if (xhttp.status === 401 || xhttp.status === 500){
+    //   console.log('GET Failed!!');
+    // }
+    // else{
+    //   // var response = JSON.parse(xhttp.responseText);
+    //   // var itemList = response.results;
+    //   // //console.log(this.props);
+    //   // for (var i = 0; i < itemList.length; i++){
+    //   //     itemList[i]["tags"] = this.props.updateCallback.tagsToListString(itemList[i].tags);
+    //   // }
+    //   // this.setState({tagSearchResults: itemList});
+    //   // console.log("Resulting list: ");
+    //   // console.log(itemList);
+    var url_parameter = "?" + completeString
+      this.props.updateCallback.setState({
+          currentSearchURL: url_parameter
+      });
+      this.props.updateCallback.getAllItem(url_parameter);
+      this.props.updateCallback.setState({tagSearchText: completeFormat});
+      this.closeModal();
+    //}
   }
 
   render() {
