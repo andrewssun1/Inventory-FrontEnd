@@ -28,12 +28,18 @@ class RequestComponent extends React.Component {
                 2: 'denied'
             }
         };
-
+        this.getAllRequest = this.getAllRequests.bind(this);
         this.onRowClick = this.onRowClick.bind(this);
+        this.resetTable = this.resetTable.bind(this);
     }
 
     componentWillMount(){
-        this.getAllRequests(null)
+        this.getAllRequests(null);
+    }
+
+    resetTable(){
+        this.getAllRequests(null);
+        this._requestTable.setState({selectedRequest: 0});
     }
 
     getAllRequests(url_parameter){
@@ -174,7 +180,7 @@ class RequestComponent extends React.Component {
 
         return(
             <div>
-                <RequestButton ref="requestButton" { ...this.state}/>
+                <RequestButton ref="requestButton" { ...this.state} cb={this}/>
                 <RequestTable filterFields={this.filterFields}
                 selectRowProp={selectRowProp} options={options}{ ...this.state }
                 updateCallback={this} ref={(child) => { this._requestTable = child; }}/>
