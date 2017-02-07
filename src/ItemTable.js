@@ -182,6 +182,7 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
+    this._child.getRequests(row.name);
     this._child.openModal();
   }
 

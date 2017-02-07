@@ -3,25 +3,35 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
+var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from './TextEntryFormElement';
 import MakeRequestModal from './MakeRequestModal';
 import ViewRequestModal from './ViewRequestModal';
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
+
+//TODO: Refactor so that only the item id is passed in, and a get item detail request is made
+//TODO: Refactor this and Request Table, create one component that is used in both
+
+var xhttp = new XMLHttpRequest();
 
 class ItemDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       showModal: false,
-      isEditing: false
+      isEditing: false,
+      outstandingRequests: null
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.toggleEditing = this.toggleEditing.bind(this);
     this.saveEdits = this.saveEdits.bind(this);
     this.requestItem = this.requestItem.bind(this);
+    this.getRequests = this.getRequests.bind(this);
   }
 
   openModal() {
@@ -57,6 +67,31 @@ class ItemDetail extends React.Component {
     console.log('request clicked');
   }
 
+  getRequests(item_name){
+    // GET request to get all outstanding requests for this item by this user
+    var url;
+    console.log(item_name);
+    if (localStorage.isAdmin == "true") {
+      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+    } else {
+      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+    }
+    xhttp.open("GET", url, false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    xhttp.send();
+    var response = JSON.parse(xhttp.responseText);
+    console.log(response);
+    var response_results = response.results;
+    for (var i = 0; i < response_results.length; i++){
+        response_results[i]["item"] = response_results[i].item.name;
+    }
+    this.setState({
+      outstandingRequests: response.results,
+      totalDataSize: response.count
+    });
+  }
+
   render() {
     //TODO: Add in image
     if(this.props.row == null) {
@@ -64,6 +99,13 @@ class ItemDetail extends React.Component {
     }
 
     const isAdmin = (localStorage.isAdmin == "true");
+
+    const options = {
+      //onRowClick: this.onRowClick,
+      sizePerPageList: [ 30 ],
+      sizePerPage: 30,
+      page: this.state.currentPage
+    };
 
     return (
       <div>
@@ -77,7 +119,7 @@ class ItemDetail extends React.Component {
         <TextEntryFormElement controlId="formHorizontalQuantity" label="Quantity"
         type="number" initialValue={this.props.row.quantity} ref={(child) => {this._quantityField = child;}}/>
         <TextEntryFormElement controlId="formHorizontalModelNumber" label="Model Number"
-        type="number" initialValue={this.props.row.model_number} ref={(child) => {this._modelNumberField = child;}}/>
+        type="text" initialValue={this.props.row.model_number} ref={(child) => {this._modelNumberField = child;}}/>
         <TextEntryFormElement controlId="formHorizontalLocation" label="Location"
         type="text" initialValue={this.props.row.location} ref={(child) => {this._locationField = child;}}/>
         <TextEntryFormElement controlId="formHorizontalTags" label="Tags"
@@ -93,6 +135,17 @@ class ItemDetail extends React.Component {
         <p> Location: {this.props.row.location} </p>
         <p> Tags: {this.props.row.tags} </p>
         <p> {this.props.row.description} </p>
+        <br />
+        <h4> Requests </h4>
+        <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
+        data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
+        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
+        <TableHeaderColumn dataField='item' width="120">Item</TableHeaderColumn>
+        <TableHeaderColumn dataField='quantity' width="50">Quantity</TableHeaderColumn>
+        <TableHeaderColumn dataField='status' width="100">Status</TableHeaderColumn>
+        <TableHeaderColumn dataField='timestamp' width="150">Timestamp</TableHeaderColumn>
+        <TableHeaderColumn dataField='reason' width="200">Reason</TableHeaderColumn>
+        </BootstrapTable>
         </div>
       }
 
