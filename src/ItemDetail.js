@@ -52,15 +52,17 @@ class ItemDetail extends React.Component {
   }
 
   saveEdits() {
-    this.props.row.name = this._nameField.state.value;
-    this.props.row.quantity = this._quantityField.state.value;
-    this.props.row.model_number = this._modelNumberField.state.value;
-    this.props.row.location = this._locationField.state.value;
-    this.props.row.tags = this._tagsField.state.value;
-    this.props.row.description = this._descriptionField.state.value;
-    this.props.updateCallback.addOrUpdateRow(this.props.row, 'PATCH', this.props.row.id);
-    this.props.updateCallback.componentWillMount();
-    this.toggleEditing();
+    var r = confirm("Are you sure you want to save?");
+    if (r) {
+      this.props.row.name = this._nameField.state.value;
+      this.props.row.quantity = this._quantityField.state.value;
+      this.props.row.model_number = this._modelNumberField.state.value;
+      this.props.row.location = this._locationField.state.value;
+      this.props.row.description = this._descriptionField.state.value;
+      this.props.updateCallback.addOrUpdateRow(this.props.row, 'PATCH', this.props.row.id);
+      this.props.updateCallback.componentWillMount();
+      this.toggleEditing();
+    }
   }
 
   requestItem() {
