@@ -111,6 +111,7 @@ class LogComponent extends React.Component {
                 var response = JSON.parse(json_response);
                 response['action_tag'] = response['action']['tag'];
                 var tempData = this.state.data;
+                response.timestamp = moment(response.timestamp).format('lll')
                 tempData.push(response);
                 this.setState({
                     data: tempData
