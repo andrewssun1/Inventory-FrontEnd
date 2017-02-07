@@ -25,8 +25,8 @@ class RequestButton extends React.Component {
     denyRequest(requestID) {
         //TODO the admin_comment field will be changed to come from the modal
         var admin_comment = "this is a general admin comment to deny request";
-        //var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
-        var url = "http://localhost:8000/api/request/deny/" + requestID + "/";
+        var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
+        //var url = "http://localhost:8000/api/request/deny/" + requestID + "/";
         xhttp.open("PATCH", url, false); //synchronous request
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
@@ -57,8 +57,8 @@ class RequestButton extends React.Component {
     cancelRequest(requestID) {
         //TODO the admin_comment field will be changed to come from the modal
         var cancellationReason = "this is a general comment to cancel request";
-        //var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
-        var url = "http://localhost:8000/api/request/cancel/" + requestID + "/";
+        var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
+        //var url = "http://localhost:8000/api/request/cancel/" + requestID + "/";
         xhttp.open("PATCH", url, false); //synchronous request
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
@@ -140,18 +140,17 @@ class RequestButton extends React.Component {
         const isAdmin = (localStorage.isAdmin === "true");
         return(
             isAdmin ?
-            <div>
-                <Bootstrap.ButtonToolbar>
-                    <Button onClick={this.approveClick} bsStyle="success">Approve</Button>
-                    <Button onClick={this.denyClick} bsStyle="danger">Deny</Button>
-                </Bootstrap.ButtonToolbar>
-            </div> :
-            <div>
-                <Bootstrap.ButtonToolbar>
-                    <Button onClick={this.cancelClick} bsStyle="danger">Cancel</Button>
-                    <Button onClick={this.denyClick} bsStyle="info">New Request</Button>
-                </Bootstrap.ButtonToolbar>
-            </div>
+                <div>
+                    <Bootstrap.ButtonToolbar>
+                        <Button onClick={this.approveClick} bsStyle="success">Approve</Button>
+                        <Button onClick={this.denyClick} bsStyle="danger">Deny</Button>
+                    </Bootstrap.ButtonToolbar>
+                </div> :
+                <div>
+                    <Bootstrap.ButtonToolbar>
+                        <Button onClick={this.cancelClick} bsStyle="danger">Cancel</Button>
+                    </Bootstrap.ButtonToolbar>
+                </div>
 
         )
     }

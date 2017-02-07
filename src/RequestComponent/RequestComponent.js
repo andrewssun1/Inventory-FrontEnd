@@ -175,7 +175,7 @@ class RequestComponent extends React.Component {
         return(
             <div>
                 <RequestButton ref="requestButton" { ...this.state}/>
-                <RequestTable ref="requestTable" filterFields={this.filterFields}
+                <RequestTable filterFields={this.filterFields}
                 selectRowProp={selectRowProp} options={options}{ ...this.state }
                 updateCallback={this} ref={(child) => { this._requestTable = child; }}/>
             </div>
