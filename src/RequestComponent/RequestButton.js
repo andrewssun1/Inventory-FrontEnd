@@ -11,30 +11,31 @@ class RequestButton extends React.Component {
         super(props);
         console.log("selected is " + this.props.selected)
         this.approveClick = this.approveClick.bind(this);
-        this.approveRequest = this.approveRequest.bind(this);
+        //this.approveRequest = this.approveRequest.bind(this);
         this.denyClick = this.denyClick.bind(this);
-        this.denyRequest = this.denyRequest.bind(this);
+        //this.denyRequest = this.denyRequest.bind(this);
         this.cancelClick = this.cancelClick.bind(this);
-        this.cancelRequest = this.cancelRequest.bind(this);
+        //this.cancelRequest = this.cancelRequest.bind(this);
+        this.patchRequest = this.patchRequest.bind(this);
     }
     componentWillMount() {
         if (checkAuthAndAdmin()) {
             console.log("checked auth and amin");
         }
     }
-    denyRequest(requestID) {
-        //TODO the admin_comment field will be changed to come from the modal
-        var admin_comment = "this is a general admin comment to deny request";
-        var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
-        //var url = "http://localhost:8000/api/request/deny/" + requestID + "/";
+
+    patchRequest(requestID, type, patchRequestBodyKey, patchRequestBodyValue) {
+        console.log("making request of type " + type);
+        var url = "https://asap-test.colab.duke.edu/api/request/" + type + "/" + requestID + "/";
         xhttp.open("PATCH", url, false); //synchronous request
         xhttp.setRequestHeader("Content-Type", "application/json");
         xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        var requestBody = {"id": requestID, "admin_comment": admin_comment};
-        //convert JSON to string to send for PATCH request
+        var requestBody = {"id": requestID};
+        requestBody[patchRequestBodyKey] = patchRequestBodyValue;
         xhttp.send(JSON.stringify(requestBody));
         if (xhttp.status === 401 || xhttp.status === 500){
-            console.log("deny request did not work")
+            //<Alert message="alert message"></Alert>
+            console.log("patch request did not work")
             var response = JSON.parse(xhttp.responseText);
             console.log("about to print response");
             console.log(response);
@@ -54,70 +55,13 @@ class RequestButton extends React.Component {
         }
     }
 
-    cancelRequest(requestID) {
-        //TODO the admin_comment field will be changed to come from the modal
-        var cancellationReason = "this is a general comment to cancel request";
-        var url = "https://asap-test.colab.duke.edu/api/request/deny/" + requestID + "/";
-        //var url = "http://localhost:8000/api/request/cancel/" + requestID + "/";
-        xhttp.open("PATCH", url, false); //synchronous request
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        var requestBody = {"id": requestID, "reason": cancellationReason};
-        //convert JSON to string to send for PATCH request
-        xhttp.send(JSON.stringify(requestBody));
-        if (xhttp.status === 401 || xhttp.status === 500){
-            console.log("cancel request did not work")
-            var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response");
-            console.log(response);
-            if(!!localStorage.token){
-                delete localStorage.token;
-            }
-            this.setState({
-                _loginState: false
-            });
-            hashHistory.push('/login');
-            return null;
-        }
-        else {
-            var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response");
-            console.log(response);
-        }
-    }
-
-    approveRequest(requestID) {
-        //TODO the admin_comment field will come from the modal
-        var admin_comment = "this is a general admin comment";
-        var url = "https://asap-test.colab.duke.edu/api/request/approve/" + requestID + "/";
-        xhttp.open("PATCH", url, false); //synchronous request
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        var requestBody = {"id": requestID, "admin_comment": admin_comment};
-        //convert JSON to string to send for PATCH request
-        xhttp.send(JSON.stringify(requestBody));
-        if (xhttp.status === 401 || xhttp.status === 500){
-            if(!!localStorage.token){
-                delete localStorage.token;
-            }
-            this.setState({
-                _loginState: false
-            });
-            hashHistory.push('/login');
-            return null;
-        }
-        else {
-            var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response");
-            console.log(response);
-        }
-    }
     approveClick() {
         var requestIDs = this.props.selected;
         var i;
         for (i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.approveRequest(requestIDs[i]);
+            this.patchRequest(requestIDs[i], "approve", "admin_comment", "this is a general admin comment");
+            //this.approveRequest(requestIDs[i]);
         }
     }
     denyClick() {
@@ -125,7 +69,8 @@ class RequestButton extends React.Component {
         var i;
         for (i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.denyRequest(requestIDs[i]);
+            this.patchRequest(requestIDs[i], "deny", "admin_comment", "this is a general admin comment");
+            //this.denyRequest(requestIDs[i]);
         }
     }
     cancelClick() {
@@ -133,7 +78,8 @@ class RequestButton extends React.Component {
         var i;
         for (i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.cancelRequest(requestIDs[i]);
+            this.patchRequest(requestIDs[i], "cancel", "reason", "this is a cancellation reason");
+            //this.cancelRequest(requestIDs[i]);
         }
     }
     render() {
