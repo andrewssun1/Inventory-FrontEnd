@@ -36,7 +36,7 @@ export default class MasterPage extends React.Component {
     return(
       <div>
         <button type="button" className="btn btn-primary btn-lg pull-right" style={loginStyle} onClick={this.handleLoginButton}>{!!localStorage.token ? "Logout" : "Login"}</button>
-        <h1 style={hStyle}>Welcome to Duke University Inventory System</h1>
+        <h1 style={hStyle}>Welcome to Duke ECE Inventory System</h1>
         {this.props.children}
       </div>
     )

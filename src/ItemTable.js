@@ -6,11 +6,12 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var Bootstrap = require('react-bootstrap');
 import ItemDetail from './ItemDetail';
+import TagModal from './TagModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
-import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl} from 'react-bootstrap';
+import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl, ButtonGroup} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin } from './Utilities';
@@ -35,11 +36,13 @@ class ItemTable extends React.Component {
       _loginState: true,
       currentSearchURL: null,
       currentPage: 1,
-      totalDataSize: 0
+      totalDataSize: 0,
+      tagSearchText: ""
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
+    this.onTagSearchClick = this.onTagSearchClick.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -54,6 +57,7 @@ class ItemTable extends React.Component {
           var response_results = response.results
           for (var i = 0; i < response_results.length; i++){
               // console.log(this.tagsToListString(response_results[i].tags));
+              response_results[i]["tags_data"] = response_results[i].tags;
               response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
           }
           this.setState({
@@ -182,13 +186,19 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
+    this._child.getRequests(row.name);
     this._child.openModal();
+  }
+
+  onTagSearchClick() {
+    this._tagchild.openModal();
   }
 
     onSearchChange(searchText, colInfos, multiColumnSearch) {
         if(searchText==''){
             this.setState({
-                currentSearchURL: null
+                currentSearchURL: null,
+                tagSearchText: ""
             });
             this.getAllItem(null);
         }
@@ -236,6 +246,13 @@ class ItemTable extends React.Component {
 
     return(
       <div>
+      <div className="text-right">
+        <ButtonGroup>
+          <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
+          <Button onClick={() => this.onSearchChange("", null, null)}>Clear</Button>
+        </ButtonGroup>
+        <p>{this.state.tagSearchText}</p>
+      </div>
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
@@ -244,10 +261,12 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='location'>Location</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
+      <TableHeaderColumn dataField='tags_data' hidden>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 
       <ItemDetail  ref={(child) => { this._child = child; }}
       row={this.state.row} updateCallback={this}/>
+      <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
       </div>
     )
   }

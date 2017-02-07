@@ -57,25 +57,28 @@ class ViewRequestModal extends React.Component {
   }
 
   cancel() {
-    console.log('Cancelling');
-    this.patchRequest('cancel');
+    var requestBody = {"id": this.state.requestData.id,
+    "reason":"Placeholder for now"};
+    this.patchRequest('cancel', requestBody);
   }
 
   approve() {
-    console.log('Approving');
-    this.patchRequest('approve');
+    var requestBody = {"id": this.state.requestData.id,
+    "admin_comment":"Placeholder for now"};
+    this.patchRequest('approve', requestBody);
   }
 
   deny() {
-    console.log('Denying');
-    this.patchRequest('deny');
+    var requestBody = {"id": this.state.requestData.id,
+    "admin_comment":"Placeholder for now"};
+    this.patchRequest('deny', requestBody);
   }
 
   isOutstanding() {
     return (this.state.requestData.status == "outstanding");
   }
 
-  patchRequest(type) {
+  patchRequest(type, requestBody) {
     xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/request/" + type + "/" + this.state.requestData.id + "/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
@@ -83,8 +86,6 @@ class ViewRequestModal extends React.Component {
       console.log('PATCH Failed!!');
     }
     else{
-      var requestBody = {"id": this.state.requestData.id,
-      "reason":"Placeholder for now"};
       console.log(requestBody);
       var jsonResult = JSON.stringify(requestBody);
       xhttp.send(jsonResult);

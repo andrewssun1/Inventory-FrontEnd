@@ -6,6 +6,8 @@ import ItemTable from './ItemTable';
 import { checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
 import RequestComponent from './RequestComponent/RequestComponent'
+import TagModal from './TagModal'
+import ManageUsers from './ManageUsers'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -65,6 +67,10 @@ export default class ApplicationTabs extends React.Component {
                      Logs
                    </NavItem>) : null
                    }
+                   {isAdmin ? (<NavItem eventKey="users">
+                     Manage Users
+                   </NavItem>) : null
+                   }
                  <NavItem eventKey="settings">
                    Settings
                  </NavItem>
@@ -84,8 +90,12 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComp"></LogComponent>
                  </Tab.Pane>
+                 {isAdmin ? (
+                 <Tab.Pane eventKey="users">
+                   <ManageUsers ref="manage"></ManageUsers>
+                 </Tab.Pane>) : null}
                  <Tab.Pane eventKey="settings">
-                   Settings go here
+                   <TagModal ref="tagmodal"></TagModal>
                  </Tab.Pane>
                </Tab.Content>
              </Col>
