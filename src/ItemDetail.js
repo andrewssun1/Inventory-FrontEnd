@@ -12,7 +12,7 @@ var Form = Bootstrap.Form;
 
 class ItemDetail extends React.Component {
   constructor(props) {
-    super(props);
+    super(props);3
     this.state = {
       showModal: false,
       isEditing: false
@@ -108,6 +108,7 @@ class ItemDetail extends React.Component {
         :
         //Buttons for an admin in viewing mode
         <div>
+        <Button onClick={this.requestItem} bsStyle="success">Disburse</Button>
         <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
