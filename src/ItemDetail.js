@@ -12,7 +12,7 @@ var Form = Bootstrap.Form;
 
 class ItemDetail extends React.Component {
   constructor(props) {
-    super(props);3
+    super(props);
     this.state = {
       showModal: false,
       isEditing: false
