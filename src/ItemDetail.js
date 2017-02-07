@@ -9,6 +9,7 @@ import ViewRequestModal from './ViewRequestModal';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
+import TagComponent from './TagComponent/TagComponent'
 
 class ItemDetail extends React.Component {
   constructor(props) {
@@ -80,8 +81,6 @@ class ItemDetail extends React.Component {
         type="number" initialValue={this.props.row.model_number} ref={(child) => {this._modelNumberField = child;}}/>
         <TextEntryFormElement controlId="formHorizontalLocation" label="Location"
         type="text" initialValue={this.props.row.location} ref={(child) => {this._locationField = child;}}/>
-        <TextEntryFormElement controlId="formHorizontalTags" label="Tags"
-        type="text" initialValue={this.props.row.tags} componentClass="textarea" ref={(child) => {this._tagsField = child;}}/>
         <TextEntryFormElement controlId="formHorizontalDescription" label="Description"
         type="text" initialValue={this.props.row.description} componentClass="textarea" ref={(child) => {this._descriptionField = child;}}/>
         </Form>
@@ -91,8 +90,9 @@ class ItemDetail extends React.Component {
         <p> Quantity: {this.props.row.quantity} </p>
         <p> Model Number: {this.props.row.model_number} </p>
         <p> Location: {this.props.row.location} </p>
-        <p> Tags: {this.props.row.tags} </p>
-        <p> {this.props.row.description} </p>
+        <p> Description: {this.props.row.description} </p>
+          <p> Tags: </p>
+        <TagComponent item_id={this.props.row.id} item_detail={this.props.row.tags_data}/>
         </div>
       }
 

@@ -57,6 +57,7 @@ class ItemTable extends React.Component {
           var response_results = response.results
           for (var i = 0; i < response_results.length; i++){
               // console.log(this.tagsToListString(response_results[i].tags));
+              response_results[i]["tags_data"] = response_results[i].tags;
               response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
           }
           this.setState({
@@ -259,6 +260,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='location'>Location</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
+      <TableHeaderColumn dataField='tags_data' hidden>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 
       <ItemDetail  ref={(child) => { this._child = child; }}
