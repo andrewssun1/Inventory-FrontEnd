@@ -77,8 +77,7 @@ export default class ApplicationTabs extends React.Component {
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
                    You are in the user homepage. Welcome {localStorage.username}!
-                   Unfortunately, this page is still being built so enjoy this video in the mean time :D
-                   <iframe width="560" height="315" src="https://www.youtube.com/embed/4p7fB_r77z4" frameborder="0" allowfullscreen></iframe>
+                   Unfortunately, this page is still being built :D :/ Sorry
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
                      <ItemTable ref="table1"></ItemTable>
