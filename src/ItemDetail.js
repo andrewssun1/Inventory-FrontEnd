@@ -80,17 +80,21 @@ class ItemDetail extends React.Component {
     xhttp.open("GET", url, false);
     xhttp.setRequestHeader("Content-Type", "application/json");
     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    var response = JSON.parse(xhttp.responseText);
-    console.log(response);
-    var response_results = response.results;
-    for (var i = 0; i < response_results.length; i++){
+    if (xhttp.status === 401 || xhttp.status === 500){
+      console.log('POST Failed!!');
+    } else {
+      xhttp.send();
+      var response = JSON.parse(xhttp.responseText);
+      console.log(response);
+      var response_results = response.results;
+      for (var i = 0; i < response_results.length; i++){
         response_results[i]["item"] = response_results[i].item.name;
+      }
+      this.setState({
+        outstandingRequests: response.results,
+        totalDataSize: response.count
+      });
     }
-    this.setState({
-      outstandingRequests: response.results,
-      totalDataSize: response.count
-    });
   }
 
   render() {
@@ -133,7 +137,7 @@ class ItemDetail extends React.Component {
         <p> Model Number: {this.props.row.model_number} </p>
         <p> Location: {this.props.row.location} </p>
         <p> Description: {this.props.row.description} </p>
-          <p> Tags: </p>
+        <p> Tags: </p>
         <TagComponent item_id={this.props.row.id} item_detail={this.props.row.tags_data}/>
         <br />
         <h4> Requests </h4>
