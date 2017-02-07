@@ -80,7 +80,7 @@ export default class LoginPage extends React.Component {
       }
     }
     else{
-      this.setState({_alert_both: true});
+      // this.setState({_alert_both: true});
     }
   }
 
