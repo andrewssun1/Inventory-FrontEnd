@@ -71,15 +71,14 @@ export default class ApplicationTabs extends React.Component {
                      Manage Users
                    </NavItem>) : null
                    }
-                 <NavItem eventKey="settings">
-                   Settings
-                 </NavItem>
                </Nav>
              </Col>
              <Col sm={8}>
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
                    You are in the user homepage. Welcome {localStorage.username}!
+                   Unfortunately, this page is still being built so enjoy this video in the mean time :D
+                   <iframe width="560" height="315" src="https://www.youtube.com/embed/4p7fB_r77z4" frameborder="0" allowfullscreen></iframe>
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
                      <ItemTable ref="table1"></ItemTable>
@@ -94,9 +93,6 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="users">
                    <ManageUsers ref="manage"></ManageUsers>
                  </Tab.Pane>) : null}
-                 <Tab.Pane eventKey="settings">
-                   <TagModal ref="tagmodal"></TagModal>
-                 </Tab.Pane>
                </Tab.Content>
              </Col>
            </Row>
