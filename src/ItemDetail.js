@@ -43,6 +43,7 @@ class ItemDetail extends React.Component {
     if(this.state.isEditing) {
       this.toggleEditing();
     }
+    this.props.updateCallback.componentWillMount();
     this.setState({showModal: false});
   }
 

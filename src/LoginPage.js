@@ -79,9 +79,6 @@ export default class LoginPage extends React.Component {
         xhttp.send();
       }
     }
-    else{
-      this.setState({_alert_both: true});
-    }
   }
 
   handleClick() {
