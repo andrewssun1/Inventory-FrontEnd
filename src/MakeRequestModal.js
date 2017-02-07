@@ -33,6 +33,7 @@ class MakeRequestModal extends React.Component {
 
   closeModal() {
     this.setState({showModal: false});
+    this.setState({disableRequestButton: true});
   }
 
   componentWillMount(){
