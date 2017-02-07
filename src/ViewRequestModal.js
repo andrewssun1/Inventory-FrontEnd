@@ -64,13 +64,13 @@ class ViewRequestModal extends React.Component {
 
   approve() {
     var requestBody = {"id": this.state.requestData.id,
-    "admin_comment":"Placeholder for now"};
+    "admin_comment":this._commentsField.state.value};
     this.patchRequest('approve', requestBody);
   }
 
   deny() {
     var requestBody = {"id": this.state.requestData.id,
-    "admin_comment":"Placeholder for now"};
+    "admin_comment":this._commentsField.state.value};
     this.patchRequest('deny', requestBody);
   }
 
@@ -108,11 +108,24 @@ class ViewRequestModal extends React.Component {
       <p> Item: {this.state.requestData.item.name} </p>
       <p> Quantity: {this.state.requestData.quantity} </p>
       <p> Reason: {this.state.requestData.reason} </p>
+      <br />
+      {(this.state.requestData.status != "outstanding") ? <div>
+      {(this.state.requestData.status == "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}
+      <p> By: {this.state.requestData.admin.username} </p>
+      <p> At time: {this.state.requestData.admin_timestamp} </p>
+      <p> Comments: {this.state.requestData.admin_comment} </p>
+      </div>
+      :
+      <h4> Outstanding </h4>
+      }
       <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       </Modal.Body>
       <Modal.Footer>
       {isAdmin ?
       <div>
+      {this.isOutstanding() ? <div> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
+      type="text" initialValue="" componentClass="textarea" ref={(child) => {this._commentsField = child;}}/>
+      <br /> <br /> <br /> <br /> </div> : null}
       {(this.isOutstanding() && this.state.requestProblemString == "") ?
       <Button onClick={this.approve} bsStyle="success">Approve Request</Button> : null}
       {this.isOutstanding() ? <Button onClick={this.deny} bsStyle="danger">Deny Request</Button> : null}

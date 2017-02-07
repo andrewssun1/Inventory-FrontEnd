@@ -19,6 +19,9 @@ class TextEntryFormElement extends React.Component {
 
   handleChange(evt) {
     this.setState({value: evt.target.value});
+    if(this.props.changeHandleCallback != null) {
+      this.props.changeHandleCallback.handleChange(evt);
+    }
   }
 
   render() {
