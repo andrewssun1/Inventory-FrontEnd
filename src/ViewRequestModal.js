@@ -57,6 +57,7 @@ class ViewRequestModal extends React.Component {
   }
 
   cancel() {
+    //TODO: change placeholder
     var requestBody = {"id": this.state.requestData.id,
     "reason":"Placeholder for now"};
     this.patchRequest('cancel', requestBody);

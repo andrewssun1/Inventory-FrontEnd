@@ -23,7 +23,6 @@ class ItemTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      row: null,
       _products: [{
         "id": 111111111,
         "name": "siva",
@@ -185,8 +184,8 @@ class ItemTable extends React.Component {
   }
 
   onRowClick(row, isSelected, e) {
-    this.setState({row: row});
     this._child.getRequests(row.name);
+    this._child.getDetailedItem(row.id);
     this._child.openModal();
   }
 
@@ -264,8 +263,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='tags_data' hidden>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 
-      <ItemDetail  ref={(child) => { this._child = child; }}
-      row={this.state.row} updateCallback={this}/>
+      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this}/>
       <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
       </div>
     )
