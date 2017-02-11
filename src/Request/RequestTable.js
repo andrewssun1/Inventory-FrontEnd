@@ -22,7 +22,7 @@ class RequestTable extends React.Component {
       unselectable: [],
       selected: [],
       showModal: false,
-      selectedRequest: 0 //TODO: is this used?
+      selectedRequest: 0
     }
 
     this.filterFields = {
