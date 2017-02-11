@@ -6,7 +6,7 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var Bootstrap = require('react-bootstrap');
 import ItemDetail from './ItemDetail';
-import TagModal from './TagModal';
+import TagModal from '../TagModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -14,7 +14,7 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {Modal, Button, Form, FormGroup, Col, ControlLabel, FormControl, ButtonGroup} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
-import { checkAuthAndAdmin } from './Utilities';
+import { checkAuthAndAdmin } from '../Utilities';
 
 var xhttp = new XMLHttpRequest();
 

@@ -4,15 +4,15 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 var ReactBsTable = require('react-bootstrap-table');
-import TextEntryFormElement from './TextEntryFormElement';
-import MakeRequestModal from './MakeRequestModal';
-import ViewRequestModal from './ViewRequestModal';
+import TextEntryFormElement from '../TextEntryFormElement';
+import MakeRequestModal from '../Request/MakeRequestModal';
+import ViewRequestModal from '../Request/ViewRequestModal';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-import TagComponent from './TagComponent/TagComponent'
+import TagComponent from '../TagComponent/TagComponent'
 
 //TODO: Refactor this and Request Table, create one component that is used in both
 

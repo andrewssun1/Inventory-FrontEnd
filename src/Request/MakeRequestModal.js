@@ -3,8 +3,8 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from "./TextEntryFormElement";
-import {checkAuthAndAdmin} from "./Utilities";
+import TextEntryFormElement from "../TextEntryFormElement";
+import {checkAuthAndAdmin} from "../Utilities";
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;

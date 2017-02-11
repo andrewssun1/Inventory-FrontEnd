@@ -3,7 +3,7 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from './TextEntryFormElement';
+import TextEntryFormElement from '../TextEntryFormElement';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 
