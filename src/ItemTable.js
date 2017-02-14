@@ -141,6 +141,7 @@ class ItemTable extends React.Component {
           xhttp.send(jsonResult);
           var response = JSON.parse(xhttp.responseText);
           row.id = response.id;
+          this.forceUpdate();
       }
     }
     // console.log(this.state._products);

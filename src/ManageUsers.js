@@ -21,6 +21,7 @@ export default class ManageUsers extends React.Component {
     }
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
+    this.nameValidator = this.nameValidator.bind(this);
   }
 
   componentWillMount() {
@@ -49,6 +50,10 @@ export default class ManageUsers extends React.Component {
             _loginState: false
         });
     }
+  }
+
+  componentDidMount(){
+    this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
   }
 
   // Makes sure name has at least one character

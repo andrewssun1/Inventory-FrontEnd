@@ -37,6 +37,7 @@ export default class ApplicationTabs extends React.Component {
      */
     if (key === "items") {
       setTimeout(() => {
+        console.log("attempting to update!")
         this.refs.table1.forceUpdate();
       }, 500);
     }
