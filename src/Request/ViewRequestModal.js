@@ -3,7 +3,7 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from './TextEntryFormElement';
+import TextEntryFormElement from '../TextEntryFormElement';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 
@@ -57,6 +57,7 @@ class ViewRequestModal extends React.Component {
   }
 
   cancel() {
+    //TODO: change placeholder
     var requestBody = {"id": this.state.requestData.id,
     "reason":"Placeholder for now"};
     this.patchRequest('cancel', requestBody);

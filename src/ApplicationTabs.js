@@ -2,10 +2,10 @@
 // creation of some simple tabs
 // @author Andrew
 
-import ItemTable from './ItemTable';
+import ItemComponent from './Item/ItemComponent';
 import { checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
-import RequestComponent from './RequestComponent/RequestComponent'
+import RequestComponent from './Request/RequestComponent'
 import TagModal from './TagModal'
 import ManageUsers from './ManageUsers'
 
@@ -37,7 +37,7 @@ export default class ApplicationTabs extends React.Component {
      */
     if (key === "items") {
       setTimeout(() => {
-        this.refs.table1.forceUpdate();
+        this.refs.itemComponent.forceUpdate();
       }, 500);
     }
   });
@@ -82,7 +82,7 @@ export default class ApplicationTabs extends React.Component {
                    You are in the user homepage. Welcome {localStorage.username}!
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
-                     <ItemTable ref="table1"></ItemTable>
+                     <ItemComponent ref="itemComponent"></ItemComponent>
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
                    <RequestComponent ref="requestComponent"></RequestComponent>
