@@ -3,8 +3,8 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from "./TextEntryFormElement";
-import {checkAuthAndAdmin} from "./Utilities";
+import TextEntryFormElement from "../TextEntryFormElement";
+import {checkAuthAndAdmin} from "../Utilities";
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -17,12 +17,14 @@ class MakeRequestModal extends React.Component {
     this.state = {
       showModal: false,
       isAdmin: false,
-      requestProblemString: ''
+      requestProblemString: '',
+      disableRequestButton: true
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.makeRequest = this.makeRequest.bind(this);
     this.makeDisburse = this.makeDisburse.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   openModal() {
@@ -31,6 +33,7 @@ class MakeRequestModal extends React.Component {
 
   closeModal() {
     this.setState({showModal: false});
+    this.setState({disableRequestButton: true});
   }
 
   componentWillMount(){
@@ -82,6 +85,10 @@ class MakeRequestModal extends React.Component {
     )
   }
 
+  handleChange(evt) {
+    this.setState({disableRequestButton: (evt.target.value == "")});
+  }
+
   render() {
     return (
       <div>
@@ -94,7 +101,7 @@ class MakeRequestModal extends React.Component {
       <TextEntryFormElement controlId="formHorizontalQuantity" label="Quantity" type="number"
       initialValue={1} ref={(child) => {this._quantityField = child;}}/>
       <TextEntryFormElement controlId="formHorizontalReason" label="Reason"
-      type="text" initialValue="" componentClass="textarea" ref={(child) => {this._reasonField = child;}}/>
+      type="text" initialValue="" componentClass="textarea" changeHandleCallback={this} ref={(child) => {this._reasonField = child;}}/>
       {this.state.isAdmin === 'true' ? (<TextEntryFormElement controlId="formHorizontalReceiver" label="Receiver"
                                                    type="text" initialValue="" ref={(child) => {this._receiverField = child;}}/>) :
            (null)}
@@ -103,7 +110,7 @@ class MakeRequestModal extends React.Component {
       <Modal.Footer>
       <div>
           {this.state.isAdmin === 'true' ? (<Button onClick={this.makeDisburse} bsStyle="success">Disburse</Button>) :
-              (<Button onClick={this.makeRequest} bsStyle="primary">Make Request</Button>)}
+              (<Button onClick={this.makeRequest} bsStyle="primary" disabled={this.state.disableRequestButton}>Make Request</Button>)}
       <Button onClick={this.closeModal} bsStyle="danger">Cancel</Button>
       </div>
       </Modal.Footer>
