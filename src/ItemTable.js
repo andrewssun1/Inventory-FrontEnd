@@ -37,12 +37,14 @@ class ItemTable extends React.Component {
       currentSearchURL: null,
       currentPage: 1,
       totalDataSize: 0,
-      tagSearchText: ""
+      tagSearchText: "",
+      showModal: true
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
+    this.buttonFormatter = this.buttonFormatter.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -187,8 +189,10 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
-    this._child.getRequests(row.name);
-    this._child.openModal();
+    if (this.state.showModal){
+      this._child.getRequests(row.name);
+      this._child.openModal();
+    }
   }
 
   onTagSearchClick() {
@@ -221,6 +225,19 @@ class ItemTable extends React.Component {
             currentPage: page
         })
     }
+
+  onAddtoCartClick(cell, row){
+    console.log(row);
+    this.state.showModal = false;
+    alert("Added " + row.name + " to cart!");
+  }
+
+  buttonFormatter(cell, row) {
+    return (
+      <div class="col-md-4 center-block">
+      <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>
+      </div>);
+  }
 
   render() {
 
@@ -262,6 +279,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='location'>Location</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
+      <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center"></TableHeaderColumn>
       <TableHeaderColumn dataField='tags_data' hidden>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 
