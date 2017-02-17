@@ -6,7 +6,8 @@ var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
-import {Modal, Button, Radio, ButtonGroup, Input} from 'react-bootstrap'
+import {Modal, Button, Radio, ButtonGroup} from 'react-bootstrap';
+import {restRequest, checkAuthAndAdmin} from "./Utilities.js"
 
 class TagModal extends React.Component {
   constructor(props) {
@@ -35,22 +36,31 @@ class TagModal extends React.Component {
   openModal() {
     // Wants to get list of tags every time
     // Do REST API call
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/tag/unique/", false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    if (xhttp.status === 401 || xhttp.status === 500){
-      console.log('GET Failed!!');
-    }
-    else{
-      var response = JSON.parse(xhttp.responseText);
-      var tagList = response.results;
-      for (var i = 0; i < tagList.length; i++){
-        this.state.tagOptions.push({label: tagList[i].tag, value: tagList[i].tag});
-      }
-    }
-    this.setState({showModal: true});
+    restRequest("GET", "/api/item/tag/unique/", "application/json", null,
+                (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  var tagList = response.results;
+                  for (var i = 0; i < tagList.length; i++){
+                    this.state.tagOptions.push({label: tagList[i].tag, value: tagList[i].tag});
+                  }
+                  this.setState({showModal: true});
+                }, ()=>{console.log('GET Failed!!');});
+    // var xhttp = new XMLHttpRequest();
+    // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/tag/unique/", false);
+    // xhttp.setRequestHeader("Content-Type", "application/json");
+    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    // xhttp.send();
+    // if (xhttp.status === 401 || xhttp.status === 500){
+    //   console.log('GET Failed!!');
+    // }
+    // else{
+    //   var response = JSON.parse(xhttp.responseText);
+    //   var tagList = response.results;
+    //   for (var i = 0; i < tagList.length; i++){
+    //     this.state.tagOptions.push({label: tagList[i].tag, value: tagList[i].tag});
+    //   }
+    // }
+    // this.setState({showModal: true});
   }
 
   saveModal(){

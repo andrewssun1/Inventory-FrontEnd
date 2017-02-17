@@ -5,9 +5,9 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import RequestButton from "./RequestButton";
 import ViewRequestModal from './ViewRequestModal.js';
 import {hashHistory} from "react-router";
-
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 var moment = require('moment');
-var xhttp = new XMLHttpRequest();
+//var xhttp = new XMLHttpRequest();
 
 class RequestTable extends React.Component {
   constructor(props){
@@ -47,36 +47,50 @@ class RequestTable extends React.Component {
   }
 
   getAllRequests(url_parameter){
-    var url = url_parameter == null ? "https://asap-test.colab.duke.edu/api/request/" : "https://asap-test.colab.duke.edu/api/request/" + url_parameter;
-    xhttp.open("GET", url, false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    if (xhttp.status === 401 || xhttp.status === 500){
-      if(!!localStorage.token){
-        delete localStorage.token;
-      }
-      this.setState({
-        _loginState: false
-      });
-      hashHistory.push('/login');
-      return null;
-    }
-    else{
-      var response = JSON.parse(xhttp.responseText);
-      var unselectable_ids = [];
-      var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
-      this.setState({
-        data: response_results,
-        totalDataSize: response.count,
-        unselectable: unselectable_ids
-      });
-    }
+    var url = url_parameter === null ? "/api/request/" : "/api/request/" + url_parameter;
+    checkAuthAndAdmin(()=>{
+      restRequest("GET", url, "application/json", null,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    console.log(response);
+                    var unselectable_ids = [];
+                    var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
+                    this.setState({
+                      data: response_results,
+                      totalDataSize: response.count,
+                      unselectable: unselectable_ids
+                    });
+                  }, ()=>{});
+    });
+    // xhttp.open("GET", url, false);
+    // xhttp.setRequestHeader("Content-Type", "application/json");
+    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    // xhttp.send();
+    // if (xhttp.status === 401 || xhttp.status === 500){
+    //   if(!!localStorage.token){
+    //     delete localStorage.token;
+    //   }
+    //   this.setState({
+    //     _loginState: false
+    //   });
+    //   hashHistory.push('/login');
+    //   return null;
+    // }
+    // else{
+    //   var response = JSON.parse(xhttp.responseText);
+    //   var unselectable_ids = [];
+    //   var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
+    //   this.setState({
+    //     data: response_results,
+    //     totalDataSize: response.count,
+    //     unselectable: unselectable_ids
+    //   });
+    // }
   }
 
   static editGetResponse(data,unselectable_arr) {
     for(var index=0; index< data.length; index++){
-      data[index]['item_name'] = data[index]['item'] == null ? 'UNKNOWN ITEM' : data[index]['item']['name'];
+      data[index]['item_name'] = data[index]['item'] === null ? 'UNKNOWN ITEM' : data[index]['item']['name'];
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
       if(data[index]['status']!=='outstanding'){
         unselectable_arr.push(data[index]['id'])
@@ -87,8 +101,8 @@ class RequestTable extends React.Component {
 
   onPageChange(page, sizePerPage) {
     var page_argument = "page=" + page;
-    var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
-    url_param = this.state.currentSearchURL == null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
+    var url_param = this.state.currentFilterURL === null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
+    url_param = this.state.currentSearchURL === null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
     this.getAllRequests(url_param);
     this.setState({
       currentPage: page
@@ -126,7 +140,7 @@ class RequestTable extends React.Component {
   }
 
   onSearchChange(searchText, colInfos, multiColumnSearch) {
-    if(searchText==''){
+    if(searchText===''){
       this.setState({
         currentSearchURL: null
       });
@@ -150,7 +164,7 @@ class RequestTable extends React.Component {
     }
     else{
       var url_parameter = "?";
-      if(filterObj.status != null){
+      if(filterObj.status !== null){
         url_parameter = url_parameter + "status=" + this.filterFields.status[filterObj.status.value];
       }
       this.getAllRequests(url_parameter)
@@ -158,8 +172,11 @@ class RequestTable extends React.Component {
   }
 
   onRowClick(row, isSelected, e) {
-    this._requestModal.getDetailedRequest(row.id);
-    this._requestModal.openModal();
+    console.log(this._requestModal.state.requestData);
+    console.log(row.id);
+    this._requestModal.getDetailedRequest(row.id, ()=>{
+      this._requestModal.openModal();
+    });
   }
 
   render() {
@@ -199,10 +216,10 @@ class RequestTable extends React.Component {
       selectRow={ selectRowProp }
       striped hover>
       <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-      <TableHeaderColumn dataField='item_name' width="150">Item</TableHeaderColumn>
-      <TableHeaderColumn dataField='quantity' width="80">Quantity</TableHeaderColumn>
-      <TableHeaderColumn dataField='status' width="150" filter={ { type: 'SelectFilter', options: this.filterFields.status } } editable={ false }>Status</TableHeaderColumn>
-      <TableHeaderColumn dataField='timestamp' width="170"  editable={ false }>Timestamp</TableHeaderColumn>
+      <TableHeaderColumn dataField='item_name' width="150px">Item</TableHeaderColumn>
+      <TableHeaderColumn dataField='quantity' width="80px">Quantity</TableHeaderColumn>
+      <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', options: this.filterFields.status } } editable={ false }>Status</TableHeaderColumn>
+      <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
       </BootstrapTable>
       </div>

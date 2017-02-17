@@ -44,11 +44,11 @@ export default class ApplicationTabs extends React.Component {
 }
 
   componentWillMount(){
-    checkAuthAndAdmin()
+    checkAuthAndAdmin(()=>{})
   }
 
   render() {
-      const isAdmin = (localStorage.isAdmin == "true");
+      const isAdmin = (localStorage.isAdmin === "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">

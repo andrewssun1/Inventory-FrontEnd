@@ -4,12 +4,11 @@
 
 var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
-var Bootstrap = require('react-bootstrap');
 var moment = require('moment');
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-import {checkAuthAndAdmin} from './Utilities'
+import {restRequest, checkAuthAndAdmin} from './Utilities'
 var xhttp = new XMLHttpRequest();
 
 export default class ManageUsers extends React.Component {
@@ -25,31 +24,48 @@ export default class ManageUsers extends React.Component {
   }
 
   componentWillMount() {
-    if (checkAuthAndAdmin()){
+    checkAuthAndAdmin(()=>{
         // GET request to get all items from database
-        xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/", false);
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        if (xhttp.status === 401 || xhttp.status === 500){
-          console.log('GET Failed!!');
-        }
-        xhttp.send();
-        var response = JSON.parse(xhttp.responseText);
-        var response_results = response.results;
-        for (var i = 0; i < response_results.length; i++){
-          response.results[i].last_login = moment(response.results[i].last_login).format('lll')
-          response.results[i].date_joined = moment(response.results[i].date_joined).format('lll')
-        }
-        this.setState({
-            _users: response_results
-        });
-    }
-    // auth failed
-    else{
-        this.setState({
-            _loginState: false
-        });
-    }
+        restRequest("GET", "/api/user/", "application/json", null,
+                    (responseText)=>{
+                      var response = JSON.parse(responseText);
+                      var response_results = response.results;
+                      for (var i = 0; i < response_results.length; i++){
+                        response.results[i].last_login = moment(response.results[i].last_login).format('lll')
+                        response.results[i].date_joined = moment(response.results[i].date_joined).format('lll')
+                      }
+                      this.setState({
+                          _users: response_results
+                      });
+                    },
+                    ()=>{
+                      console.log('GET Failed!!');
+                      this.setState({
+                          _loginState: false
+                      });
+                    });
+        // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/", false);
+        // xhttp.setRequestHeader("Content-Type", "application/json");
+        // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+        // if (xhttp.status === 401 || xhttp.status === 500){
+        //   console.log('GET Failed!!');
+        // }
+        // xhttp.send();
+        // var response = JSON.parse(xhttp.responseText);
+        // var response_results = response.results;
+        // for (var i = 0; i < response_results.length; i++){
+        //   response.results[i].last_login = moment(response.results[i].last_login).format('lll')
+        //   response.results[i].date_joined = moment(response.results[i].date_joined).format('lll')
+        // }
+        // this.setState({
+        //     _users: response_results
+        // });
+    }, ()=>{
+      // auth failed
+          this.setState({
+              _loginState: false
+          });
+    });
   }
 
   componentDidMount(){
@@ -65,50 +81,50 @@ export default class ManageUsers extends React.Component {
   }
 
   onAddRow(row) {
-    if (checkAuthAndAdmin() && row){ // should we check for auth/admin here? yes right?
-      xhttp.open("POST", "https://asap-test.colab.duke.edu/api/user/", false);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      if (xhttp.status === 401 || xhttp.status === 500){
-        console.log('POST Failed!!');
-      }
-      // POST request able to continue
-        else{
-          var sendJSON = {};
-          sendJSON.username = row.username;
-          sendJSON.password = row.password;
-          sendJSON.email = row.email;
-          sendJSON.is_staff = (row.is_staff == 'true');
-
-          this.state._users.push(row);
-          var jsonResult = JSON.stringify(sendJSON);
-
-          // Send the row and parse the response
-          xhttp.send(jsonResult);
-          var response = JSON.parse(xhttp.responseText);
-          row.id = response.id;
-      }
-    }
+    checkAuthAndAdmin(()=>{
+      var sendJSON = {};
+      sendJSON.username = row.username;
+      sendJSON.password = row.password;
+      sendJSON.email = row.email;
+      sendJSON.is_staff = (row.is_staff === 'true');
+      var jsonResult = JSON.stringify(sendJSON);
+      restRequest("POST", "/api/user/", "application/json", jsonResult,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    row.id = response.id;
+                    this.state._users.push(row);
+                  }, ()=>{console.log('POST Failed!!');});
+    });
   }
 
   onDeleteRow(rows) {
-    if(checkAuthAndAdmin() && rows){
-        xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/user/"+rows[0], false);
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        xhttp.send();
-      this.setState({
-        _users: this.state._users.filter((product) => {
-          return rows.indexOf(product.id) === -1;
-        })
-      })
-    }
+
+    checkAuthAndAdmin(()=>{
+      restRequest("DELETE", "/api/user/"+rows[0], "application/json", null,
+                  ()=>{
+                    this.setState({
+                      _users: this.state._users.filter((product) => {
+                        return rows.indexOf(product.id) === -1;
+                      })
+                    })
+                  },
+                  ()=>{}
+                );
+      //   xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/user/"+rows[0], false);
+      //   xhttp.setRequestHeader("Content-Type", "application/json");
+      //   xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+      //   xhttp.send();
+      // this.setState({
+      //   _users: this.state._users.filter((product) => {
+      //     return rows.indexOf(product.id) === -1;
+      //   })
+      // })
+    });
     // console.log(rows);
   }
 
 
   render(){
-    const isAdmin = (localStorage.isAdmin == "true");
 
     const selectRow = {
       mode: 'checkbox' //radio or checkbox

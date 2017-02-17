@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom';
 import ApplicationTabs from './ApplicationTabs'
 import LoginPage from './LoginPage'
 import MasterPage from './MasterPage'
-import isLoggedIn from './Utilities.js'
-import { Router, IndexRoute, Route, hashHistory } from 'react-router';
+import { Router, Route, hashHistory } from 'react-router';
 
 
 function requireAuth(nextState, replace){

@@ -4,7 +4,7 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
-import {checkAuthAndAdmin} from "../Utilities";
+import {restRequest, checkAuthAndAdmin} from "../Utilities";
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -37,32 +37,52 @@ class MakeRequestModal extends React.Component {
   }
 
   componentWillMount(){
-      checkAuthAndAdmin();
-      this.setState({
-        isAdmin: localStorage.isAdmin
-      })
+      checkAuthAndAdmin(()=>{
+        this.setState({
+          isAdmin: localStorage.isAdmin
+        })
+      });
+
   }
 
   makeAPIPostRequest(url, requestBody){
-      xhttp.open('POST', url, false);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
       var jsonResult = JSON.stringify(requestBody);
-      xhttp.send(jsonResult);
-      if (xhttp.status === 401 || xhttp.status === 500){
-          this.setState({
-              requestProblemString: 'A problem occured, please contact system administrator'
-          })
-      }
-      else if(xhttp.status === 405){
-          var response = JSON.parse(xhttp.responseText);
-          this.setState({
-            requestProblemString: response.detail
-          })
-      }
-      else{
-          this.closeModal();
-      }
+      restRequest("POST", url, "application/json", jsonResult,
+                  ()=>{
+                    this.closeModal();
+                  },
+                  (status, responseText)=>{
+                    if (status === 401 || status === 500){
+                        this.setState({
+                            requestProblemString: 'A problem occured, please contact system administrator'
+                        })
+                    }
+                    else if(status === 405){
+                        var response = JSON.parse(responseText);
+                        this.setState({
+                          requestProblemString: response.detail
+                        })
+                    }
+                  });
+      // xhttp.open('POST', url, false);
+      // xhttp.setRequestHeader("Content-Type", "application/json");
+      // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+      // var jsonResult = JSON.stringify(requestBody);
+      // xhttp.send(jsonResult);
+      // if (xhttp.status === 401 || xhttp.status === 500){
+      //     this.setState({
+      //         requestProblemString: 'A problem occured, please contact system administrator'
+      //     })
+      // }
+      // else if(xhttp.status === 405){
+      //     var response = JSON.parse(xhttp.responseText);
+      //     this.setState({
+      //       requestProblemString: response.detail
+      //     })
+      // }
+      // else{
+      //     this.closeModal();
+      // }
   }
 
   makeDisburse(){
@@ -72,11 +92,11 @@ class MakeRequestModal extends React.Component {
         "receiver": this._receiverField.state.value,
         "disburse_comment": this._reasonField.state.value
     };
-    this.makeAPIPostRequest("https://asap-test.colab.duke.edu/api/request/disburse/", requestBody)
+    this.makeAPIPostRequest("/api/request/disburse/", requestBody)
   }
 
   makeRequest() {
-    this.makeAPIPostRequest("https://asap-test.colab.duke.edu/api/request/",
+    this.makeAPIPostRequest("/api/request/",
         {
           "item_id": this.props.item_id,
           "quantity": this._quantityField.state.value,
@@ -86,7 +106,7 @@ class MakeRequestModal extends React.Component {
   }
 
   handleChange(evt) {
-    this.setState({disableRequestButton: (evt.target.value == "")});
+    this.setState({disableRequestButton: (evt.target.value === "")});
   }
 
   render() {
