@@ -7,26 +7,27 @@ var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
 import MakeRequestModal from '../Request/MakeRequestModal';
 import ViewRequestModal from '../Request/ViewRequestModal';
+import TagComponent from '../TagComponent/TagComponent'
+import TypeEnum from '../TypeEnum';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-import TagComponent from '../TagComponent/TagComponent'
-
-//TODO: Refactor this and Request Table, create one component that is used in both
 
 var xhttp = new XMLHttpRequest();
 
 class ItemDetail extends React.Component {
+
   constructor(props) {
     super(props);
+    this.refDict = {};
     this.state = {
       showModal: false,
       isEditing: false,
       itemData: null,
-      outstandingRequests: null
-
+      outstandingRequests: null,
+      fieldData: null
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -35,6 +36,8 @@ class ItemDetail extends React.Component {
     this.requestItem = this.requestItem.bind(this);
     this.getRequests = this.getRequests.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
+    this.renderDisplayFields = this.renderDisplayFields.bind(this);
+    this.renderEditFields = this.renderEditFields.bind(this);
   }
 
   getDetailedItem(id) {
@@ -49,7 +52,18 @@ class ItemDetail extends React.Component {
       console.log("Getting Response");
       console.log(response);
       this.setState({itemData: response});
+      this.populateFieldData(response);
     }
+  }
+
+  populateFieldData(response) {
+    var data = [
+      {name: "Name", type: TypeEnum.SHORT_STRING, value: response.name},
+      {name: "Quantity", type: TypeEnum.INTEGER, value: response.quantity},
+      {name: "Model Number", type: TypeEnum.SHORT_STRING, value: response.model_number},
+      {name: "Description", type: TypeEnum.LONG_STRING, value: response.description}
+    ];
+    this.setState({fieldData: data});
   }
 
   saveItem() {
@@ -60,11 +74,10 @@ class ItemDetail extends React.Component {
       console.log('PATCH Failed!!');
     } else {
       var requestBody = {
-        "name": this._nameField.state.value,
-        "quantity": this._quantityField.state.value,
-        "model_number": this._modelNumberField.state.value,
-        "description": this._descriptionField.state.value,
-        "location": "Nowhere until you make a user-defined field"
+        "name": this.refDict["Name"].state.value,
+        "quantity": this.refDict["Quantity"].state.value,
+        "model_number": this.refDict["Model Number"].state.value,
+        "description": this.refDict["Description"].state.value
       }
       var jsonResult = JSON.stringify(requestBody);
       xhttp.send(jsonResult);
@@ -118,6 +131,9 @@ class ItemDetail extends React.Component {
   }
 
   toggleEditing() {
+    if(!this.state.isEditing) {
+      this.renderEditFields();
+    }
     this.setState({isEditing: !this.state.isEditing});
   }
 
@@ -134,6 +150,22 @@ class ItemDetail extends React.Component {
     this.closeModal();
     this._requestModal.openModal();
     console.log('request clicked');
+  }
+
+  renderDisplayFields() {
+    let displayFields = this.state.fieldData.map((field) => {
+      return(<p key={field.name}> {field.name} : {field.value} </p>);
+    });
+    return (displayFields);
+  }
+
+  renderEditFields() {
+    let editFields = this.state.fieldData.map((field) => {
+      return(<TextEntryFormElement key={field.name} controlId={"formHorizontal" + field.name}
+      label={field.name} type={field.type} initialValue={field.value}
+      ref={child => this.refDict[field.name] = child}/>);
+    });
+    return(editFields);
   }
 
   render() {
@@ -153,22 +185,12 @@ class ItemDetail extends React.Component {
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
       {this.state.isEditing ?
-        <Form horizontal>
-        <TextEntryFormElement controlId="formHorizontalName" label="Name" type="text"
-        initialValue={this.state.itemData.name} ref={(child) => {this._nameField = child;}}/>
-        <TextEntryFormElement controlId="formHorizontalQuantity" label="Quantity"
-        type="number" initialValue={this.state.itemData.quantity} ref={(child) => {this._quantityField = child;}}/>
-        <TextEntryFormElement controlId="formHorizontalModelNumber" label="Model Number"
-        type="text" initialValue={this.state.itemData.model_number} ref={(child) => {this._modelNumberField = child;}}/>
-        <TextEntryFormElement controlId="formHorizontalDescription" label="Description"
-        type="text" initialValue={this.state.itemData.description} componentClass="textarea" ref={(child) => {this._descriptionField = child;}}/>
+        <Form horizontal ref={(child) => { this._editForm = child; }}>
+        {this.renderEditFields()}
         </Form>
         :
         <div>
-        <h2> {this.state.itemData.name} </h2>
-        <p> Quantity: {this.state.itemData.quantity} </p>
-        <p> Model Number: {this.state.itemData.model_number} </p>
-        <p> Description: {this.state.itemData.description} </p>
+        {this.renderDisplayFields()}
         <p> Tags: </p>
         <TagComponent item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
