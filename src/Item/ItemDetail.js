@@ -97,7 +97,6 @@ class ItemDetail extends React.Component {
       var response = JSON.parse(xhttp.responseText);
       console.log("Getting Response");
       console.log(response);
-      this.getDetailedItem(this.state.itemData.id);
     }
     //Save Custom Fields
     var itemDataArrays = [this.state.itemData.short_text_fields,
@@ -114,6 +113,8 @@ class ItemDetail extends React.Component {
         }
       }
     }
+    //Update detailed item data:
+    this.getDetailedItem(this.state.itemData.id);
   }
 
   getRequests(item_name){
