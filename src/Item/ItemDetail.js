@@ -38,6 +38,7 @@ class ItemDetail extends React.Component {
     this.getDetailedItem = this.getDetailedItem.bind(this);
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
     this.renderEditFields = this.renderEditFields.bind(this);
+    this.customFieldRequest = this.customFieldRequest.bind(this);
   }
 
   getDetailedItem(id) {
@@ -57,12 +58,22 @@ class ItemDetail extends React.Component {
   }
 
   populateFieldData(response) {
+    //Default Fields:
     var data = [
       {name: "Name", type: TypeEnum.SHORT_STRING, value: response.name},
       {name: "Quantity", type: TypeEnum.INTEGER, value: response.quantity},
       {name: "Model Number", type: TypeEnum.SHORT_STRING, value: response.model_number},
       {name: "Description", type: TypeEnum.LONG_STRING, value: response.description}
     ];
+    //Custom Fields:
+    var typesArray = [TypeEnum.SHORT_STRING, TypeEnum.INTEGER, TypeEnum.FLOAT, TypeEnum.LONG_STRING];
+    var responseDataArrays = [response.short_text_fields, response.int_fields, response.float_fields, response.long_text_fields];
+    for(var i = 0; i < typesArray.length; i++) {
+      for(var j = 0; j < responseDataArrays[i].length; j++) {
+        var field = responseDataArrays[i][j];
+        data.push({name: field.field, type: typesArray[i], value: field.value});
+      }
+    }
     this.setState({fieldData: data});
   }
 
@@ -79,6 +90,8 @@ class ItemDetail extends React.Component {
         "model_number": this.refDict["Model Number"].state.value,
         "description": this.refDict["Description"].state.value
       }
+      console.log(requestBody);
+      //Send response body:
       var jsonResult = JSON.stringify(requestBody);
       xhttp.send(jsonResult);
       var response = JSON.parse(xhttp.responseText);
@@ -86,8 +99,22 @@ class ItemDetail extends React.Component {
       console.log(response);
       this.getDetailedItem(this.state.itemData.id);
     }
+    //Save Custom Fields
+    var itemDataArrays = [this.state.itemData.short_text_fields,
+                              this.state.itemData.int_fields,
+                              this.state.itemData.float_fields,
+                              this.state.itemData.long_text_fields];
+    var types = ["shorttext", "int",
+                          "float", "longtext"];
+    for(var i = 0; i < itemDataArrays.length; i++) {
+      var oldFields = itemDataArrays[i];
+      for(var j = 0; j < oldFields.length; j++) {
+        if(oldFields[j].value != this.refDict[oldFields[j].field].state.value) {
+          this.customFieldRequest(types[i], oldFields[j].field_id, this.refDict[oldFields[j].field].state.value);
+        }
+      }
+    }
   }
-
 
   getRequests(item_name){
     // GET request to get all outstanding requests for this item by this user
@@ -115,6 +142,25 @@ class ItemDetail extends React.Component {
         outstandingRequests: response.results,
         totalDataSize: response.count
       });
+    }
+  }
+
+  customFieldRequest(type, id, value) {
+    xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/item/field/" + type + "/" + id, false);
+    xhttp.setRequestHeader("Content-Type", "application/json");
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+    if (xhttp.status === 401 || xhttp.status === 500) {
+      console.log('PATCH Failed!!');
+    } else {
+      var requestBody = {
+        "value": value
+      }
+      console.log(requestBody);
+      var jsonResult = JSON.stringify(requestBody);
+      xhttp.send(jsonResult);
+      var response = JSON.parse(xhttp.responseText);
+      console.log("Getting Response");
+      console.log(response);
     }
   }
 
