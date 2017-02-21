@@ -7,6 +7,8 @@ import {Form, FormGroup, Col, Button, ControlLabel, FormControl, Alert} from 're
 import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
+const SERVER = "http://asap-test.colab.duke.edu";
+
 export default class LoginPage extends React.Component {
   constructor(props) {
     super(props);
@@ -52,7 +54,7 @@ export default class LoginPage extends React.Component {
       var authToken = currUrl.substring(currUrl.indexOf("code=")+5, currUrl.indexOf('&'));
       var postJSON = {};
       postJSON.code = authToken;
-      postJSON.redirect_uri = "http://localhost:3000";
+      postJSON.redirect_uri = SERVER;
 
       restRequest("POST", "/api/user/auth/duke", "application/json", JSON.stringify(postJSON),
                   (xhttpResponse)=>{
@@ -118,7 +120,7 @@ export default class LoginPage extends React.Component {
   }
 
   handleClickNetid() {
-      window.location.replace("https://oauth.oit.duke.edu/oauth/authorize?response_type=code&redirect_uri=http://localhost:3000&client_id=asap-inventory-system&scope=basic+identity%3Anetid%3Aread&state=abc123");
+      window.location.replace("https://oauth.oit.duke.edu/oauth/authorize?response_type=code&redirect_uri="+SERVER+"&client_id=asap-inventory-system&scope=basic+identity%3Anetid%3Aread&state=abc123");
   }
 
   render() {
