@@ -39,6 +39,7 @@ class ItemDetail extends React.Component {
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
     this.renderEditFields = this.renderEditFields.bind(this);
     this.customFieldRequest = this.customFieldRequest.bind(this);
+    this.typeCheck = this.typeCheck.bind(this);
   }
 
   getDetailedItem(id) {
@@ -108,13 +109,18 @@ class ItemDetail extends React.Component {
     for(var i = 0; i < itemDataArrays.length; i++) {
       var oldFields = itemDataArrays[i];
       for(var j = 0; j < oldFields.length; j++) {
-        if(oldFields[j].value != this.refDict[oldFields[j].field].state.value) {
-          this.customFieldRequest(types[i], oldFields[j].field_id, this.refDict[oldFields[j].field].state.value);
+        var newValue = this.refDict[oldFields[j].field].state.value;
+        if(oldFields[j].value != newValue && this.typeCheck(newValue, types[i])) {
+          this.customFieldRequest(types[i], oldFields[j].id, newValue);
         }
       }
     }
     //Update detailed item data:
     this.getDetailedItem(this.state.itemData.id);
+  }
+
+  typeCheck(value, type) {
+    return (type == 'short_text' || type == 'long_text' || value != "");
   }
 
   getRequests(item_name){
