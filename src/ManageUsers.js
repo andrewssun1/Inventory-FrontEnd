@@ -16,7 +16,7 @@ export default class ManageUsers extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      _users: []
+      _users: [{is_superuser: false}]
     }
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
@@ -119,8 +119,8 @@ export default class ManageUsers extends React.Component {
       <TableHeaderColumn dataField='username' editable={ { validator: this.nameValidator} }>Username</TableHeaderColumn>
       <TableHeaderColumn dataField='password' editable={ { validator: this.nameValidator} } hidden>Password</TableHeaderColumn>
       <TableHeaderColumn dataField='email'>Email</TableHeaderColumn>
-      <TableHeaderColumn dataField='is_staff' editable={ { type: 'select', options: { values: jobTypes } } }>Is Admin</TableHeaderColumn>
-      <TableHeaderColumn dataField='last_login' hiddenOnInsert>Last Logged In</TableHeaderColumn>
+      <TableHeaderColumn dataField='is_staff' editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
+      <TableHeaderColumn dataField='is_superuser' editable={ { type: 'select', options: { values: jobTypes} } }>Is Admin</TableHeaderColumn>
       <TableHeaderColumn dataField='date_joined' hiddenOnInsert>Date Joined</TableHeaderColumn>
       </BootstrapTable>
       </div>
