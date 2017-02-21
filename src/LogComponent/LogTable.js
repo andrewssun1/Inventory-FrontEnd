@@ -22,9 +22,9 @@ class LogTable extends React.Component {
                             } }
                             striped hover>
                 <TableHeaderColumn dataField='id' isKey hidden hiddenOnInsert autoValue={true}>Id</TableHeaderColumn>
-                <TableHeaderColumn dataField='user' width="100" autoValue={true}>User</TableHeaderColumn>
-                <TableHeaderColumn dataField='action_tag' width="170" filter={ { type: 'SelectFilter', options: this.props.action_filter_obj } } editable={ { type: 'select', options: { values: this.props.action_list } } }>Action</TableHeaderColumn>
-                <TableHeaderColumn dataField='timestamp' width="170" autoValue={true}>Timestamp</TableHeaderColumn>
+                <TableHeaderColumn dataField='user' width="100px" autoValue={true}>User</TableHeaderColumn>
+                <TableHeaderColumn dataField='action_tag' width="170px" filter={ { type: 'SelectFilter', options: this.props.action_filter_obj } } editable={ { type: 'select', options: { values: this.props.action_list } } }>Action</TableHeaderColumn>
+                <TableHeaderColumn dataField='timestamp' width="170px" autoValue={true}>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
             </BootstrapTable>
         )

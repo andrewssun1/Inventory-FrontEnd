@@ -30,6 +30,7 @@ class CustomFieldTable extends React.Component {
     this.getFieldData();
   }
 
+  //TODO: Refactor these methods:
   getFieldData() {
     xhttp.open("GET","https://asap-test.colab.duke.edu/api/item/field/", false);
     xhttp.setRequestHeader("Content-Type", "application/json");
