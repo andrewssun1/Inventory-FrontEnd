@@ -8,6 +8,7 @@ import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
 const SERVER = "http://asap-test.colab.duke.edu";
+//const SERVER = "http://localhost:3000";
 
 export default class LoginPage extends React.Component {
   constructor(props) {
@@ -88,7 +89,7 @@ export default class LoginPage extends React.Component {
                   currUrl = currUrl.replace(/(\?code=).*/, "");
                   console.log(currUrl);
                   window.location.replace(currUrl);
-                  //hashHistory.push('/main');
+                  hashHistory.push('/main');
                 }, ()=>{});
   }
 
