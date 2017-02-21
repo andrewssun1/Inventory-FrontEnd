@@ -7,7 +7,7 @@ import {Form, FormGroup, Col, Button, ControlLabel, FormControl, Alert} from 're
 import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
-const SERVER = "http://asap-test.colab.duke.edu";
+const SERVER = "https://asap-test.colab.duke.edu";
 //const SERVER = "http://localhost:3000";
 
 export default class LoginPage extends React.Component {
@@ -86,10 +86,14 @@ export default class LoginPage extends React.Component {
                   localStorage.username = userResponse.username;
                   localStorage.isAdmin = userResponse.is_staff;
                   var currUrl = window.location.href;
+                  if (currUrl.includes("code=")){
                   currUrl = currUrl.replace(/(\?code=).*/, "");
                   console.log(currUrl);
                   window.location.replace(currUrl);
+                }
+                else{
                   hashHistory.push('/main');
+                }
                 }, ()=>{});
   }
 
