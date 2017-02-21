@@ -11,11 +11,12 @@ import ManageUsers from './ManageUsers'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-var Tab = ReactBootstrap.Tab;
-var Row = ReactBootstrap.Row;
-var Col = ReactBootstrap.Col;
-var Nav = ReactBootstrap.Nav;
-var NavItem = ReactBootstrap.NavItem;
+import {Tab, Row, Col, Nav, NavItem} from 'react-bootstrap';
+// var Tab = ReactBootstrap.Tab;
+// var Row = ReactBootstrap.Row;
+// var Col = ReactBootstrap.Col;
+// var Nav = ReactBootstrap.Nav;
+// var NavItem = ReactBootstrap.NavItem;
 
 export default class ApplicationTabs extends React.Component {
 

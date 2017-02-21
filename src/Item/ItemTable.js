@@ -170,6 +170,7 @@ class ItemTable extends React.Component {
     this.setState({row: row});
     if (this.state.showModal){
       this._child.getRequests(row.name);
+      this._child.getDetailedItem(row.id);
       this._child.openModal();
     }
     else{

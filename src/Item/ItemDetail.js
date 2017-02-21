@@ -116,11 +116,14 @@ class ItemDetail extends React.Component {
     //     totalDataSize: response.count
     //   });
     // }
+    // console.log("Finishing getting requests")
   }
 
   openModal() {
-    console.log("opening modal")
-    this.setState({showModal: true});
+    console.log("opening modal");
+    //this.state.showModal = true;
+    this.setState({showModal: true}, ()=>{console.log(this.state.showModal)});
+    this.forceUpdate();
   }
 
   closeModal() {
@@ -199,7 +202,6 @@ class ItemDetail extends React.Component {
         </BootstrapTable>
         </div>
       }
-
       </Modal.Body>
       <Modal.Footer>
       {isAdmin ?

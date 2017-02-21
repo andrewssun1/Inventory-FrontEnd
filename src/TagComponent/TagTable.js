@@ -16,7 +16,7 @@ class TagTable extends React.Component {
                             selectRow={ this.props.selectRowProp }
                             striped hover>
                 <TableHeaderColumn dataField='id' isKey hidden hiddenOnInsert autoValue={true}>ID</TableHeaderColumn>
-                <TableHeaderColumn dataField='tag' width="170" editable={ true }>Tag</TableHeaderColumn>
+                <TableHeaderColumn dataField='tag' width="170px" editable={ true }>Tag</TableHeaderColumn>
             </BootstrapTable>
         )
     }
