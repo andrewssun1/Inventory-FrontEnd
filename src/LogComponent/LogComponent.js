@@ -51,15 +51,6 @@ class LogComponent extends React.Component {
           restRequest("POST", "/api/log/", "application/json", request,
                       (responseText)=>{cb(responseText)}, ()=>{console.log('POST Failed!!')})
                   });
-        // xhttp.open("POST", "https://asap-test.colab.duke.edu/api/log/", false);
-        // xhttp.setRequestHeader("Content-Type", "application/json");
-        // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        // var request = {"action_id": parseInt(this.state.action_map.get(action), 10), "description": description};
-        // xhttp.send(JSON.stringify(request));
-        // if (xhttp.status === 401 || xhttp.status === 500){
-        //     console.log('POST Failed!!');
-        // }
-        // return xhttp.responseText
     }
 
     componentWillMount() {
@@ -87,40 +78,6 @@ class LogComponent extends React.Component {
                         }, ()=>{})
                       });
         });
-
-        // //Getting all the actions
-        // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/log/action/", false);
-        // xhttp.setRequestHeader("Content-Type", "application/json");
-        // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        // xhttp.send();
-        // if (xhttp.status === 401 || xhttp.status === 500){
-        //     if(!!localStorage.token){
-        //         delete localStorage.token;
-        //     }
-        //     this.setState({
-        //         _loginState: false
-        //     });
-        //     hashHistory.push('/login');
-        //     return null;
-        // }
-        // else{
-        //     var response = JSON.parse(xhttp.responseText);
-        //     // console.log(response)
-        //     var responseMap = new Map();
-        //     var actions = [];
-        //     var action_filters = {};
-        //     for (var i=0; i<response.results.length; i++){
-        //         responseMap.set(response.results[i]['tag'], response.results[i]['id']);
-        //         actions.push(response.results[i]['tag']);
-        //         action_filters[parseInt(response.results[i]['id'], 10)] = response.results[i]['tag'];
-        //     }
-        //     // console.log(action_filters);
-        //     this.setState({
-        //         action_map: responseMap,
-        //         action_list: actions,
-        //         action_filter_obj: action_filters
-        //     });
-        // }
     }
 
     onAddRow(row) {

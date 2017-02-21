@@ -98,25 +98,6 @@ class ItemDetail extends React.Component {
                   totalDataSize: response.count
                 });
               }, ()=>{console.log('GET Failed!!');});
-    // xhttp.open("GET", url, false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   console.log('POST Failed!!');
-    // } else {
-    //   xhttp.send();
-    //   var response = JSON.parse(xhttp.responseText);
-    //   console.log(response);
-    //   var response_results = response.results;
-    //   for (var i = 0; i < response_results.length; i++){
-    //     response_results[i]["item"] = response_results[i].item.name;
-    //   }
-    //   this.setState({
-    //     outstandingRequests: response.results,
-    //     totalDataSize: response.count
-    //   });
-    // }
-    // console.log("Finishing getting requests")
   }
 
   openModal() {

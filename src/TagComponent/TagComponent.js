@@ -43,30 +43,6 @@ class TagComponent extends React.Component {
                 ()=>{
                   console.log('POST Failed!!');
                 })
-        // if (row){
-        //     xhttp.open('POST', "https://asap-test.colab.duke.edu/api/item/tag/", false);
-        //     xhttp.setRequestHeader("Content-Type", "application/json");
-        //     xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        //     var data = {
-        //         "item" : this.props.item_id,
-        //         "tag"  : row.tag
-        //     };
-        //     xhttp.send(JSON.stringify(data));
-        //     if (xhttp.status === 401 || xhttp.status === 500){
-        //         console.log('POST Failed!!');
-        //     }
-        //     else{
-        //         var response = JSON.parse(xhttp.responseText);
-        //         var temp_data = this.state.data;
-        //         temp_data.push({
-        //             "id": response.id,
-        //             "tag": response.tag
-        //         })
-        //         this.setState({
-        //             data: temp_data
-        //         })
-        //     }
-        // }
     }
 
     onDeleteRow(rows) {
@@ -80,18 +56,6 @@ class TagComponent extends React.Component {
                             });
                           },
                         ()=>{alert("DELETE FAILED. Please contact system admin.")});
-                // xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/item/tag/"+rows[i], false);
-                // xhttp.setRequestHeader("Content-Type", "application/json");
-                // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-                // xhttp.send();
-                // if (xhttp.status === 401 || xhttp.status === 500 || xhttp.status === 405){
-                //     alert("DELETE FAILED. Please contact system admin.")
-                // }
-                // this.setState({
-                //     data: this.state.data.filter((product) => {
-                //         return rows.indexOf(product.id) === -1;
-                //     })
-                // })
             }
     }
 

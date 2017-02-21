@@ -62,30 +62,6 @@ class RequestTable extends React.Component {
                     });
                   }, ()=>{});
     });
-    // xhttp.open("GET", url, false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // xhttp.send();
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   if(!!localStorage.token){
-    //     delete localStorage.token;
-    //   }
-    //   this.setState({
-    //     _loginState: false
-    //   });
-    //   hashHistory.push('/login');
-    //   return null;
-    // }
-    // else{
-    //   var response = JSON.parse(xhttp.responseText);
-    //   var unselectable_ids = [];
-    //   var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
-    //   this.setState({
-    //     data: response_results,
-    //     totalDataSize: response.count,
-    //     unselectable: unselectable_ids
-    //   });
-    // }
   }
 
   static editGetResponse(data,unselectable_arr) {

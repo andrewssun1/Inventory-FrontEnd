@@ -44,22 +44,6 @@ export default class ManageUsers extends React.Component {
                           _loginState: false
                       });
                     });
-        // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/user/", false);
-        // xhttp.setRequestHeader("Content-Type", "application/json");
-        // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-        // if (xhttp.status === 401 || xhttp.status === 500){
-        //   console.log('GET Failed!!');
-        // }
-        // xhttp.send();
-        // var response = JSON.parse(xhttp.responseText);
-        // var response_results = response.results;
-        // for (var i = 0; i < response_results.length; i++){
-        //   response.results[i].last_login = moment(response.results[i].last_login).format('lll')
-        //   response.results[i].date_joined = moment(response.results[i].date_joined).format('lll')
-        // }
-        // this.setState({
-        //     _users: response_results
-        // });
     }, ()=>{
       // auth failed
           this.setState({
@@ -110,17 +94,7 @@ export default class ManageUsers extends React.Component {
                   },
                   ()=>{}
                 );
-      //   xhttp.open("DELETE", "https://asap-test.colab.duke.edu/api/user/"+rows[0], false);
-      //   xhttp.setRequestHeader("Content-Type", "application/json");
-      //   xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      //   xhttp.send();
-      // this.setState({
-      //   _users: this.state._users.filter((product) => {
-      //     return rows.indexOf(product.id) === -1;
-      //   })
-      // })
     });
-    // console.log(rows);
   }
 
 

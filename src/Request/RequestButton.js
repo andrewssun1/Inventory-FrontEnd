@@ -60,40 +60,6 @@ class RequestButton extends React.Component {
                       }
                       this.props.cb.resetTable();
                     });
-        // xhttp.open("PATCH", url, false); //synchronous request
-        // xhttp.setRequestHeader("Content-Type", "application/json");
-        // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-
-
-        // xhttp.send(JSON.stringify(requestBody));
-        // if (xhttp.status === 401 || xhttp.status === 500){
-        //     //<Alert message="alert message"></Alert>
-        //     console.log("patch request did not work")
-        //     var response = JSON.parse(xhttp.responseText);
-        //     console.log("about to print response!");
-        //     console.log(response);
-        //     if(!!localStorage.token){
-        //         delete localStorage.token;
-        //     }
-        //     this.setState({
-        //         _loginState: false
-        //     });
-        //     hashHistory.push('/login');
-        //     return null;
-        // }
-        // else if(xhttp.status === 405){
-        //     response = JSON.parse(xhttp.responseText);
-        //     console.log(response.detail);
-        //     this.setState({
-        //         requestProblemString: response.detail
-        //     })
-        // }
-        // else {
-        //     response = JSON.parse(xhttp.responseText);
-        //     console.log("about to print response!!");
-        //     console.log(response);
-        // }
-        // this.props.cb.resetTable();
     }
 
     approveClick() {

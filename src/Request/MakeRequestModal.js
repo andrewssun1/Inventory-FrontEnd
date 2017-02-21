@@ -64,25 +64,6 @@ class MakeRequestModal extends React.Component {
                         })
                     }
                   });
-      // xhttp.open('POST', url, false);
-      // xhttp.setRequestHeader("Content-Type", "application/json");
-      // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      // var jsonResult = JSON.stringify(requestBody);
-      // xhttp.send(jsonResult);
-      // if (xhttp.status === 401 || xhttp.status === 500){
-      //     this.setState({
-      //         requestProblemString: 'A problem occured, please contact system administrator'
-      //     })
-      // }
-      // else if(xhttp.status === 405){
-      //     var response = JSON.parse(xhttp.responseText);
-      //     this.setState({
-      //       requestProblemString: response.detail
-      //     })
-      // }
-      // else{
-      //     this.closeModal();
-      // }
   }
 
   makeDisburse(){

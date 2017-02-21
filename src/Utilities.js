@@ -51,7 +51,9 @@ export function restRequest( requestType, url, contentType, requestStr, successC
   var xhttp = new XMLHttpRequest();
   xhttp.open(requestType, BACKEND_SERVER + url, true);
   xhttp.setRequestHeader("Content-Type", contentType);
-  xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+  if (localStorage.token){
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+  }
   var f = function(){restCb(xhttp, successCb, errorCb)};
   xhttp.onreadystatechange = f;
   xhttp.send(requestStr);

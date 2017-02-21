@@ -46,6 +46,31 @@ export default class LoginPage extends React.Component {
       });
   }
 
+  componentWillMount(){
+    var currUrl = window.location.href;
+    if (currUrl.includes("code=")){
+      var authToken = currUrl.substring(currUrl.indexOf("code=")+5, currUrl.indexOf('&'));
+      var postJSON = {};
+      postJSON.code = authToken;
+      postJSON.redirect_uri = "http://localhost:3000";
+
+      restRequest("POST", "/api/user/auth/duke", "application/json", JSON.stringify(postJSON),
+                  (xhttpResponse)=>{
+                    var userResponse = JSON.parse(xhttpResponse);
+                    var dukeToken = userResponse.access_token;
+                    const CLIENT_ID = "2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy";
+                    var sendString = "grant_type=convert_token&client_id="+CLIENT_ID+"&backend=duke&token="+dukeToken;
+                    restRequest("POST", "/auth/convert-token/", "application/x-www-form-urlencoded", sendString,
+                                (xhttpResponse)=>{
+                                  console.log(JSON.parse(xhttpResponse));
+                                  this.testSuccessCb(xhttpResponse);
+                                }, (state, xhttpResponse2)=>{this.testErrorCb();
+                                  console.log(JSON.parse(xhttpResponse2));
+                                });
+                  }, (state, xhttpResponse)=>{console.log(JSON.parse(xhttpResponse));});
+    }
+  }
+
   testSuccessCb(xhttpResponse){
     var response = JSON.parse(xhttpResponse);
     // put access token in local storage and check whether it's user or admin
@@ -57,7 +82,11 @@ export default class LoginPage extends React.Component {
                   var userResponse = JSON.parse(xhttpResponse);
                   localStorage.username = userResponse.username;
                   localStorage.isAdmin = userResponse.is_staff;
-                  hashHistory.push('/main');
+                  var currUrl = window.location.href;
+                  currUrl = currUrl.replace(/(\?code=).*/, "");
+                  console.log(currUrl);
+                  window.location.replace(currUrl);
+                  //hashHistory.push('/main');
                 }, ()=>{});
   }
 
@@ -87,6 +116,11 @@ export default class LoginPage extends React.Component {
                 this.testSuccessCb, this.testErrorCb);
 
   }
+
+  handleClickNetid() {
+      window.location.replace("https://oauth.oit.duke.edu/oauth/authorize?response_type=code&redirect_uri=http://localhost:3000&client_id=asap-inventory-system&scope=basic+identity%3Anetid%3Aread&state=abc123");
+  }
+
   render() {
 
     return(
@@ -113,8 +147,11 @@ export default class LoginPage extends React.Component {
 
     <FormGroup>
       <Col smOffset={5} sm={2}>
-        <Button id="submitButton" type="button" onClick={this.handleClick}>
+        <Button style={{marginRight: "15px"}} id="submitButton" type="button" onClick={this.handleClick}>
           Sign in
+        </Button>
+        <Button id="submitButtonNetid" type="button" onClick={this.handleClickNetid}>
+          Sign in Using NetID
         </Button>
       </Col>
     </FormGroup>

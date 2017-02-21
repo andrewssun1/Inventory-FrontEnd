@@ -45,22 +45,6 @@ class TagModal extends React.Component {
                   }
                   this.setState({showModal: true});
                 }, ()=>{console.log('GET Failed!!');});
-    // var xhttp = new XMLHttpRequest();
-    // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/tag/unique/", false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // xhttp.send();
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   console.log('GET Failed!!');
-    // }
-    // else{
-    //   var response = JSON.parse(xhttp.responseText);
-    //   var tagList = response.results;
-    //   for (var i = 0; i < tagList.length; i++){
-    //     this.state.tagOptions.push({label: tagList[i].tag, value: tagList[i].tag});
-    //   }
-    // }
-    // this.setState({showModal: true});
   }
 
   saveModal(){
@@ -100,25 +84,6 @@ class TagModal extends React.Component {
     var completeFormat = formatIncluded + ((includedString===""||excludedString==="") ? "" : this.state.selectedOption) + formatExcluded;
 
     console.log(completeFormat);
-    //this.closeModal();
-    // var xhttp = new XMLHttpRequest();
-    // xhttp.open("GET", "https://asap-test.colab.duke.edu/api/item/?"+completeString, false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // xhttp.send();
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   console.log('GET Failed!!');
-    // }
-    // else{
-    //   // var response = JSON.parse(xhttp.responseText);
-    //   // var itemList = response.results;
-    //   // //console.log(this.props);
-    //   // for (var i = 0; i < itemList.length; i++){
-    //   //     itemList[i]["tags"] = this.props.updateCallback.tagsToListString(itemList[i].tags);
-    //   // }
-    //   // this.setState({tagSearchResults: itemList});
-    //   // console.log("Resulting list: ");
-    //   // console.log(itemList);
     var url_parameter = "?" + completeString
       this.props.updateCallback.setState({
           currentSearchURL: url_parameter

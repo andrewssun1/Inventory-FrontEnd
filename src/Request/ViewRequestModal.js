@@ -43,24 +43,6 @@ class ViewRequestModal extends React.Component {
                   //cb();
                 }, ()=>{console.log("Get detailed request failed");}
                 )
-    // xhttp.open('GET', "https://asap-test.colab.duke.edu/api/request/detailed/" + id + "/", false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   console.log('PATCH Failed!!');
-    // }
-    // else{
-    //   xhttp.send();
-    //   var response = JSON.parse(xhttp.responseText);
-    //   // console.log("Getting Response");
-    //   // console.log(response);
-    //   this.setState({requestData: response});
-    //   if(response.quantity > response.item.quantity) {
-    //     this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
-    //   } else {
-    //     this.setState({requestProblemString: ""});
-    //   }
-    // }
   }
 
   openModal() {
@@ -109,22 +91,6 @@ class ViewRequestModal extends React.Component {
                   this.props.updateCallback.getAllRequests(null);
                   this.closeModal();
                 })
-    // xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/request/" + type + "/" + this.state.requestData.id + "/", false);
-    // xhttp.setRequestHeader("Content-Type", "application/json");
-    // xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    // if (xhttp.status === 401 || xhttp.status === 500){
-    //   console.log('PATCH Failed!!');
-    // }
-    // else{
-    //   console.log(requestBody);
-    //   var jsonResult = JSON.stringify(requestBody);
-    //   xhttp.send(jsonResult);
-    //   var response = JSON.parse(xhttp.responseText);
-    //   console.log("Getting Response");
-    //   console.log(response);
-    // }
-    // this.props.updateCallback.getAllRequests(null);
-    // this.closeModal();
   }
 
   render() {
