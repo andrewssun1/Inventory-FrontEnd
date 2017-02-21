@@ -1,10 +1,10 @@
 import React from "react";
 import {hashHistory} from "react-router";
-import { checkAuthAndAdmin } from "../Utilities";
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
-var xhttp = new XMLHttpRequest();
+//var xhttp = new XMLHttpRequest();
 
 class RequestButton extends React.Component {
     constructor(props){
@@ -18,54 +18,53 @@ class RequestButton extends React.Component {
         this.patchRequest = this.patchRequest.bind(this);
     }
     componentWillMount() {
-        checkAuthAndAdmin()
+        checkAuthAndAdmin(()=>{})
     }
 
     patchRequest(requestID, type, patchRequestBodyKey, patchRequestBodyValue) {
         this.setState({
             requestProblemString: ''
         })
-        var url = "https://asap-test.colab.duke.edu/api/request/" + type + "/" + requestID + "/";
-        xhttp.open("PATCH", url, false); //synchronous request
-        xhttp.setRequestHeader("Content-Type", "application/json");
-        xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+        var url = "/api/request/" + type + "/" + requestID + "/";
         var requestBody = {"id": requestID};
         requestBody[patchRequestBodyKey] = patchRequestBodyValue;
-        xhttp.send(JSON.stringify(requestBody));
-        if (xhttp.status === 401 || xhttp.status === 500){
-            //<Alert message="alert message"></Alert>
-            console.log("patch request did not work")
-            var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response!");
-            console.log(response);
-            if(!!localStorage.token){
-                delete localStorage.token;
-            }
-            this.setState({
-                _loginState: false
-            });
-            hashHistory.push('/login');
-            return null;
-        }
-        else if(xhttp.status === 405){
-            var response = JSON.parse(xhttp.responseText);
-            console.log(response.detail);
-            this.setState({
-                requestProblemString: response.detail
-            })
-        }
-        else {
-            var response = JSON.parse(xhttp.responseText);
-            console.log("about to print response!!");
-            console.log(response);
-        }
-        this.props.cb.resetTable();
+        restRequest("PATCH", url, "application/json", JSON.stringify(requestBody),
+                    (responseText)=>{
+                      var response = JSON.parse(responseText);
+                      console.log("about to print response!!");
+                      console.log(response);
+                      this.props.cb.resetTable();
+                    },
+                    (status, responseText)=>{
+                      if (status === 401 || status === 500){
+                          //<Alert message="alert message"></Alert>
+                          console.log("patch request did not work")
+                          var response = JSON.parse(responseText);
+                          console.log("about to print response!");
+                          console.log(response);
+                          if(!!localStorage.token){
+                              delete localStorage.token;
+                          }
+                          this.setState({
+                              _loginState: false
+                          });
+                          hashHistory.push('/login');
+                          return null;
+                      }
+                      else if(status === 405){
+                          var response = JSON.parse(responseText);
+                          console.log(response.detail);
+                          this.setState({
+                              requestProblemString: response.detail
+                          })
+                      }
+                      this.props.cb.resetTable();
+                    });
     }
 
     approveClick() {
         var requestIDs = this.props.selected;
-        var i;
-        for (i = 0; i < requestIDs.length; i++) {
+        for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "approve", "admin_comment", "this is a general admin comment");
             //this.approveRequest(requestIDs[i]);
@@ -73,8 +72,7 @@ class RequestButton extends React.Component {
     }
     denyClick() {
         var requestIDs = this.props.selected;
-        var i;
-        for (i = 0; i < requestIDs.length; i++) {
+        for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "deny", "admin_comment", "this is a general admin comment");
             //this.denyRequest(requestIDs[i]);
@@ -82,8 +80,7 @@ class RequestButton extends React.Component {
     }
     cancelClick() {
         var requestIDs = this.props.selected;
-        var i;
-        for (i = 0; i < requestIDs.length; i++) {
+        for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "cancel", "reason", "this is a cancellation reason");
             //this.cancelRequest(requestIDs[i]);

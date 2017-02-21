@@ -11,11 +11,7 @@ import ManageUsers from './ManageUsers'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-var Tab = ReactBootstrap.Tab;
-var Row = ReactBootstrap.Row;
-var Col = ReactBootstrap.Col;
-var Nav = ReactBootstrap.Nav;
-var NavItem = ReactBootstrap.NavItem;
+import {Tab, Row, Col, Nav, NavItem} from 'react-bootstrap';
 
 export default class ApplicationTabs extends React.Component {
 
@@ -44,11 +40,11 @@ export default class ApplicationTabs extends React.Component {
 }
 
   componentWillMount(){
-    checkAuthAndAdmin()
+    checkAuthAndAdmin(()=>{})
   }
 
   render() {
-      const isAdmin = (localStorage.isAdmin == "true");
+      const isAdmin = (localStorage.isAdmin === "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">

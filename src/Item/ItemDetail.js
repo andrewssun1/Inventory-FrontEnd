@@ -6,13 +6,13 @@ var Bootstrap = require('react-bootstrap');
 var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
 import MakeRequestModal from '../Request/MakeRequestModal';
-import ViewRequestModal from '../Request/ViewRequestModal';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 import TagComponent from '../TagComponent/TagComponent'
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
 //TODO: Refactor this and Request Table, create one component that is used in both
 
@@ -38,41 +38,41 @@ class ItemDetail extends React.Component {
   }
 
   getDetailedItem(id) {
-    xhttp.open('GET', "https://asap-test.colab.duke.edu/api/item/" + id, false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    if (xhttp.status === 401 || xhttp.status === 500) {
-      console.log('PATCH Failed!!');
-    } else {
-      xhttp.send();
-      var response = JSON.parse(xhttp.responseText);
-      console.log("Getting Response");
-      console.log(response);
-      this.setState({itemData: response});
-    }
-  }
+    checkAuthAndAdmin(()=>{
+      restRequest("GET", "/api/item/"+id, "application/json", null,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    console.log("Getting Response");
+                    console.log(response);
+                    this.setState({itemData: response});
+                  },
+                ()=>{console.log('GET Failed!!');}
+    );
+  });
+}
 
-  saveItem() {
-    xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/item/" + this.state.itemData.id, false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    if (xhttp.status === 401 || xhttp.status === 500) {
-      console.log('PATCH Failed!!');
-    } else {
+  saveItem(cb) {
+    checkAuthAndAdmin(()=>{
       var requestBody = {
         "name": this._nameField.state.value,
         "quantity": this._quantityField.state.value,
         "model_number": this._modelNumberField.state.value,
         "description": this._descriptionField.state.value,
         "location": "Nowhere until you make a user-defined field"
-      }
+      };
       var jsonResult = JSON.stringify(requestBody);
-      xhttp.send(jsonResult);
-      var response = JSON.parse(xhttp.responseText);
-      console.log("Getting Response");
-      console.log(response);
-      this.getDetailedItem(this.state.itemData.id);
-    }
+      restRequest("PATCH", "/api/item/" + this.state.itemData.id, "application/json", jsonResult,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    console.log("Getting Response");
+                    console.log(response);
+                    this.getDetailedItem(this.state.itemData.id);
+                    cb();
+                  },
+                ()=>{
+                  console.log('PATCH Failed!!');
+                });
+    });
   }
 
 
@@ -80,33 +80,31 @@ class ItemDetail extends React.Component {
     // GET request to get all outstanding requests for this item by this user
     var url;
     console.log(item_name);
-    if (localStorage.isAdmin == "true") {
-      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+    if (localStorage.isAdmin === "true") {
+      url = "/api/request/?item__name="+item_name+"&status=outstanding";
     } else {
-      url = "https://asap-test.colab.duke.edu/api/request/?item__name="+item_name+"&status=outstanding";
+      url = "/api/request/?item__name="+item_name+"&status=outstanding";
     }
-    xhttp.open("GET", url, false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    if (xhttp.status === 401 || xhttp.status === 500){
-      console.log('POST Failed!!');
-    } else {
-      xhttp.send();
-      var response = JSON.parse(xhttp.responseText);
-      console.log(response);
-      var response_results = response.results;
-      for (var i = 0; i < response_results.length; i++){
-        response_results[i]["item"] = response_results[i].item.name;
-      }
-      this.setState({
-        outstandingRequests: response.results,
-        totalDataSize: response.count
-      });
-    }
+    restRequest("GET", url, "application/json", null,
+              (responseText)=>{
+                var response = JSON.parse(responseText);
+                console.log(response);
+                var response_results = response.results;
+                for (var i = 0; i < response_results.length; i++){
+                  response_results[i]["item"] = response_results[i].item.name;
+                }
+                this.setState({
+                  outstandingRequests: response.results,
+                  totalDataSize: response.count
+                });
+              }, ()=>{console.log('GET Failed!!');});
   }
 
   openModal() {
-    this.setState({showModal: true});
+    console.log("opening modal");
+    //this.state.showModal = true;
+    this.setState({showModal: true}, ()=>{console.log(this.state.showModal)});
+    this.forceUpdate();
   }
 
   closeModal() {
@@ -124,8 +122,9 @@ class ItemDetail extends React.Component {
   saveEdits() {
     var r = confirm("Are you sure you want to save?");
     if (r) {
-      this.saveItem();
-      this.props.updateCallback.componentWillMount();
+      this.saveItem(()=>{
+        this.props.updateCallback.componentWillMount();
+      });
       this.toggleEditing();
     }
   }
@@ -139,7 +138,7 @@ class ItemDetail extends React.Component {
   render() {
     if(this.state.itemData == null) return null;
 
-    const isAdmin = (localStorage.isAdmin == "true");
+    const isAdmin = (localStorage.isAdmin === "true");
 
     const options = {
       sizePerPageList: [ 30 ],
@@ -176,15 +175,14 @@ class ItemDetail extends React.Component {
         <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
         data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
         <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-        <TableHeaderColumn dataField='item' width="120">Item</TableHeaderColumn>
-        <TableHeaderColumn dataField='quantity' width="50">Quantity</TableHeaderColumn>
-        <TableHeaderColumn dataField='status' width="100">Status</TableHeaderColumn>
-        <TableHeaderColumn dataField='timestamp' width="150">Timestamp</TableHeaderColumn>
-        <TableHeaderColumn dataField='reason' width="200">Reason</TableHeaderColumn>
+        <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
+        <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
+        <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
+        <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
+        <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
         </BootstrapTable>
         </div>
       }
-
       </Modal.Body>
       <Modal.Footer>
       {isAdmin ?
