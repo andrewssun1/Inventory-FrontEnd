@@ -1,5 +1,5 @@
-// bootstraptable.js
-// Example to create a simple table using React Bootstrap table
+// ItemTable.js
+// The big bad boy. Table for displaying the inventory system.
 // @author Andrew Sun
 
 var React = require('react');
@@ -9,8 +9,9 @@ import TagModal from '../TagModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+import '../DropdownTable.css';
 
-import {Button, ButtonGroup} from 'react-bootstrap';
+import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Row} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -26,7 +27,8 @@ class ItemTable extends React.Component {
         "quantity": null,
         "model_number": "12344567",
         "description": "This is super lit",
-        "tags": [{"tag": "first tag"}, {"tag": "second tag"}]
+        "tags": [{"tag": "first tag"}, {"tag": "second tag"}],
+        "cart_quantity": 1
       }],
       _loginState: true,
       currentSearchURL: null,
@@ -53,6 +55,7 @@ class ItemTable extends React.Component {
                         // console.log(this.tagsToListString(response_results[i].tags));
                         response_results[i]["tags_data"] = response_results[i].tags;
                         response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
+                        response_results[i].cart_quantity = 1;
                     }
                     this.setState({
                         _products: response_results,
@@ -125,6 +128,7 @@ class ItemTable extends React.Component {
                     (responseText)=>{
                       var response = JSON.parse(responseText);
                       row.id = response.id;
+                      row.cart_quantity = 1;
                       this.forceUpdate();
                     }, ()=>{})
       }
@@ -173,9 +177,6 @@ class ItemTable extends React.Component {
       this._child.getDetailedItem(row.id);
       this._child.openModal();
     }
-    else{
-      this._child.openModal();
-    }
   }
 
   onTagSearchClick() {
@@ -212,12 +213,59 @@ class ItemTable extends React.Component {
   onAddtoCartClick(cell, row){
     console.log(row);
     this.state.showModal = false;
-    alert("Added " + row.name + " to cart!");
+    var addItemJson = JSON.stringify({
+      item_id: row.id,
+      quantity_requested: row.cart_quantity
+    });
+    restRequest("POST", "/api/shoppingCart/addItem/", "application/json", addItemJson,
+                (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  console.log(response);
+                  alert("Added " + row.cart_quantity + " of " + row.name + " to cart!");
+                  localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
+                }, (status, errResponse)=>{console.log(JSON.parse(errResponse))});
+  }
+
+  generateMenuItems(cell, row){
+    var menuItems = [];
+    for (var i = 1; i < 11; i++){
+      menuItems.push((
+        <MenuItem key={"menuItem"+i} onSelect={(e, eventKey)=>{
+            row.cart_quantity = e;
+          }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
+      ))
+    }
+    return(
+      <DropdownButton key={"asd"} id={"trying"} title={row.cart_quantity}>
+        {menuItems}
+      </DropdownButton>
+    );
+  }
+
+  generateHighQuantityTextBox(cell, row){
+    return(
+                  <FormControl
+                    type="number"
+                    defaultValue={10}
+                    style={{width: "72px"}}
+                    onChange={(e)=>{row.cart_quantity=e.target.value}}
+                  />
+
+      );
   }
 
   buttonFormatter(cell, row) {
+    this.state.showModal = false;
     return (
-      <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>);
+      <div>
+      <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
+      <InputGroup>
+      {(row.cart_quantity < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
+      <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>
+      </InputGroup>
+      </FormGroup>
+      </div>
+    );
   }
 
   render() {
@@ -259,7 +307,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center" hiddenOnInsert></TableHeaderColumn>
+      <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>
       </BootstrapTable>) : null}
 

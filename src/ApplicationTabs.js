@@ -3,23 +3,26 @@
 // @author Andrew
 
 import ItemComponent from './Item/ItemComponent';
-import { checkAuthAndAdmin } from './Utilities';
+import { restRequest, checkAuthAndAdmin } from './Utilities';
 import LogComponent from './LogComponent/LogComponent'
 import RequestComponent from './Request/RequestComponent'
 import TagModal from './TagModal'
 import ManageUsers from './ManageUsers'
+import ShoppingCartTable from './ShoppingCartTable'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-import {Tab, Row, Col, Nav, NavItem} from 'react-bootstrap';
+import {Tab, Row, Col, Nav, NavItem, Glyphicon} from 'react-bootstrap';
 
 export default class ApplicationTabs extends React.Component {
 
   constructor(props) {
   super(props);
   this.state = {
-    key: 2
+    key: 2,
+    cart_quantity: 0
   };
+  this.onCartChanged = this.onCartChanged.bind(this);
 }
 
   handleTabChange = (key) => {
@@ -43,6 +46,38 @@ export default class ApplicationTabs extends React.Component {
     checkAuthAndAdmin(()=>{})
   }
 
+  componentDidMount(){
+    if (!localStorage.cart_quantity){
+      localStorage.cart_quantity = 0;
+    }
+    var originalSetItem = localStorage.setItem;
+    // TODO: Get cart here!
+    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+                (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  var currCart = response.id;
+                  restRequest("GET", "/api/shoppingCart/detailed/"+currCart+"/", "application/JSON", null,
+                              (responseText)=>{
+                                var detailResponse = JSON.parse(responseText);
+                                localStorage.setItem("cart_quantity", detailResponse.requests.length);
+                                console.log(JSON.parse(responseText));
+                              }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                  //console.log(response);
+                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+
+    localStorage.setItem = function(){
+        var eve = document.createEvent('Event')
+        eve.initEvent('itemInserted', true, true);
+        originalSetItem.apply(this, arguments);
+        window.dispatchEvent(eve);
+    }
+    window.addEventListener("itemInserted", this.onCartChanged);
+  }
+
+  onCartChanged(){
+    this.setState({cart_quantity: localStorage.cart_quantity});
+  }
+
   render() {
       const isAdmin = (localStorage.isAdmin === "true");
        return (
@@ -51,25 +86,24 @@ export default class ApplicationTabs extends React.Component {
              <Col sm={2}>
                <Nav bsStyle="pills" stacked>
                  <NavItem eventKey="home">
-                   Home
+                   <Glyphicon style={{marginRight: "8px"}} glyph="home" />Home
                  </NavItem>
                  <NavItem eventKey="items">
-                   Items
+                   <Glyphicon style={{marginRight: "8px"}} glyph="th-list" />Items
                  </NavItem>
                  <NavItem eventKey="requests">
-                   Requests
+                   <Glyphicon style={{marginRight: "8px"}} glyph="question-sign" />Requests
                  </NavItem>
                    {isAdmin ? (<NavItem eventKey="logs">
-                     Logs
+                     <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
                    }
-                   {isAdmin ? (<NavItem eventKey="users">
-                     Manage Users
+                   {isAdmin ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
-                 <NavItem eventKey="settings">
-                   Settings
-                 </NavItem>
+                   <NavItem eventKey="cart">
+                     <Glyphicon style={{marginRight: "8px"}} glyph="shopping-cart" />{"Cart ("+this.state.cart_quantity+")"}
+                   </NavItem>
                </Nav>
              </Col>
              <Col sm={8}>
@@ -90,8 +124,8 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="users">
                    <ManageUsers ref="manage"></ManageUsers>
                  </Tab.Pane>) : null}
-                 <Tab.Pane eventKey="settings">
-                   <TagModal ref="tagmodal"></TagModal>
+                 <Tab.Pane eventKey="cart">
+                   <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
                  </Tab.Pane>
                </Tab.Content>
              </Col>
