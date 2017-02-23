@@ -34,6 +34,7 @@ export default class ShoppingCartTable extends React.Component {
     this.generateMenuItems = this.generateMenuItems.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.updateCart = this.updateCart.bind(this);
+    this.openCartModal = this.openCartModal.bind(this);
   }
 
   generateMenuItems(cell, row){
@@ -139,7 +140,6 @@ export default class ShoppingCartTable extends React.Component {
                   var response = JSON.parse(responseText);
                 }, ()=>{});
     this.closeModal();
-
   }
 
   onDeleteRow(rows){
@@ -157,6 +157,10 @@ export default class ShoppingCartTable extends React.Component {
     });
   }
 
+  openCartModal(){
+    this._cartchild.openModal()
+  }
+
   render(){
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
@@ -172,7 +176,7 @@ export default class ShoppingCartTable extends React.Component {
     <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
     <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
     </BootstrapTable>
-    <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success">Send Cart</Button>
+    <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>Send Cart</Button>
     </div>);
   }
 

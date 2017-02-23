@@ -25,7 +25,7 @@ class RequestButton extends React.Component {
         this.setState({
             requestProblemString: ''
         })
-        var url = "/api/request/" + type + "/" + requestID + "/";
+        var url = "/api/shoppingCart/" + type + "/" + requestID + "/";
         var requestBody = {"id": requestID};
         requestBody[patchRequestBodyKey] = patchRequestBodyValue;
         restRequest("PATCH", url, "application/json", JSON.stringify(requestBody),

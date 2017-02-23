@@ -7,7 +7,7 @@ class RequestComponent extends React.Component {
     render() {
       return (
         <div>
-        <RequestTable />
+        <RequestTable ref="requestTable"/>
         </div>
       )
     }

@@ -58,7 +58,8 @@ class RequestTable extends React.Component {
                     this.setState({
                       data: response_results,
                       totalDataSize: response.count,
-                      unselectable: unselectable_ids
+                      unselectable: unselectable_ids,
+                      selected: []
                     });
                   }, ()=>{});
     });
@@ -172,6 +173,7 @@ class RequestTable extends React.Component {
     const selectRowProp = {
       mode: 'checkbox',
       clickToSelect: false,
+      selected: this.state.selected,
       unselectable: this.state.unselectable,
       onSelect: this.onRowSelect.bind(this),
       onSelectAll: this.onSelectAll.bind(this),

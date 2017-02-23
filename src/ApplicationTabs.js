@@ -43,6 +43,9 @@ export default class ApplicationTabs extends React.Component {
     else if (key === "cart"){
       this.refs.shoppingCartTable.componentWillMount();
     }
+    else if (key === "requests"){
+      this.refs.requestComponent.refs.requestTable.componentWillMount();
+    }
   });
 }
 
@@ -59,10 +62,12 @@ export default class ApplicationTabs extends React.Component {
     restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
+                  localStorage.activecartid = response.id;
                   localStorage.setItem("cart_quantity", response.requests.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
 
+    // 10TH GRADE MAGICS
     localStorage.setItem = function(){
         var eve = document.createEvent('Event')
         eve.initEvent('itemInserted', true, true);
