@@ -8,8 +8,7 @@ var Bootstrap = require('react-bootstrap');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
-// import { hashHistory } from 'react-router';
-import { checkAuthAndAdmin } from '../Utilities';
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
 var xhttp = new XMLHttpRequest();
 
@@ -23,81 +22,77 @@ class CustomFieldTable extends React.Component {
     this.getFieldData = this.getFieldData.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
-    this.onRowClick = this.onRowClick.bind(this);
   }
 
   componentWillMount() {
     this.getFieldData();
   }
 
-  //TODO: Refactor these methods:
   getFieldData() {
-    xhttp.open("GET","https://asap-test.colab.duke.edu/api/item/field/", false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    xhttp.send();
-    var response = JSON.parse(xhttp.responseText);
-    var response_results = response.results
-    console.log(response);
-    this.setState({_fields: response_results});
-  }
+    checkAuthAndAdmin(()=>{
+      restRequest("GET", "/api/item/field/", "application/json", null,
+      (responseText)=>{
+        var response = JSON.parse(responseText);
+        console.log("Getting Custom Field Response");
+        console.log(response);
+        this.setState({_fields: response.results});
+      },
+      ()=>{console.log('GET Failed!!');}
+    );
+  });
+}
 
-  onAddRow(row) {
-    xhttp.open("POST","https://asap-test.colab.duke.edu/api/item/field/", false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+onAddRow(row) {
+  checkAuthAndAdmin(()=>{
     var requestBody = {
       "name"    : row.name,
       "type"    : row.type,
       "private" : row.private
     }
-    console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
-    xhttp.send(jsonResult);
-    var response = JSON.parse(xhttp.responseText);
-    var response_results = response.results
-    console.log(response);
-    this.getFieldData();
-  }
+    restRequest("POST", "/api/item/field/", "application/json", jsonResult,
+    (responseText)=>{
+      var response = JSON.parse(responseText);
+      console.log("Getting Add Custom Field Response");
+      console.log(response);
+      this.getFieldData();
+    },
+    ()=>{console.log('GET Failed!!');}
+  );
+});
+}
 
-  onDeleteRow(rows) {
-    console.log(rows);
-    for (var i = 0; i < rows.length; i++){
-      xhttp.open("DELETE","https://asap-test.colab.duke.edu/api/item/field/" + rows[i], false);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-      xhttp.send();
-    }
-    this.getFieldData();
-  }
+onDeleteRow(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    restRequest("DELETE", "/api/item/field/" + rows[i], "application/json", null,
+    (responseText)=>{ this.getFieldData();},
+    ()=>{console.log('GET Failed!!');}
+  );
+}
+}
 
-  onRowClick(row, isSelected, e) {
-    //TODO: anything here?
-  }
+render() {
+  const selectRow = {
+    mode: 'checkbox' //radio or checkbox
+  };
 
-  render() {
-    const selectRow = {
-      mode: 'checkbox' //radio or checkbox
-    };
+  const options = {
+    onAddRow: this.onAddRow,
+    onDeleteRow: this.onDeleteRow
+  };
 
-    const options = {
-      onAddRow: this.onAddRow,
-      onDeleteRow: this.onDeleteRow,
-      onRowClick: this.onRowClick,
-    };
-
-    return(
-      <div>
-      <BootstrapTable ref="customFieldTable" remote={ true } options={options}
-      selectRow={selectRow} deleteRow={true} insertRow={true} data={this.state._fields} striped hover>
-      <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
-      <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
-      <TableHeaderColumn dataField='type'>Type</TableHeaderColumn>
-      <TableHeaderColumn dataField='private'>Privacy</TableHeaderColumn>
-      </BootstrapTable>
-      </div>
-    )
-  }
+  return(
+    <div>
+    <BootstrapTable ref="customFieldTable" remote={ true } options={options}
+    selectRow={selectRow} deleteRow={true} insertRow={true} data={this.state._fields} striped hover>
+    <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
+    <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
+    <TableHeaderColumn dataField='type'>Type</TableHeaderColumn>
+    <TableHeaderColumn dataField='private'>Privacy</TableHeaderColumn>
+    </BootstrapTable>
+    </div>
+  )
+}
 }
 
 export default CustomFieldTable;

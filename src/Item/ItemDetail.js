@@ -148,22 +148,19 @@ saveItem(cb) {
   }
 
   customFieldRequest(type, id, value) {
-    //TODO: Refactor to use Andrew's thing
-    xhttp.open('PATCH', "https://asap-test.colab.duke.edu/api/item/field/" + type + "/" + id, false);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
-    if (xhttp.status === 401 || xhttp.status === 500) {
-      console.log('PATCH Failed!!');
-    } else {
-      var requestBody = {
-        "value": value
-      }
-      var jsonResult = JSON.stringify(requestBody);
-      xhttp.send(jsonResult);
-      var response = JSON.parse(xhttp.responseText);
+    var requestBody = {
+      "value": value
+    }
+    var jsonResult = JSON.stringify(requestBody);
+    restRequest("PATCH", "/api/item/field/" + type + "/" + id, "application/json", jsonResult,
+    (responseText)=>{
+      var response = JSON.parse(responseText);
       console.log("Getting Response");
       console.log(response);
-    }
+    },
+    ()=>{
+      console.log('PATCH Failed!!');
+    });
   }
 
   openModal() {
