@@ -8,8 +8,6 @@ var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 import {restRequest} from "../Utilities.js"
 
-var xhttp = new XMLHttpRequest();
-
 class ViewRequestModal extends React.Component {
   constructor(props) {
     super(props);
@@ -29,7 +27,7 @@ class ViewRequestModal extends React.Component {
   }
 
   getDetailedRequest(id, cb) {
-    restRequest("GET", "/api/request/detailed/"+id+"/", "application/json", null,
+    restRequest("GET", "/api/shoppingCart/detailed/"+id+"/", "application/json", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   console.log("Getting Response");
@@ -78,7 +76,7 @@ class ViewRequestModal extends React.Component {
 
   patchRequest(type, requestBody) {
     var jsonResult = JSON.stringify(requestBody);
-    restRequest("PATCH", "/api/request/"+type+"/"+this.state.requestData.id+"/",
+    restRequest("PATCH", "/api/shoppingCart/"+type+"/"+this.state.requestData.id+"/",
                 jsonResult,
                 (responseText)=>{
                   var response = JSON.parse(responseText);

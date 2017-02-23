@@ -5,7 +5,6 @@
 var React = require('react');
 //import isLoggedIn from './Utilities.js'
 import { hashHistory } from 'react-router';
-import { Button, Glyphicon } from 'react-bootstrap';
 
 export default class MasterPage extends React.Component {
 

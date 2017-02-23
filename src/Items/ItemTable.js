@@ -11,7 +11,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import '../DropdownTable.css';
 
-import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Row} from 'react-bootstrap';
+import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -72,6 +72,14 @@ class ItemTable extends React.Component {
 
   componentWillMount() {
     this.getAllItem(null)
+  }
+
+  componentDidMount(){
+
+    document.getElementById("testing").onclick = () => {
+      console.log("ahhhhhh!!!");
+      alert("I clicked this");
+    }
   }
 
   // Converts JSON tags to a comma-separated string of tags
@@ -172,10 +180,16 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
+    // console.log(row);
+    // console.log(isSelected);
+    // console.log(e);
     if (this.state.showModal){
-      this._child.getRequests(row.name);
+      //this._child.getRequests(row.name);
       this._child.getDetailedItem(row.id);
       this._child.openModal();
+    }
+    else{
+      this.setState({showModal: true});
     }
   }
 
@@ -211,8 +225,9 @@ class ItemTable extends React.Component {
     }
 
   onAddtoCartClick(cell, row){
-    console.log(row);
     this.state.showModal = false;
+    console.log(row);
+    //this.setState({showModal: false});
     var addItemJson = JSON.stringify({
       item_id: row.id,
       quantity_requested: row.cart_quantity
@@ -255,9 +270,9 @@ class ItemTable extends React.Component {
   }
 
   buttonFormatter(cell, row) {
-    this.state.showModal = false;
+    //this.setState({showModal: false});
     return (
-      <div>
+      <div id="testing" onClick={()=>{this.state.showModal=false;}}>
       <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
       <InputGroup>
       {(row.cart_quantity < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}

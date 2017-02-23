@@ -7,7 +7,7 @@ var Bootstrap = require('react-bootstrap');
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 import {Modal, Button, Radio, ButtonGroup} from 'react-bootstrap';
-import {restRequest, checkAuthAndAdmin} from "./Utilities.js"
+import {restRequest} from "./Utilities.js"
 
 class TagModal extends React.Component {
   constructor(props) {

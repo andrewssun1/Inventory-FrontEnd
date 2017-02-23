@@ -9,9 +9,8 @@ var moment = require('moment');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {restRequest, checkAuthAndAdmin} from './Utilities'
-var xhttp = new XMLHttpRequest();
 
-export default class ManageUsers extends React.Component {
+export default class ManageUsersComponent extends React.Component {
 
   constructor(props) {
     super(props);

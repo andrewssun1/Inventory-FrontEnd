@@ -7,7 +7,7 @@ import ItemTable from './ItemTable';
 class ItemComponent extends React.Component {
   render() {
     return (
-      <ItemTable />
+      <ItemTable ref="itemTable"/>
     )
   }
 }

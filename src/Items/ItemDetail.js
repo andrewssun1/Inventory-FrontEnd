@@ -5,18 +5,16 @@ var React = require('react');
 var Bootstrap = require('react-bootstrap');
 var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
-import MakeRequestModal from '../Request/MakeRequestModal';
+import MakeRequestModal from '../Requests/MakeRequestModal';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-import TagComponent from '../TagComponent/TagComponent'
+import TagComponent from '../Tags/TagComponent'
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
 //TODO: Refactor this and Request Table, create one component that is used in both
-
-var xhttp = new XMLHttpRequest();
 
 class ItemDetail extends React.Component {
   constructor(props) {
@@ -35,6 +33,7 @@ class ItemDetail extends React.Component {
     this.requestItem = this.requestItem.bind(this);
     this.getRequests = this.getRequests.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
+    this.renderRequests = this.renderRequests.bind(this);
   }
 
   getDetailedItem(id) {
@@ -135,6 +134,27 @@ class ItemDetail extends React.Component {
     console.log('request clicked');
   }
 
+  renderRequests(){
+    const options = {
+      sizePerPageList: [ 30 ],
+      sizePerPage: 30,
+      page: this.state.currentPage
+    };
+    return (
+            <div>
+            <h4> Requests </h4>
+            <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
+            data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
+            <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
+            <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
+            <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
+            <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
+            <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
+            <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
+            </BootstrapTable>
+          </div>);
+  }
+
   render() {
     if(this.state.itemData == null) return null;
 
@@ -171,16 +191,6 @@ class ItemDetail extends React.Component {
         <p> Tags: </p>
         <TagComponent item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        <h4> Requests </h4>
-        <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
-        data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
-        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-        <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
-        <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
-        <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
-        <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
-        <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
-        </BootstrapTable>
         </div>
       }
       </Modal.Body>

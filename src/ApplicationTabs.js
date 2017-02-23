@@ -1,14 +1,13 @@
-// simpletabs.js
-// creation of some simple tabs
+// ApplicationTabs.js
+// Creates the tab structure for the application
 // @author Andrew
 
-import ItemComponent from './Item/ItemComponent';
+import ItemComponent from './Items/ItemComponent';
 import { restRequest, checkAuthAndAdmin } from './Utilities';
-import LogComponent from './LogComponent/LogComponent'
-import RequestComponent from './Request/RequestComponent'
-import TagModal from './TagModal'
-import ManageUsers from './ManageUsers'
-import ShoppingCartTable from './ShoppingCartTable'
+import LogComponent from './Logs/LogComponent'
+import RequestComponent from './Requests/RequestComponent'
+import ManageUsersComponent from './ManageUsersComponent'
+import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -36,8 +35,13 @@ export default class ApplicationTabs extends React.Component {
      */
     if (key === "items") {
       setTimeout(() => {
+        console.log(this.refs);
+        console.log(this.refs.itemComponent.refs);
         this.refs.itemComponent.forceUpdate();
       }, 500);
+    }
+    else if (key === "cart"){
+      this.refs.shoppingCartTable.componentWillMount();
     }
   });
 }
@@ -55,14 +59,8 @@ export default class ApplicationTabs extends React.Component {
     restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
-                  var currCart = response.id;
-                  restRequest("GET", "/api/shoppingCart/detailed/"+currCart+"/", "application/JSON", null,
-                              (responseText)=>{
-                                var detailResponse = JSON.parse(responseText);
-                                localStorage.setItem("cart_quantity", detailResponse.requests.length);
-                                console.log(JSON.parse(responseText));
-                              }, (status, responseText)=>{console.log(JSON.parse(responseText))});
-                  //console.log(response);
+                  localStorage.setItem("cart_quantity", response.requests.length);
+                  console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
 
     localStorage.setItem = function(){
@@ -122,7 +120,7 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  {isAdmin ? (
                  <Tab.Pane eventKey="users">
-                   <ManageUsers ref="manage"></ManageUsers>
+                   <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
