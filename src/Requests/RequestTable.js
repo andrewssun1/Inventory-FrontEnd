@@ -55,6 +55,7 @@ class RequestTable extends React.Component {
                     console.log(response);
                     var unselectable_ids = [];
                     var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
+                    console.log(response_results);
                     this.setState({
                       data: response_results,
                       totalDataSize: response.count,
@@ -182,7 +183,7 @@ class RequestTable extends React.Component {
     return(
       <div>
       <ViewRequestModal id={this.state.selectedRequest}
-      updateCallback={this.props.updateCallback}
+      updateCallback={this}
       ref={(child) => { this._requestModal = child; }} />
       <RequestButton ref="requestButton" { ...this.state} cb={this}/>
       <BootstrapTable ref="logTable"

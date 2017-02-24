@@ -7,13 +7,16 @@ import TextEntryFormElement from '../TextEntryFormElement';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 import {restRequest} from "../Utilities.js"
+var ReactBsTable = require('react-bootstrap-table');
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 class ViewRequestModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       showModal: false,
-      requestData: null,
+      requestData: [],
       requestProblemString: ""
     }
     this.openModal = this.openModal.bind(this);
@@ -32,12 +35,28 @@ class ViewRequestModal extends React.Component {
                   var response = JSON.parse(responseText);
                   console.log("Getting Response");
                   console.log(response);
-                  this.setState({requestData: response}, cb);
-                  if(response.quantity > response.item.quantity) {
-                    this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
-                  } else {
+                  var errorItems = [];
+                  for (var i = 0; i < response.requests.length; i++){
+                    response.requests[i].name = response.requests[i].item.name;
+                    if(response.requests[i].quantity_requested > response.requests[i].item.quantity) {
+                      errorItems.push(response.requests[i].name);
+                      // this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
+                    }
+                  }
+                  if (errorItems.length === 0 || response.status !== "outstanding"){
                     this.setState({requestProblemString: ""});
                   }
+                  else{
+                    var errorString = "Cannot approve. Requested quantity exceeds quantity in stock for the following items: "
+                    for (var j = 0; j < errorItems.length-1; j++){
+                      errorString = errorString + errorItems[j] + ", ";
+                    }
+                    errorString = errorString + errorItems[errorItems.length-1];
+                    this.setState({requestProblemString: errorString});
+                  }
+
+                  this.setState({requestData: response}, cb);
+
                   //cb();
                 }, ()=>{console.log("Get detailed request failed");}
                 )
@@ -76,7 +95,7 @@ class ViewRequestModal extends React.Component {
 
   patchRequest(type, requestBody) {
     var jsonResult = JSON.stringify(requestBody);
-    restRequest("PATCH", "/api/shoppingCart/"+type+"/"+this.state.requestData.id+"/",
+    restRequest("PATCH", "/api/shoppingCart/"+type+"/"+this.state.requestData.id+"/", "application/json",
                 jsonResult,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
@@ -85,7 +104,7 @@ class ViewRequestModal extends React.Component {
                   this.props.updateCallback.getAllRequests(null);
                   this.closeModal();
                 }, ()=>{
-                  console.log("PATCH FAILED");
+                  console.log("PATCH FAILED!");
                   this.props.updateCallback.getAllRequests(null);
                   this.closeModal();
                 })
@@ -95,13 +114,15 @@ class ViewRequestModal extends React.Component {
     const isAdmin = (localStorage.isAdmin === "true");
 
     return (
-      (this.state.requestData !== null) ?
+      (this.state.requestData.length !== 0) ?
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
-      <p> Item: {this.state.requestData.item.name} </p>
-      <p> Quantity: {this.state.requestData.quantity} </p>
-      <p> Reason: {this.state.requestData.reason} </p>
+        <BootstrapTable ref="viewRequestModal" data={this.state.requestData.requests} striped hover>
+        <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
+        <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
+        <TableHeaderColumn dataField='quantity_requested' dataAlign="center">Quantity</TableHeaderColumn>
+        </BootstrapTable>
       <br />
       {(this.state.requestData.status !== "outstanding") ? <div>
       {(this.state.requestData.status === "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}

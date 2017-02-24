@@ -64,7 +64,7 @@ export default class CartQuantityChooser extends React.Component {
 
   updateRowQuantity(row){
     row.shouldUpdate = false;
-    this.updateCart(row.id, row.quantity_requested);
+    this.updateCart(row.id, parseInt(row.quantity_requested, 10));
     console.log("uhhh updating?")
   }
 
