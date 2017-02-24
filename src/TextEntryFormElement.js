@@ -1,6 +1,7 @@
 // Text entry element for React Bootstrap formHorizontalDescription
 // @author Patrick Terry
 
+import TypeEnum from './TypeEnum';
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 var FormGroup = Bootstrap.FormGroup;
@@ -31,7 +32,9 @@ class TextEntryFormElement extends React.Component {
       {this.props.label}
       </Col>
       <Col sm={10}>
-      <FormControl componentClass={this.props.componentClass} type={this.props.type} value={this.state.value} onChange={this.handleChange}/>
+      <FormControl componentClass={(this.props.type == TypeEnum.LONG_STRING) ? "textarea" : "input"}
+      type={(this.props.type == TypeEnum.INTEGER || this.props.type == TypeEnum.FLOAT) ? "number" : "text"}
+      value={this.state.value} onChange={this.handleChange}/>
       </Col>
       </FormGroup>
     )
