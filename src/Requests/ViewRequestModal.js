@@ -3,10 +3,11 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from '../TextEntryFormElement';
+import TextEntryFormElement from '../TextEntryFormElement'
+import {restRequest} from "../Utilities.js"
+import TypeConstants from "../TypeConstants.js"
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
-import {restRequest} from "../Utilities.js"
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -27,6 +28,8 @@ class ViewRequestModal extends React.Component {
     this.patchRequest = this.patchRequest.bind(this);
     this.getDetailedRequest = this.getDetailedRequest.bind(this);
     this.isOutstanding = this.isOutstanding.bind(this);
+    this.renderBottomComponents = this.renderBottomComponents.bind(this);
+    this.renderButtons = this.renderButtons.bind(this);
   }
 
   getDetailedRequest(id, cb) {
@@ -110,6 +113,43 @@ class ViewRequestModal extends React.Component {
                 })
   }
 
+  renderBottomComponents() {
+    let data = this.state.requestData;
+    switch (this.state.requestData.status) {
+      case "approved":
+      case "denied":
+        return(
+          <div>
+          {(this.state.requestData.status === "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}
+          <p> By: {data.admin.username} </p>
+          <p> At time: {data.admin_timestamp} </p>
+          <p> Comments: {data.admin_comment} </p>
+          </div>);
+      case "active":
+        return(<h4> Active </h4>);
+      default:
+        return(<h4> Outstanding </h4>);
+    }
+  }
+
+  renderButtons() {
+    const isAdmin = (localStorage.isAdmin == "true");
+    var buttons = [];
+    if(this.isOutstanding()) {
+      if(isAdmin) {
+        buttons.push(<div> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
+        type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
+        <br /> <br /> <br /> <br /> </div>);
+        if(this.state.requestProblemString === "") {
+          buttons.push(<Button onClick={this.approve} bsStyle="success">Approve Request</Button>);
+        }
+        buttons.push(<Button onClick={this.deny} bsStyle="danger">Deny Request</Button>);
+      }
+    }
+    buttons.push(<Button onClick={this.closeModal} >Close</Button>);
+    return buttons;
+  }
+
   render() {
     const isAdmin = (localStorage.isAdmin === "true");
 
@@ -124,34 +164,11 @@ class ViewRequestModal extends React.Component {
         <TableHeaderColumn dataField='quantity_requested' dataAlign="center">Quantity</TableHeaderColumn>
         </BootstrapTable>
       <br />
-      {(this.state.requestData.status !== "outstanding") ? <div>
-      {(this.state.requestData.status === "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}
-      <p> By: {this.state.requestData.admin.username} </p>
-      <p> At time: {this.state.requestData.admin_timestamp} </p>
-      <p> Comments: {this.state.requestData.admin_comment} </p>
-      </div>
-      :
-      <h4> Outstanding </h4>
-      }
+      {this.renderBottomComponents()}
       <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       </Modal.Body>
       <Modal.Footer>
-      {isAdmin ?
-      <div>
-      {this.isOutstanding() ? <div> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
-      type="text" initialValue="" componentClass="textarea" ref={(child) => {this._commentsField = child;}}/>
-      <br /> <br /> <br /> <br /> </div> : null}
-      {(this.isOutstanding() && this.state.requestProblemString === "") ?
-      <Button onClick={this.approve} bsStyle="success">Approve Request</Button> : null}
-      {this.isOutstanding() ? <Button onClick={this.deny} bsStyle="danger">Deny Request</Button> : null}
-      <Button onClick={this.closeModal} >Close</Button>
-      </div>
-      :
-      <div>
-      {this.isOutstanding() ? <Button onClick={this.cancel} bsStyle="danger">Cancel Request</Button> : null}
-      <Button onClick={this.closeModal} >Close</Button>
-      </div>
-      }
+      {this.renderButtons()}
       </Modal.Footer>
       </Bootstrap.Modal>
       </div>
