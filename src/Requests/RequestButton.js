@@ -3,6 +3,7 @@ import {hashHistory} from "react-router";
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import AlertComponent from "../AlertComponent"
 
 //var xhttp = new XMLHttpRequest();
 
@@ -27,33 +28,19 @@ class RequestButton extends React.Component {
         })
         var url = "/api/shoppingCart/" + type + "/" + requestID + "/";
         var requestBody = {"id": requestID};
+        var dict = {deny: "denied", cancel: "cancelled", approve: "approved"};
         requestBody[patchRequestBodyKey] = patchRequestBodyValue;
         restRequest("PATCH", url, "application/json", JSON.stringify(requestBody),
                     (responseText)=>{
                       var response = JSON.parse(responseText);
                       console.log("about to print response!!");
                       console.log(response);
+                      this._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                       this.props.cb.resetTable();
                     },
                     (status, responseText)=>{
                       var response = JSON.parse(responseText);
-                      if (status === 401 || status === 500){
-                          console.log(response);
-                          if(!!localStorage.token){
-                              delete localStorage.token;
-                          }
-                          this.setState({
-                              _loginState: false
-                          });
-                          hashHistory.push('/login');
-                          return null;
-                      }
-                      else if(status === 405){
-                          console.log(response.detail);
-                          this.setState({
-                              requestProblemString: response.detail
-                          })
-                      }
+                      this._alertchild.generateError(response.detail);
                       this.props.cb.resetTable();
                     });
     }
@@ -62,7 +49,7 @@ class RequestButton extends React.Component {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.patchRequest(requestIDs[i], "approve", "admin_comment", "this is a general admin comment");
+            this.patchRequest(requestIDs[i], "approve", "admin_comment", "");
             //this.approveRequest(requestIDs[i]);
         }
     }
@@ -70,7 +57,7 @@ class RequestButton extends React.Component {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.patchRequest(requestIDs[i], "deny", "admin_comment", "this is a general admin comment");
+            this.patchRequest(requestIDs[i], "deny", "admin_comment", "");
             //this.denyRequest(requestIDs[i]);
         }
     }
@@ -78,7 +65,7 @@ class RequestButton extends React.Component {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
             console.log(requestIDs[i])
-            this.patchRequest(requestIDs[i], "cancel", "reason", "this is a cancellation reason");
+            this.patchRequest(requestIDs[i], "cancel", "reason", "");
             //this.cancelRequest(requestIDs[i]);
         }
     }
@@ -86,7 +73,7 @@ class RequestButton extends React.Component {
         const isAdmin = (localStorage.isAdmin === "true");
         return(
             <div style={{marginLeft: "11px"}}>
-                <p style={{color:"red"}}> {this.state.requestProblemString} </p>
+                <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
                 {isAdmin ?
                 <div>
                     <Bootstrap.ButtonToolbar>

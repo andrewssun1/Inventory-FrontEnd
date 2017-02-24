@@ -43,6 +43,7 @@ export default class ApplicationTabs extends React.Component {
     }
     else if (key === "cart"){
       this.refs.shoppingCartTable.componentWillMount();
+      this.refs.shoppingCartTable._alertchild.closeAlert();
     }
     else if (key === "requests"){
       this.refs.requestComponent.refs.requestTable.componentWillMount();

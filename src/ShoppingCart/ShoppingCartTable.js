@@ -12,6 +12,7 @@ import '../DropdownTable.css';
 import {Button, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Modal, Col, ControlLabel} from 'react-bootstrap';
 import ShoppingCartModal from './ShoppingCartModal';
 import CartQuantityChooser from './CartQuantityChooser';
+import AlertComponent from '../AlertComponent'
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -64,7 +65,10 @@ export default class ShoppingCartTable extends React.Component {
       restRequest("DELETE", "/api/shoppingCart/deleteItem/"+rows[i]+"/", "application/json", null,
                   ()=>{
                     localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) - 1);
-                  }, ()=>{});
+                    this._alertchild.generateSuccess("Successfully deleted item from cart.");
+                  }, (status, errResponse)=>{
+                    this._alertchild.generateError(JSON.parse(errResponse).detail);
+                  });
     }
     this.setState({
       _cart: this.state._cart.filter((product) => {
@@ -92,6 +96,7 @@ export default class ShoppingCartTable extends React.Component {
     };
     return(
       <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ShoppingCartModal ref={(child) => {this._cartchild = child; }} updateCallback={this}/>
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
