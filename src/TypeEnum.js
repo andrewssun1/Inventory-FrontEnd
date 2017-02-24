@@ -1,9 +1,7 @@
 // Types of fields
 // @author Patrick Terry
 
-//TODO: See if you can use the strings from the back-end
-//And ask Siva if he could standardize those
-var TypeEnum = {
+const TypeEnum = {
   INTEGER: 1,
   FLOAT: 2,
   SHORT_STRING: 3,

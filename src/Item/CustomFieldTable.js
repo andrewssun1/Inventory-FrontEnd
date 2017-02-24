@@ -8,6 +8,8 @@ var Bootstrap = require('react-bootstrap');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
+import TypeConstants from "../TypeConstants.js"
+
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
 var xhttp = new XMLHttpRequest();
@@ -18,6 +20,7 @@ class CustomFieldTable extends React.Component {
     super(props);
     this.state = {
       _fields: []
+
     };
     this.getFieldData = this.getFieldData.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
@@ -35,6 +38,15 @@ class CustomFieldTable extends React.Component {
         var response = JSON.parse(responseText);
         console.log("Getting Custom Field Response");
         console.log(response);
+        var results = response.results;
+        for(var i = 0; i < results.length; i++) {
+          results[i].type = TypeConstants.RequestToFormatMap[results[i].type];
+          if(results[i].private) {
+            results[i].private = "Private";
+          } else {
+            results[i].private = "Public";
+          }
+        }
         this.setState({_fields: response.results});
       },
       ()=>{console.log('GET Failed!!');}
@@ -46,9 +58,10 @@ onAddRow(row) {
   checkAuthAndAdmin(()=>{
     var requestBody = {
       "name"    : row.name,
-      "type"    : row.type,
-      "private" : row.private
+      "type"    : TypeConstants.FormattedToRequestMap[row.type],
+      "private" : (row.private == 'Private')
     }
+    console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", "/api/item/field/", "application/json", jsonResult,
     (responseText)=>{
@@ -57,7 +70,7 @@ onAddRow(row) {
       console.log(response);
       this.getFieldData();
     },
-    ()=>{console.log('GET Failed!!');}
+    ()=>{console.log('Add Failed!!');}
   );
 });
 }
@@ -81,14 +94,17 @@ render() {
     onDeleteRow: this.onDeleteRow
   };
 
+  const typeList = TypeConstants.FormattedStrings;
+  const boolList = [ "Public", "Private"];
+
   return(
     <div>
     <BootstrapTable ref="customFieldTable" remote={ true } options={options}
     selectRow={selectRow} deleteRow={true} insertRow={true} data={this.state._fields} striped hover>
     <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
     <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
-    <TableHeaderColumn dataField='type'>Type</TableHeaderColumn>
-    <TableHeaderColumn dataField='private'>Privacy</TableHeaderColumn>
+    <TableHeaderColumn dataField='type' editable={ { type: 'select', options: { values: typeList} } }>Type</TableHeaderColumn>
+    <TableHeaderColumn dataField='private' editable={ { type: 'select', options: { values: boolList} } }>Privacy</TableHeaderColumn>
     </BootstrapTable>
     </div>
   )

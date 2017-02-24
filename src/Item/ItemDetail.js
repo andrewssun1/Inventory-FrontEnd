@@ -8,7 +8,7 @@ import TextEntryFormElement from '../TextEntryFormElement';
 import MakeRequestModal from '../Request/MakeRequestModal';
 import ViewRequestModal from '../Request/ViewRequestModal';
 import TagComponent from '../TagComponent/TagComponent'
-import TypeEnum from '../TypeEnum';
+import TypeConstants from '../TypeConstants';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
@@ -62,15 +62,17 @@ class ItemDetail extends React.Component {
 populateFieldData(response) {
   //Default Fields:
   var data = [
-    {name: "Name", type: TypeEnum.SHORT_STRING, value: response.name},
-    {name: "Quantity", type: TypeEnum.INTEGER, value: response.quantity},
-    {name: "Model Number", type: TypeEnum.SHORT_STRING, value: response.model_number},
-    {name: "Description", type: TypeEnum.LONG_STRING, value: response.description}
+    {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
+    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity},
+    {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
+    {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
   ];
   //Custom Fields:
-  var typesArray = [TypeEnum.SHORT_STRING, TypeEnum.INTEGER, TypeEnum.FLOAT, TypeEnum.LONG_STRING];
-  var responseDataArrays = [response.short_text_fields, response.int_fields, response.float_fields, response.long_text_fields];
+  var typesArray = TypeConstants.Array;
+  console.log("printing response arrays");
+  var responseDataArrays = [response.int_fields, response.float_fields, response.short_text_fields, response.long_text_fields];
   for(var i = 0; i < typesArray.length; i++) {
+    console.log(responseDataArrays[i]);
     for(var j = 0; j < responseDataArrays[i].length; j++) {
       var field = responseDataArrays[i][j];
       data.push({name: field.field, type: typesArray[i], value: field.value});
@@ -100,12 +102,11 @@ saveItem(cb) {
     });
 
     //Save Custom Fields
-    var itemDataArrays = [this.state.itemData.short_text_fields,
-      this.state.itemData.int_fields,
+    var itemDataArrays = [this.state.itemData.int_fields,
       this.state.itemData.float_fields,
+      this.state.itemData.short_text_fields,
       this.state.itemData.long_text_fields];
-      var types = ["shorttext", "int",
-      "float", "longtext"];
+      var types = TypeConstants.RequestStrings;
       for(var i = 0; i < itemDataArrays.length; i++) {
         var oldFields = itemDataArrays[i];
         for(var j = 0; j < oldFields.length; j++) {
@@ -210,6 +211,7 @@ saveItem(cb) {
 
   renderEditFields() {
     if(this.state.fieldData != null) {
+      console.log(this.state.fieldData);
       let editFields = this.state.fieldData.map((field) => {
         return(<TextEntryFormElement key={field.name} controlId={"formHorizontal" + field.name}
         label={field.name} type={field.type} initialValue={field.value}
@@ -245,7 +247,7 @@ saveItem(cb) {
         <p> Tags: </p>
         <TagComponent item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        <h4> Requests </h4>
+        {/*<h4> Requests </h4>
         <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
         data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
         <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
@@ -254,7 +256,7 @@ saveItem(cb) {
         <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
         <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
         <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
-        </BootstrapTable>
+        </BootstrapTable>*/}
         </div>
       }
       </Modal.Body>
