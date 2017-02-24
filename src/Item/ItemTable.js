@@ -174,7 +174,6 @@ class ItemTable extends React.Component {
       this._child.openModal();
     }
     else{
-      console.log("showModal is false");
       this._child.openModal();
     }
   }
