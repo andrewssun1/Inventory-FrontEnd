@@ -34,9 +34,10 @@ export default class ApplicationTabs extends React.Component {
      * If disable animation, call forceUpdate directly.
      */
     if (key === "items") {
+      this.refs.itemComponent.refs.itemTable._alertchild.closeAlert();
       setTimeout(() => {
-        console.log(this.refs);
-        console.log(this.refs.itemComponent.refs);
+        //console.log(this.refs);
+        //console.log(this.refs.itemComponent.refs);
         this.refs.itemComponent.forceUpdate();
       }, 500);
     }

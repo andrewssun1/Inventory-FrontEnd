@@ -85,18 +85,18 @@ class RequestButton extends React.Component {
     render() {
         const isAdmin = (localStorage.isAdmin === "true");
         return(
-            <div>
+            <div style={{marginLeft: "11px"}}>
                 <p style={{color:"red"}}> {this.state.requestProblemString} </p>
                 {isAdmin ?
                 <div>
                     <Bootstrap.ButtonToolbar>
-                        <Button onClick={this.approveClick} bsStyle="success">Approve</Button>
-                        <Button onClick={this.denyClick} bsStyle="danger">Deny</Button>
+                        <Button onClick={this.approveClick} bsSize="sm" bsStyle="success">Approve</Button>
+                        <Button onClick={this.denyClick} bsSize="sm" bsStyle="danger">Deny</Button>
                     </Bootstrap.ButtonToolbar>
                 </div> :
                 <div>
                     <Bootstrap.ButtonToolbar>
-                        <Button onClick={this.cancelClick} bsStyle="danger">Cancel</Button>
+                        <Button onClick={this.cancelClick} bsSize="sm" bsStyle="danger">Cancel</Button>
                     </Bootstrap.ButtonToolbar>
                 </div>}
             </div>

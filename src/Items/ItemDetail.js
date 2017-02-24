@@ -13,6 +13,7 @@ var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 import TagComponent from '../Tags/TagComponent'
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import {MenuItem, DropdownButton, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
 
 //TODO: Refactor this and Request Table, create one component that is used in both
 
@@ -34,6 +35,7 @@ class ItemDetail extends React.Component {
     this.getRequests = this.getRequests.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
     this.renderRequests = this.renderRequests.bind(this);
+    this.buttonFormatter = this.buttonFormatter.bind(this);
   }
 
   getDetailedItem(id) {
@@ -134,6 +136,54 @@ class ItemDetail extends React.Component {
     console.log('request clicked');
   }
 
+  generateMenuItems(cell, row){
+    var menuItems = [];
+    for (var i = 1; i < 11; i++){
+      menuItems.push((
+        <MenuItem key={"menuItemS"+i} onSelect={(e, eventKey)=>{
+            row.quantity_requested = e;
+            //this.updateCart(row.id, row.quantity_requested);
+            //this.forceUpdate();
+          }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
+      ))
+    }
+    return(
+      <DropdownButton key={"asd2"} id={"trying2"} style={{marginRight: "10px"}} title={row.quantity_requested}>
+        {menuItems}
+      </DropdownButton>
+    );
+  }
+
+  generateHighQuantityTextBox(cell, row){
+    return(
+                  <FormControl
+                    type="number"
+                    min="1"
+                    defaultValue={row.quantity_requested}
+                    style={{width: "72px", marginRight: "10px"}}
+                    onChange={(e)=>{
+                      row.quantity_requested=e.target.value;
+                      row.shouldUpdate = true;
+                    }}
+                  />
+
+      );
+  }
+
+  buttonFormatter(cell, row) {
+    return (
+      <div className="pull-right">
+      <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
+      <InputGroup>
+      {(row.quantity_requested < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
+      <Button onClick={this.requestItem} bsStyle="primary">Add to Cart</Button>
+      <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
+      </InputGroup>
+      </FormGroup>
+      </div>
+    );
+  }
+
   renderRequests(){
     const options = {
       sizePerPageList: [ 30 ],
@@ -212,8 +262,7 @@ class ItemDetail extends React.Component {
         :
         //Buttons for a user
         <div>
-        <Button onClick={this.requestItem} bsStyle="primary">Request</Button>
-        <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
+        {this.buttonFormatter(null, this.state.itemData)}
         </div>
       }
       </Modal.Footer>

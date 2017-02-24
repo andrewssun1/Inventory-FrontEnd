@@ -15,6 +15,7 @@ import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, I
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
+import AlertComponent from '../AlertComponent';
 
 class ItemTable extends React.Component {
 
@@ -35,7 +36,10 @@ class ItemTable extends React.Component {
       currentPage: 1,
       totalDataSize: 0,
       tagSearchText: "",
-      showModal: true
+      showModal: true,
+      alertState: false,
+      alertType: "error",
+      alertMessage: ""
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
@@ -72,14 +76,6 @@ class ItemTable extends React.Component {
 
   componentWillMount() {
     this.getAllItem(null)
-  }
-
-  componentDidMount(){
-
-    document.getElementById("testing").onclick = () => {
-      console.log("ahhhhhh!!!");
-      alert("I clicked this");
-    }
   }
 
   // Converts JSON tags to a comma-separated string of tags
@@ -151,7 +147,9 @@ class ItemTable extends React.Component {
     checkAuthAndAdmin(()=>{
       for (let i = 0; i < rows.length; i++){
         restRequest("DELETE", "/api/item/"+rows[i], "application/json", null,
-                    ()=>{}, ()=>{});
+                    ()=>{
+                      this._alertchild.generateSuccess("Successfully deleted item from database.");
+                    }, (status, errResponse)=>{this._alertchild.generateError(JSON.parse(errResponse).detail);});
       }
       this.setState({
         _products: this.state._products.filter((product) => {
@@ -236,9 +234,12 @@ class ItemTable extends React.Component {
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   console.log(response);
-                  alert("Added " + row.cart_quantity + " of " + row.name + " to cart!");
+                  //alert("Added " + row.cart_quantity + " of " + row.name + " to cart!");
                   localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
-                }, (status, errResponse)=>{console.log(JSON.parse(errResponse))});
+                  this._alertchild.generateSuccess("Successfully added " + row.cart_quantity + " of " + row.name + " to cart!");
+                }, (status, errResponse)=>{
+                  this._alertchild.generateError(JSON.parse(errResponse).detail);
+                });
   }
 
   generateMenuItems(cell, row){
@@ -308,6 +309,7 @@ class ItemTable extends React.Component {
 
     return(
       <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <div className="text-right">
         <ButtonGroup>
           <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
