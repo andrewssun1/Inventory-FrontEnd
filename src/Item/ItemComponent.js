@@ -3,11 +3,22 @@
 
 var React = require('react');
 import ItemTable from './ItemTable';
+import CustomFieldTable from './CustomFieldTable';
 
 class ItemComponent extends React.Component {
   render() {
+    const isAdmin = (localStorage.isAdmin == "true");
+
     return (
+      <div>
       <ItemTable />
+      {isAdmin ?
+        <div>
+        <h2> Custom Fields </h2>
+        <CustomFieldTable />
+        </div>
+         : null}
+      </div>
     )
   }
 }

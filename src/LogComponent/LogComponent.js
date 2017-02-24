@@ -69,7 +69,6 @@ class LogComponent extends React.Component {
                               actions.push(response.results[i]['tag']);
                               action_filters[parseInt(response.results[i]['id'], 10)] = response.results[i]['tag'];
                           }
-                          // console.log(action_filters);
                           this.setState({
                               action_map: responseMap,
                               action_list: actions,
