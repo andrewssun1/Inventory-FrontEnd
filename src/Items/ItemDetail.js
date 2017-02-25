@@ -40,8 +40,6 @@ class ItemDetail extends React.Component {
     this.requestItem = this.requestItem.bind(this);
     this.getRequests = this.getRequests.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
-    // this.renderRequests = this.renderRequests.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
     this.populateFieldData = this.populateFieldData.bind(this);
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
     this.renderEditFields = this.renderEditFields.bind(this);
@@ -229,74 +227,6 @@ saveItem(cb) {
       return(editFields);
     }
   }
-
-  generateMenuItems(cell, row){
-    var menuItems = [];
-    for (var i = 1; i < 11; i++){
-      menuItems.push((
-        <MenuItem key={"menuItemS"+i} onSelect={(e, eventKey)=>{
-            row.quantity_requested = e;
-            //this.updateCart(row.id, row.quantity_requested);
-            //this.forceUpdate();
-          }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
-      ))
-    }
-    return(
-      <DropdownButton key={"asd2"} id={"trying2"} style={{marginRight: "10px"}} title={row.quantity_requested}>
-        {menuItems}
-      </DropdownButton>
-    );
-  }
-
-  generateHighQuantityTextBox(cell, row){
-    return(
-                  <FormControl
-                    type="number"
-                    min="1"
-                    defaultValue={row.quantity_requested}
-                    style={{width: "72px", marginRight: "10px"}}
-                    onChange={(e)=>{
-                      row.quantity_requested=e.target.value;
-                      row.shouldUpdate = true;
-                    }}
-                  />
-
-      );
-  }
-
-  buttonFormatter(cell, row) {
-    return (
-      <div>
-      <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
-      <InputGroup>
-      {(row.quantity_requested < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
-      <Button onClick={this.requestItem} bsStyle="primary">Add to Cart</Button>
-      </InputGroup>
-      </FormGroup>
-      </div>
-    );
-  }
-
-  // renderRequests(){
-  //   const options = {
-  //     sizePerPageList: [ 30 ],
-  //     sizePerPage: 30,
-  //     page: this.state.currentPage
-  //   };
-  //   return (
-  //           <div>
-  //           <h4> Requests </h4>
-  //           <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
-  //           data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
-  //           <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-  //           <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
-  //           <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
-  //           <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
-  //           <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
-  //           <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
-  //           </BootstrapTable>
-  //         </div>);
-  // }
 
   render() {
     if(this.state.itemData == null) return null;

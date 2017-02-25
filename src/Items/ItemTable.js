@@ -46,7 +46,6 @@ class ItemTable extends React.Component {
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
     this.cartFormatter = this.cartFormatter.bind(this);
   }
 
@@ -250,68 +249,6 @@ class ItemTable extends React.Component {
         })
     }
 
-  onAddtoCartClick(cell, row){
-    this.state.showModal = false;
-    console.log(row);
-    //this.setState({showModal: false});
-    var addItemJson = JSON.stringify({
-      item_id: row.id,
-      quantity_requested: row.quantity_requested
-    });
-    restRequest("POST", "/api/shoppingCart/addItem/", "application/json", addItemJson,
-                (responseText)=>{
-                  var response = JSON.parse(responseText);
-                  console.log(response);
-                  //alert("Added " + row.quantity_requested + " of " + row.name + " to cart!");
-                  localStorage.setItem("cart_quantity", parseInt(localStorage.quantity_requested, 10) + 1);
-                  this._alertchild.generateSuccess("Successfully added " + row.quantity_requested + " of " + row.name + " to cart!");
-                }, (status, errResponse)=>{
-                  this._alertchild.generateError(JSON.parse(errResponse).detail);
-                });
-  }
-
-  generateMenuItems(cell, row){
-    var menuItems = [];
-    for (var i = 1; i < 11; i++){
-      menuItems.push((
-        <MenuItem key={"menuItem"+i} onSelect={(e, eventKey)=>{
-            row.quantity_requested = e;
-          }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
-      ))
-    }
-    return(
-      <DropdownButton key={"asds"} id={"trying"} title={row.quantity_requested}>
-        {menuItems}
-      </DropdownButton>
-    );
-  }
-
-  generateHighQuantityTextBox(cell, row){
-    return(
-                  <FormControl
-                    type="number"
-                    defaultValue={10}
-                    style={{width: "72px"}}
-                    onChange={(e)=>{row.quantity_requested=e.target.value}}
-                  />
-
-      );
-  }
-
-  buttonFormatter(cell, row) {
-    //this.setState({showModal: false});
-    return (
-      <div id="testing" onClick={()=>{this.state.showModal=false;}}>
-      <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
-      <InputGroup>
-      {(row.quantity_requested < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
-      <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>
-      </InputGroup>
-      </FormGroup>
-      </div>
-    );
-  }
-
   cartFormatter(cell, row) {
     return (
       <div id="testing" onClick={()=>{this.state.showModal=false;}}>
@@ -347,7 +284,6 @@ class ItemTable extends React.Component {
     return(
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
       <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
           <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
@@ -366,6 +302,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
       </BootstrapTable>) : null}
 
+      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
       <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
       </div>
     )
