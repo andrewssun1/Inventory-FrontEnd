@@ -33,6 +33,7 @@ export default class MasterPage extends React.Component {
     const loginStyle = {
       marginRight: '1cm'
     };
+    //        <Button className="pull-right" style={{marginRight: '2cm'}} bsSize="large"><Glyphicon glyph="shopping-cart" />  Cart</Button>
     return(
       <div>
         <button type="button" className="btn btn-primary btn-lg pull-right" style={loginStyle} onClick={this.handleLoginButton}>{!!localStorage.token ? "Logout" : "Login"}</button>

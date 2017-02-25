@@ -1,5 +1,5 @@
-// bootstraptable.js
-// Example to create a simple table using React Bootstrap table
+// ItemTable.js
+// The big bad boy. Table for displaying the inventory system.
 // @author Andrew Sun
 
 var React = require('react');
@@ -9,11 +9,14 @@ import TagModal from '../TagModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+import '../DropdownTable.css';
+import CartQuantityChooser from "../ShoppingCart/CartQuantityChooser";
 
-import {Button, ButtonGroup} from 'react-bootstrap';
+import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
+import AlertComponent from '../AlertComponent';
 
 class ItemTable extends React.Component {
 
@@ -26,20 +29,24 @@ class ItemTable extends React.Component {
         "quantity": null,
         "model_number": "12344567",
         "description": "This is super lit",
-        "tags": [{"tag": "first tag"}, {"tag": "second tag"}]
+        "tags": [{"tag": "first tag"}, {"tag": "second tags"}],
+        "quantity_requested": 1
       }],
       _loginState: true,
       currentSearchURL: null,
       currentPage: 1,
       totalDataSize: 0,
       tagSearchText: "",
-      showModal: true
+      showModal: true,
+      alertState: false,
+      alertType: "error",
+      alertMessage: ""
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
-    this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.cartFormatter = this.cartFormatter.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -49,21 +56,43 @@ class ItemTable extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     var response_results = response.results
-                    for (var i = 0; i < response_results.length; i++){
-                        // console.log(this.tagsToListString(response_results[i].tags));
-                        response_results[i]["tags_data"] = response_results[i].tags;
-                        response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
-                    }
-                    this.setState({
-                        _products: response_results,
-                        totalDataSize: response.count
-                    });
+                    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+                                (responseText)=>{
+                                  var responseCart = JSON.parse(responseText);
+                                  var hash = {};
+                                  for (var j = 0; j < responseCart.requests.length; j++){
+                                    var currItem = responseCart.requests[j];
+                                    console.log(currItem);
+                                    hash[currItem.item.id] = [currItem.quantity_requested, currItem.id];
+                                  }
+                                  for (var i = 0; i < response_results.length; i++){
+                                      // console.log(this.tagsToListString(response_results[i].tags));
+                                      response_results[i]["tags_data"] = response_results[i].tags;
+                                      response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
+                                      if (response_results[i].id in hash){
+                                        //console.log(hash[response_results[i].id]);
+                                        response_results[i].quantity_requested = hash[response_results[i].id][0];
+                                        response_results[i].inCart = true;
+                                        //console.log(responseCart)
+                                        response_results[i].cartId = hash[response_results[i].id][1];
+                                      }
+                                      else{
+                                        response_results[i].quantity_requested = 1;
+                                        response_results[i].inCart = false;
+                                      }
+
+                                  }
+                                  this.setState({
+                                      _products: response_results,
+                                      totalDataSize: response.count
+                                  });
+                                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
                   },
                   ()=>{
                     this.setState({
                         _loginState: false
                     });
-                  })
+                  });
     });
   }
 
@@ -125,8 +154,13 @@ class ItemTable extends React.Component {
                     (responseText)=>{
                       var response = JSON.parse(responseText);
                       row.id = response.id;
+                      row.quantity_requested = 1;
+                      this._alertchild.generateSuccess("Successfully added " + row.name + " to database.");
                       this.forceUpdate();
-                    }, ()=>{})
+                    }, (status, errResponse)=>{
+                      var err = JSON.parse(errResponse);
+                      this._alertchild.generateError("Error: " + err.name[0]);
+                    })
       }
     );
   }
@@ -139,7 +173,9 @@ class ItemTable extends React.Component {
     checkAuthAndAdmin(()=>{
       for (let i = 0; i < rows.length; i++){
         restRequest("DELETE", "/api/item/"+rows[i], "application/json", null,
-                    ()=>{}, ()=>{});
+                    ()=>{
+                      this._alertchild.generateSuccess("Successfully deleted item from database.");
+                    }, (status, errResponse)=>{this._alertchild.generateError(JSON.parse(errResponse).detail);});
       }
       this.setState({
         _products: this.state._products.filter((product) => {
@@ -168,13 +204,17 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
+    // console.log(row);
+    // console.log(isSelected);
+    // console.log(e);
     if (this.state.showModal){
-      this._child.getRequests(row.name);
-      this._child.getDetailedItem(row.id);
-      this._child.openModal();
+      //this._child.getRequests(row.name);
+      this._child.getDetailedItem(row.id, ()=>{
+        this._child.setState({row: row}, ()=>{this._child.openModal();});
+      });
     }
     else{
-      this._child.openModal();
+      this.setState({showModal: true});
     }
   }
 
@@ -209,16 +249,14 @@ class ItemTable extends React.Component {
         })
     }
 
-  onAddtoCartClick(cell, row){
-    console.log(row);
-    this.state.showModal = false;
-    alert("Added " + row.name + " to cart!");
+  cartFormatter(cell, row) {
+    return (
+      <div id="testing" onClick={()=>{this.state.showModal=false;}}>
+      <CartQuantityChooser showLabel={true} cb={this} row={row} shouldUpdateCart={row.inCart}></CartQuantityChooser>
+      </div>
+    );
   }
 
-  buttonFormatter(cell, row) {
-    return (
-      <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>);
-  }
 
   render() {
 
@@ -245,10 +283,10 @@ class ItemTable extends React.Component {
 
     return(
       <div>
-      <div className="text-right">
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+      <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
           <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
-          <Button onClick={() => this.onSearchChange("", null, null)}>Clear</Button>
         </ButtonGroup>
         <p>{this.state.tagSearchText}</p>
       </div>
@@ -259,11 +297,12 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center" hiddenOnInsert></TableHeaderColumn>
+      <TableHeaderColumn dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>
+      <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
       </BootstrapTable>) : null}
 
-      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this}/>
+      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
       <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
       </div>
     )

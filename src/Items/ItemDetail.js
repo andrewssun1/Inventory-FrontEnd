@@ -5,18 +5,20 @@ var React = require('react');
 var Bootstrap = require('react-bootstrap');
 var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
-import MakeRequestModal from '../Request/MakeRequestModal';
-import ViewRequestModal from '../Request/ViewRequestModal';
-import TagComponent from '../TagComponent/TagComponent'
+import MakeRequestModal from '../Requests/MakeRequestModal';
+import ViewRequestModal from '../Requests/ViewRequestModal';
+import TagComponent from '../Tags/TagComponent'
 import TypeConstants from '../TypeConstants';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
-var xhttp = new XMLHttpRequest();
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import {MenuItem, DropdownButton, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
+import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser'
+import AlertComponent from '../AlertComponent'
 
 class ItemDetail extends React.Component {
 
@@ -28,7 +30,8 @@ class ItemDetail extends React.Component {
       isEditing: false,
       itemData: null,
       outstandingRequests: null,
-      fieldData: null
+      fieldData: null,
+      row: []
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -44,15 +47,20 @@ class ItemDetail extends React.Component {
     this.typeCheck = this.typeCheck.bind(this);
   }
 
-  getDetailedItem(id) {
+  getDetailedItem(id, cb) {
     checkAuthAndAdmin(()=>{
       restRequest("GET", "/api/item/"+id, "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
         console.log("Getting Detailed Item Response");
         console.log(response);
-        this.setState({itemData: response});
+        this.setState({itemData: response}, ()=>{
+          if (cb != null){
+            cb();
+          }
+        });
         this.populateFieldData(response);
+        //this.refs.tagComponent.refs.tagTable.forceUpdate();
       },
       ()=>{console.log('GET Failed!!');}
     );
@@ -166,8 +174,7 @@ saveItem(cb) {
 
   openModal() {
     //this.state.showModal = true;
-    this.setState({showModal: true}, ()=>{console.log(this.state.showModal)});
-    this.forceUpdate();
+    this.setState({showModal: true}, ()=>{});
   }
 
   closeModal() {
@@ -236,6 +243,7 @@ saveItem(cb) {
       <div>
       <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._requestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
       {this.state.isEditing ?
         <Form horizontal ref={(child) => { this._editForm = child; }}>
@@ -245,7 +253,7 @@ saveItem(cb) {
         <div>
         {this.renderDisplayFields()}
         <p> Tags: </p>
-        <TagComponent item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
+        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
         {/*<h4> Requests </h4>
         <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
@@ -278,7 +286,7 @@ saveItem(cb) {
         :
         //Buttons for a user
         <div>
-        <Button onClick={this.requestItem} bsStyle="primary">Request</Button>
+        <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       }

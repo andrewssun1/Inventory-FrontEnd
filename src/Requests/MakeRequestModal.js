@@ -9,8 +9,6 @@ var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 
-var xhttp = new XMLHttpRequest();
-
 class MakeRequestModal extends React.Component {
   constructor(props) {
     super(props);

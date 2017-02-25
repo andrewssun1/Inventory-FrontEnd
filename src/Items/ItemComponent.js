@@ -11,7 +11,7 @@ class ItemComponent extends React.Component {
 
     return (
       <div>
-      <ItemTable />
+      <ItemTable ref="itemTable"/>
       {isAdmin ?
         <div>
         <h2> Custom Fields </h2>
