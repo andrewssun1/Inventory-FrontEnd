@@ -8,6 +8,7 @@ import LogComponent from './Logs/LogComponent'
 import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
+import SettingsComponent from './SettingsComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -135,6 +136,7 @@ export default class ApplicationTabs extends React.Component {
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}
                  <Tab.Pane eventKey="settings">
+                   <SettingsComponent />
                  </Tab.Pane>
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
