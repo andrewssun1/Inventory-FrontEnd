@@ -138,10 +138,10 @@ class ViewRequestModal extends React.Component {
   }
 
   renderButtons() {
-    const isAdmin = (localStorage.isAdmin == "true");
+    const isSuperUser = (localStorage.isSuperUser == "true");
     var buttons = [];
     if(this.isOutstanding()) {
-      if(isAdmin) {
+      if(isSuperUser) {
         buttons.push(<div> <TextEntryFormElement key="textElements" controlId="formHorizontalComments" label="Comments"
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
@@ -156,7 +156,7 @@ class ViewRequestModal extends React.Component {
   }
 
   render() {
-    const isAdmin = (localStorage.isAdmin === "true");
+    const isSuperUser = (localStorage.isSuperUser === "true");
 
     return (
       (this.state.requestData.length !== 0) ?

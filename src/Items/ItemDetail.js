@@ -136,7 +136,7 @@ saveItem(cb) {
   getRequests(item_name){
     // GET request to get all outstanding requests for this item by this user
     var url;
-    if (localStorage.isAdmin === "true") {
+    if (localStorage.isSuperUser === "true") {
       url = "/api/request/?item__name="+item_name+"&status=outstanding";
     } else {
       url = "/api/request/?item__name="+item_name+"&status=outstanding";
@@ -231,7 +231,7 @@ saveItem(cb) {
   render() {
     if(this.state.itemData == null) return null;
 
-    const isAdmin = (localStorage.isAdmin === "true");
+    const isSuperUser = (localStorage.isSuperUser === "true");
 
     const options = {
       sizePerPageList: [ 30 ],
@@ -269,7 +269,7 @@ saveItem(cb) {
       }
       </Modal.Body>
       <Modal.Footer>
-      {isAdmin ?
+      {isSuperUser ?
         this.state.isEditing ?
         //Buttons for an admin in editing mode
         <div>
