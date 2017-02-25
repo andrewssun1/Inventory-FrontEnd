@@ -17,6 +17,8 @@ var Form = Bootstrap.Form;
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 import {MenuItem, DropdownButton, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
+import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser'
+import AlertComponent from '../AlertComponent'
 
 class ItemDetail extends React.Component {
 
@@ -28,7 +30,8 @@ class ItemDetail extends React.Component {
       isEditing: false,
       itemData: null,
       outstandingRequests: null,
-      fieldData: null
+      fieldData: null,
+      row: []
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -37,7 +40,7 @@ class ItemDetail extends React.Component {
     this.requestItem = this.requestItem.bind(this);
     this.getRequests = this.getRequests.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
-    this.renderRequests = this.renderRequests.bind(this);
+    // this.renderRequests = this.renderRequests.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
     this.populateFieldData = this.populateFieldData.bind(this);
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
@@ -46,15 +49,20 @@ class ItemDetail extends React.Component {
     this.typeCheck = this.typeCheck.bind(this);
   }
 
-  getDetailedItem(id) {
+  getDetailedItem(id, cb) {
     checkAuthAndAdmin(()=>{
       restRequest("GET", "/api/item/"+id, "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
         console.log("Getting Detailed Item Response");
         console.log(response);
-        this.setState({itemData: response});
+        this.setState({itemData: response}, ()=>{
+          if (cb != null){
+            cb();
+          }
+        });
         this.populateFieldData(response);
+        //this.refs.tagComponent.refs.tagTable.forceUpdate();
       },
       ()=>{console.log('GET Failed!!');}
     );
@@ -168,8 +176,7 @@ saveItem(cb) {
 
   openModal() {
     //this.state.showModal = true;
-    this.setState({showModal: true}, ()=>{console.log(this.state.showModal)});
-    this.forceUpdate();
+    this.setState({showModal: true}, ()=>{});
   }
 
   closeModal() {
@@ -259,38 +266,37 @@ saveItem(cb) {
 
   buttonFormatter(cell, row) {
     return (
-      <div className="pull-right">
+      <div>
       <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
       <InputGroup>
       {(row.quantity_requested < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
       <Button onClick={this.requestItem} bsStyle="primary">Add to Cart</Button>
-      <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
       </InputGroup>
       </FormGroup>
       </div>
     );
   }
 
-  renderRequests(){
-    const options = {
-      sizePerPageList: [ 30 ],
-      sizePerPage: 30,
-      page: this.state.currentPage
-    };
-    return (
-            <div>
-            <h4> Requests </h4>
-            <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
-            data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
-            <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-            <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
-            <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
-            <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
-            <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
-            <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
-            </BootstrapTable>
-          </div>);
-  }
+  // renderRequests(){
+  //   const options = {
+  //     sizePerPageList: [ 30 ],
+  //     sizePerPage: 30,
+  //     page: this.state.currentPage
+  //   };
+  //   return (
+  //           <div>
+  //           <h4> Requests </h4>
+  //           <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
+  //           data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
+  //           <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
+  //           <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
+  //           <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
+  //           <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
+  //           <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
+  //           <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
+  //           </BootstrapTable>
+  //         </div>);
+  // }
 
   render() {
     if(this.state.itemData == null) return null;
@@ -307,6 +313,7 @@ saveItem(cb) {
       <div>
       <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._requestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
       {this.state.isEditing ?
         <Form horizontal ref={(child) => { this._editForm = child; }}>
@@ -316,7 +323,7 @@ saveItem(cb) {
         <div>
         {this.renderDisplayFields()}
         <p> Tags: </p>
-        <TagComponent item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
+        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
         {/*<h4> Requests </h4>
         <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
@@ -349,7 +356,8 @@ saveItem(cb) {
         :
         //Buttons for a user
         <div>
-        {this.buttonFormatter(null, this.state.itemData)}
+        <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
+        <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       }
       </Modal.Footer>

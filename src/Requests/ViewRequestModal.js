@@ -11,6 +11,7 @@ var Button = Bootstrap.Button;
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+var moment = require('moment');
 
 class ViewRequestModal extends React.Component {
   constructor(props) {
@@ -98,16 +99,20 @@ class ViewRequestModal extends React.Component {
 
   patchRequest(type, requestBody) {
     var jsonResult = JSON.stringify(requestBody);
+    var dict = {deny: "denied", cancel: "cancelled", approve: "approved"};
     restRequest("PATCH", "/api/shoppingCart/"+type+"/"+this.state.requestData.id+"/", "application/json",
                 jsonResult,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   console.log("Getting Response");
                   console.log(response);
+                  this.props.updateCallback._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                   this.props.updateCallback.getAllRequests(null);
                   this.closeModal();
-                }, ()=>{
+                }, (status, errResponse)=>{
+                  var errorResponse = JSON.parse(errResponse);
                   console.log("PATCH FAILED!");
+                  this.props.updateCallback._alertchild.generateError(errorResponse.detail);
                   this.props.updateCallback.getAllRequests(null);
                   this.closeModal();
                 })
@@ -122,7 +127,7 @@ class ViewRequestModal extends React.Component {
           <div>
           {(this.state.requestData.status === "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}
           <p> By: {data.admin.username} </p>
-          <p> At time: {data.admin_timestamp} </p>
+          <p> At time: {moment(data.admin_timestamp).format('lll')} </p>
           <p> Comments: {data.admin_comment} </p>
           </div>);
       case "active":
@@ -137,16 +142,16 @@ class ViewRequestModal extends React.Component {
     var buttons = [];
     if(this.isOutstanding()) {
       if(isAdmin) {
-        buttons.push(<div> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
+        buttons.push(<div> <TextEntryFormElement key="textElements" controlId="formHorizontalComments" label="Comments"
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
         if(this.state.requestProblemString === "") {
-          buttons.push(<Button onClick={this.approve} bsStyle="success">Approve Request</Button>);
+          buttons.push(<Button key="approve" onClick={this.approve} bsStyle="success">Approve Request</Button>);
         }
-        buttons.push(<Button onClick={this.deny} bsStyle="danger">Deny Request</Button>);
+        buttons.push(<Button key="deny" onClick={this.deny} bsStyle="danger">Deny Request</Button>);
       }
     }
-    buttons.push(<Button onClick={this.closeModal} >Close</Button>);
+    buttons.push(<Button key="close" onClick={this.closeModal} >Close</Button>);
     return buttons;
   }
 

@@ -26,7 +26,7 @@ class TagComponent extends React.Component {
           "item" : this.props.item_id,
           "tag"  : row.tag
       };
-      restRequest("POST", "/item/tag/", "application/json", JSON.stringify(data),
+      restRequest("POST", "/api/item/tag/", "application/json", JSON.stringify(data),
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     var temp_data = this.state.data;
@@ -45,7 +45,7 @@ class TagComponent extends React.Component {
 
     onDeleteRow(rows) {
             for (let i = 0; i < rows.length; i++){
-              restRequest("DELETE", "/item/tag/"+rows[i], "application/json", null,
+              restRequest("DELETE", "/api/item/tag/"+rows[i], "application/json", null,
                           ()=>{
                             this.setState({
                                 data: this.state.data.filter((product) => {
@@ -68,7 +68,7 @@ class TagComponent extends React.Component {
         } : {};
 
         return(
-            <TagTable selectRowProp={selectRowProp} options={options} {...this.state}/>
+            <TagTable ref="tagTable" selectRowProp={selectRowProp} options={options} {...this.state}/>
         )
     }
 }

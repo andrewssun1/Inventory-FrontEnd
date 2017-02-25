@@ -5,7 +5,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 import '../DropdownTable.css';
-import {Button, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Modal, Col, ControlLabel} from 'react-bootstrap';
+import {Button, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Modal, Col, ControlLabel, Label} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -23,34 +23,15 @@ export default class CartQuantityChooser extends React.Component {
 
   componentDidMount(){
     this.setState({shouldUpdateCart: this.props.shouldUpdateCart});
-  }
-
-  // generateMenuItems(row){
-  //   var menuItems = [];
-  //   for (var i = 1; i < 11; i++){
-  //     menuItems.push((
-  //       <MenuItem key={"menuItemS"+i} onSelect={(e, eventKey)=>{
-  //           row.quantity_requested = e;
-  //           if (this.state.shouldUpdateCart){
-  //             this.updateCart(row.id, row.quantity_requested);
-  //           }
-  //           this.forceUpdate();
-  //         }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
-  //     ))
-  //   }
-  //   return(
-  //     <DropdownButton key={"asd2"} id={"trying2"} title={row.quantity_requested}>
-  //       {menuItems}
-  //     </DropdownButton>
-  //   );
-  // }
+    this.setState({showLabel: (this.props.showLabel === true) });
+    }
 
   generateHighQuantityTextBox(row){
     return(
                   <FormControl
                     type="number"
                     min="1"
-                    defaultValue={row.quantity_requested}
+                    value={row.quantity_requested}
                     style={{width: "72px"}}
                     onChange={(e)=>{
                       row.quantity_requested=e.target.value;
@@ -64,8 +45,9 @@ export default class CartQuantityChooser extends React.Component {
 
   updateRowQuantity(row){
     row.shouldUpdate = false;
-    this.updateCart(row.id, parseInt(row.quantity_requested, 10));
-    console.log("uhhh updating?")
+    console.log(row);
+    var id = (row.cartId ? row.cartId : row.id);
+    this.updateCart(id, parseInt(row.quantity_requested, 10));
   }
 
   updateCart(id, Quantity){
@@ -79,14 +61,38 @@ export default class CartQuantityChooser extends React.Component {
                 }, (error, responseText)=>{console.log(JSON.parse(responseText))});
   }
 
+  onAddtoCartClick(row){
+    // console.log(row);
+    //this.setState({showModal: false});
+    var addItemJson = JSON.stringify({
+      item_id: row.id,
+      quantity_requested: row.quantity_requested
+    });
+    restRequest("POST", "/api/shoppingCart/addItem/", "application/json", addItemJson,
+                (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  console.log(response);
+                  //alert("Added " + row.quantity_requested + " of " + row.name + " to cart!");
+                  localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
+                  this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_requested + " of " + row.name + " to cart!");
+                  row.inCart = true;
+                  this.forceUpdate();
+                }, (status, errResponse)=>{
+                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
+                });
+  }
+
   render(){
     var row = this.props.row;
+    //console.log(row);
     return (
       <div>
       <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
       <InputGroup>
       {this.generateHighQuantityTextBox(row)}
       {row.shouldUpdate === true ? <Button bsStyle="success" onClick={() => this.updateRowQuantity(row)}>Update</Button> : null}
+      {row.inCart === true ? null : <Button bsStyle="success" onClick={() => this.onAddtoCartClick(row)}>Add to Cart</Button>}
+      {(this.state.showLabel && row.inCart) ? <Label style={{marginLeft: "5px", marginTop: "10px"}} bsStyle="info">In Cart</Label> : null}
       </InputGroup>
       </FormGroup>
       </div>

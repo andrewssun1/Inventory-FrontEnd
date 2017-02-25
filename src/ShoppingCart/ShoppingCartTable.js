@@ -53,6 +53,7 @@ export default class ShoppingCartTable extends React.Component {
                   for (var i = 0; i < response.requests.length; i++){
                     response.requests[i].name = response.requests[i].item.name;
                     response.shouldUpdate = false;
+                    response.requests[i].inCart = true;
                   }
                   localStorage.setItem("cart_quantity", response.requests.length);
                   this.setState({_cart: response.requests});
@@ -82,8 +83,9 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   createChooserAndButton(cell, row){
+    //console.log(row);
     return(
-      <CartQuantityChooser row={row} shouldUpdateCart={true}></CartQuantityChooser>
+      <CartQuantityChooser ref="cartChooser" row={row} shouldUpdateCart={true}></CartQuantityChooser>
     );
   }
 
@@ -101,7 +103,7 @@ export default class ShoppingCartTable extends React.Component {
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
+      <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
       </BootstrapTable>
       <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>Send Cart</Button>
       </div>

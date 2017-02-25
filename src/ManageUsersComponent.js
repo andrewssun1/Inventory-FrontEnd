@@ -9,6 +9,7 @@ var moment = require('moment');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {restRequest, checkAuthAndAdmin} from './Utilities'
+import AlertComponent from './AlertComponent';
 
 export default class ManageUsersComponent extends React.Component {
 
@@ -58,7 +59,7 @@ export default class ManageUsersComponent extends React.Component {
   // Makes sure name has at least one character
   nameValidator(value) {
     if (!value || value === ""){
-      return "Name must be at least one character!"
+      return "Field cannot be blank."
     }
     return true;
   }
@@ -70,13 +71,24 @@ export default class ManageUsersComponent extends React.Component {
       sendJSON.password = row.password;
       sendJSON.email = row.email;
       sendJSON.is_staff = (row.is_staff === 'true');
+      sendJSON.is_superuser = (row.is_superuser === 'true');
       var jsonResult = JSON.stringify(sendJSON);
       restRequest("POST", "/api/user/", "application/json", jsonResult,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
+                    console.log(response);
                     row.id = response.id;
                     this.state._users.push(row);
-                  }, ()=>{console.log('POST Failed!!');});
+                    this._alertchild.generateSuccess("Successfully added " + sendJSON.username);
+                  }, (status, errResponse)=>{
+                    var errs = JSON.parse(errResponse);
+                    for (var key in errs){
+                      console.log(key);
+                      this._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
+                    }
+                    console.log(JSON.parse(errResponse));
+                    this.forceUpdate();
+                  });
     });
   }
 
@@ -89,11 +101,20 @@ export default class ManageUsersComponent extends React.Component {
                       _users: this.state._users.filter((product) => {
                         return rows.indexOf(product.id) === -1;
                       })
-                    })
+                    });
+                    this._alertchild.generateSuccess("Successfully deleted user.");
                   },
                   ()=>{}
                 );
     });
+  }
+
+  emailValidator(value){
+    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    if (!re.test(value)){
+      return "Please enter a valid email."
+    }
+    return true;
   }
 
 
@@ -113,11 +134,12 @@ export default class ManageUsersComponent extends React.Component {
 
     return(
       <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <BootstrapTable ref="managetable" options={options} insertRow={true} selectRow={selectRow} data={this.state._users} deleteRow={true} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='username' editable={ { validator: this.nameValidator} }>Username</TableHeaderColumn>
       <TableHeaderColumn dataField='password' editable={ { validator: this.nameValidator} } hidden>Password</TableHeaderColumn>
-      <TableHeaderColumn dataField='email'>Email</TableHeaderColumn>
+      <TableHeaderColumn dataField='email' editable={ { validator: this.emailValidator} }>Email</TableHeaderColumn>
       <TableHeaderColumn dataField='is_staff' editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
       <TableHeaderColumn dataField='is_superuser' editable={ { type: 'select', options: { values: jobTypes} } }>Is Admin</TableHeaderColumn>
       <TableHeaderColumn dataField='date_joined' hiddenOnInsert>Date Joined</TableHeaderColumn>

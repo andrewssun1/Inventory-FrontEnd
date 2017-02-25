@@ -10,6 +10,7 @@ import TagModal from '../TagModal';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import '../DropdownTable.css';
+import CartQuantityChooser from "../ShoppingCart/CartQuantityChooser";
 
 import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup} from 'react-bootstrap';
 
@@ -28,8 +29,8 @@ class ItemTable extends React.Component {
         "quantity": null,
         "model_number": "12344567",
         "description": "This is super lit",
-        "tags": [{"tag": "first tag"}, {"tag": "second tag"}],
-        "cart_quantity": 1
+        "tags": [{"tag": "first tag"}, {"tag": "second tags"}],
+        "quantity_requested": 1
       }],
       _loginState: true,
       currentSearchURL: null,
@@ -46,6 +47,7 @@ class ItemTable extends React.Component {
     this.onRowClick = this.onRowClick.bind(this);
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
     this.buttonFormatter = this.buttonFormatter.bind(this);
+    this.cartFormatter = this.cartFormatter.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -55,22 +57,43 @@ class ItemTable extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     var response_results = response.results
-                    for (var i = 0; i < response_results.length; i++){
-                        // console.log(this.tagsToListString(response_results[i].tags));
-                        response_results[i]["tags_data"] = response_results[i].tags;
-                        response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
-                        response_results[i].cart_quantity = 1;
-                    }
-                    this.setState({
-                        _products: response_results,
-                        totalDataSize: response.count
-                    });
+                    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+                                (responseText)=>{
+                                  var responseCart = JSON.parse(responseText);
+                                  var hash = {};
+                                  for (var j = 0; j < responseCart.requests.length; j++){
+                                    var currItem = responseCart.requests[j];
+                                    console.log(currItem);
+                                    hash[currItem.item.id] = [currItem.quantity_requested, currItem.id];
+                                  }
+                                  for (var i = 0; i < response_results.length; i++){
+                                      // console.log(this.tagsToListString(response_results[i].tags));
+                                      response_results[i]["tags_data"] = response_results[i].tags;
+                                      response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
+                                      if (response_results[i].id in hash){
+                                        //console.log(hash[response_results[i].id]);
+                                        response_results[i].quantity_requested = hash[response_results[i].id][0];
+                                        response_results[i].inCart = true;
+                                        //console.log(responseCart)
+                                        response_results[i].cartId = hash[response_results[i].id][1];
+                                      }
+                                      else{
+                                        response_results[i].quantity_requested = 1;
+                                        response_results[i].inCart = false;
+                                      }
+
+                                  }
+                                  this.setState({
+                                      _products: response_results,
+                                      totalDataSize: response.count
+                                  });
+                                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
                   },
                   ()=>{
                     this.setState({
                         _loginState: false
                     });
-                  })
+                  });
     });
   }
 
@@ -132,9 +155,13 @@ class ItemTable extends React.Component {
                     (responseText)=>{
                       var response = JSON.parse(responseText);
                       row.id = response.id;
-                      row.cart_quantity = 1;
+                      row.quantity_requested = 1;
+                      this._alertchild.generateSuccess("Successfully added " + row.name + " to database.");
                       this.forceUpdate();
-                    }, ()=>{})
+                    }, (status, errResponse)=>{
+                      var err = JSON.parse(errResponse);
+                      this._alertchild.generateError("Error: " + err.name[0]);
+                    })
       }
     );
   }
@@ -183,8 +210,9 @@ class ItemTable extends React.Component {
     // console.log(e);
     if (this.state.showModal){
       //this._child.getRequests(row.name);
-      this._child.getDetailedItem(row.id);
-      this._child.openModal();
+      this._child.getDetailedItem(row.id, ()=>{
+        this._child.setState({row: row}, ()=>{this._child.openModal();});
+      });
     }
     else{
       this.setState({showModal: true});
@@ -228,15 +256,15 @@ class ItemTable extends React.Component {
     //this.setState({showModal: false});
     var addItemJson = JSON.stringify({
       item_id: row.id,
-      quantity_requested: row.cart_quantity
+      quantity_requested: row.quantity_requested
     });
     restRequest("POST", "/api/shoppingCart/addItem/", "application/json", addItemJson,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   console.log(response);
-                  //alert("Added " + row.cart_quantity + " of " + row.name + " to cart!");
-                  localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
-                  this._alertchild.generateSuccess("Successfully added " + row.cart_quantity + " of " + row.name + " to cart!");
+                  //alert("Added " + row.quantity_requested + " of " + row.name + " to cart!");
+                  localStorage.setItem("cart_quantity", parseInt(localStorage.quantity_requested, 10) + 1);
+                  this._alertchild.generateSuccess("Successfully added " + row.quantity_requested + " of " + row.name + " to cart!");
                 }, (status, errResponse)=>{
                   this._alertchild.generateError(JSON.parse(errResponse).detail);
                 });
@@ -247,12 +275,12 @@ class ItemTable extends React.Component {
     for (var i = 1; i < 11; i++){
       menuItems.push((
         <MenuItem key={"menuItem"+i} onSelect={(e, eventKey)=>{
-            row.cart_quantity = e;
+            row.quantity_requested = e;
           }} eventKey={i}>{(i===10) ? i+"+" : i}</MenuItem>
       ))
     }
     return(
-      <DropdownButton key={"asd"} id={"trying"} title={row.cart_quantity}>
+      <DropdownButton key={"asds"} id={"trying"} title={row.quantity_requested}>
         {menuItems}
       </DropdownButton>
     );
@@ -264,7 +292,7 @@ class ItemTable extends React.Component {
                     type="number"
                     defaultValue={10}
                     style={{width: "72px"}}
-                    onChange={(e)=>{row.cart_quantity=e.target.value}}
+                    onChange={(e)=>{row.quantity_requested=e.target.value}}
                   />
 
       );
@@ -276,13 +304,22 @@ class ItemTable extends React.Component {
       <div id="testing" onClick={()=>{this.state.showModal=false;}}>
       <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
       <InputGroup>
-      {(row.cart_quantity < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
+      {(row.quantity_requested < 10) ? this.generateMenuItems(cell, row) : this.generateHighQuantityTextBox(cell, row)}
       <Button bsStyle="success" onClick={() => this.onAddtoCartClick(cell, row)}>Add to Cart</Button>
       </InputGroup>
       </FormGroup>
       </div>
     );
   }
+
+  cartFormatter(cell, row) {
+    return (
+      <div id="testing" onClick={()=>{this.state.showModal=false;}}>
+      <CartQuantityChooser showLabel={true} cb={this} row={row} shouldUpdateCart={row.inCart}></CartQuantityChooser>
+      </div>
+    );
+  }
+
 
   render() {
 
@@ -310,10 +347,10 @@ class ItemTable extends React.Component {
     return(
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <div className="text-right">
+      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
+      <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
           <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
-          <Button onClick={() => this.onSearchChange("", null, null)}>Clear</Button>
         </ButtonGroup>
         <p>{this.state.tagSearchText}</p>
       </div>
@@ -324,11 +361,11 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.buttonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
+      <TableHeaderColumn dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>
+      <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
       </BootstrapTable>) : null}
 
-      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this}/>
       <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
       </div>
     )

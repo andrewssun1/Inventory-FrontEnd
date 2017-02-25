@@ -3,7 +3,6 @@ import {hashHistory} from "react-router";
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
-import AlertComponent from "../AlertComponent"
 
 //var xhttp = new XMLHttpRequest();
 
@@ -35,12 +34,12 @@ class RequestButton extends React.Component {
                       var response = JSON.parse(responseText);
                       console.log("about to print response!!");
                       console.log(response);
-                      this._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
+                      this.props.cb._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                       this.props.cb.resetTable();
                     },
                     (status, responseText)=>{
                       var response = JSON.parse(responseText);
-                      this._alertchild.generateError(response.detail);
+                      this.props.cb._alertchild.generateError(response.detail);
                       this.props.cb.resetTable();
                     });
     }
@@ -73,7 +72,6 @@ class RequestButton extends React.Component {
         const isAdmin = (localStorage.isAdmin === "true");
         return(
             <div style={{marginLeft: "11px"}}>
-                <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
                 {isAdmin ?
                 <div>
                     <Bootstrap.ButtonToolbar>

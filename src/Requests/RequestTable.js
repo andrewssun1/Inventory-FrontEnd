@@ -6,6 +6,7 @@ import RequestButton from "./RequestButton";
 import ViewRequestModal from './ViewRequestModal.js';
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 var moment = require('moment');
+import AlertComponent from "../AlertComponent"
 
 class RequestTable extends React.Component {
   constructor(props){
@@ -182,6 +183,7 @@ class RequestTable extends React.Component {
 
     return(
       <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ViewRequestModal id={this.state.selectedRequest}
       updateCallback={this}
       ref={(child) => { this._requestModal = child; }} />

@@ -35,17 +35,19 @@ export default class ApplicationTabs extends React.Component {
      */
     if (key === "items") {
       this.refs.itemComponent.refs.itemTable._alertchild.closeAlert();
+      this.refs.itemComponent.refs.itemTable.componentWillMount();
       setTimeout(() => {
-        //console.log(this.refs);
-        //console.log(this.refs.itemComponent.refs);
         this.refs.itemComponent.forceUpdate();
       }, 500);
     }
     else if (key === "cart"){
       this.refs.shoppingCartTable.componentWillMount();
+      // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
+      // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
     }
     else if (key === "requests"){
+      this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
       this.refs.requestComponent.refs.requestTable.componentWillMount();
     }
   });
