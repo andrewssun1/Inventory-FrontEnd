@@ -45,7 +45,7 @@ export default class ShoppingCartTable extends React.Component {
     return true;
   }
 
-  componentWillMount(){
+  componentDidMount(){
     restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);

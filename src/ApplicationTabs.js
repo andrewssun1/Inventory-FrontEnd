@@ -41,7 +41,7 @@ export default class ApplicationTabs extends React.Component {
       }, 500);
     }
     else if (key === "cart"){
-      this.refs.shoppingCartTable.componentWillMount();
+      this.refs.shoppingCartTable.componentDidMount();
       // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
       // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
@@ -108,6 +108,9 @@ export default class ApplicationTabs extends React.Component {
                    {isAdmin ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
+                   <NavItem eventKey="settings">
+                     <Glyphicon style={{marginRight: "8px"}} glyph="wrench" />Settings
+                   </NavItem>
                    <NavItem eventKey="cart">
                      <Glyphicon style={{marginRight: "8px"}} glyph="shopping-cart" />{"Cart ("+this.state.cart_quantity+")"}
                    </NavItem>
@@ -131,6 +134,8 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="users">
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}
+                 <Tab.Pane eventKey="settings">
+                 </Tab.Pane>
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
                  </Tab.Pane>
