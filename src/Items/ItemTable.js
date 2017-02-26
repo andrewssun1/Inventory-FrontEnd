@@ -85,7 +85,6 @@ class ItemTable extends React.Component {
                                       _products: response_results,
                                       totalDataSize: response.count
                                   });
-                                  console.log(response_results);
                                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
                   },
                   ()=>{
