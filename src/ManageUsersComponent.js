@@ -57,14 +57,6 @@ export default class ManageUsersComponent extends React.Component {
     this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
   }
 
-  // Makes sure name has at least one character
-  nameValidator(value) {
-    if (!value || value === ""){
-      return "Field cannot be blank."
-    }
-    return true;
-  }
-
   onAddRow(row) {
     checkAuthAndAdmin(()=>{
       var sendJSON = {};
@@ -87,7 +79,11 @@ export default class ManageUsersComponent extends React.Component {
                       console.log(key);
                       this._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
                     }
-                    console.log(JSON.parse(errResponse));
+                    if(this._alertchild.state.alertMessage === "Error: This field may not be blank.") {
+                      this._alertchild.generateError("Error: Please fill out all fields when adding a user");
+                    }
+                    let response = JSON.parse(errResponse);
+                    console.log(response);
                     this.forceUpdate();
                   });
     });
@@ -108,14 +104,6 @@ export default class ManageUsersComponent extends React.Component {
                   ()=>{}
                 );
     });
-  }
-
-  emailValidator(value){
-    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    if (!re.test(value)){
-      return "Please enter a valid email."
-    }
-    return true;
   }
 
   afterSaveCell(row, cellName, cellValue) {
@@ -149,7 +137,6 @@ export default class ManageUsersComponent extends React.Component {
     const options = {
       onAddRow: this.onAddRow,
       onDeleteRow: this.onDeleteRow,
-      // onRowClick: this.onRowClick,
     };
 
     const cellEdit = {
@@ -165,9 +152,9 @@ export default class ManageUsersComponent extends React.Component {
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <BootstrapTable ref="managetable" options={options} insertRow={true} selectRow={selectRow} data={this.state._users} deleteRow={true} cellEdit={cellEdit} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
-      <TableHeaderColumn dataField='username' editable={ { validator: this.nameValidator} }>Username</TableHeaderColumn>
-      <TableHeaderColumn dataField='password' editable={ { validator: this.nameValidator} } hidden>Password</TableHeaderColumn>
-      <TableHeaderColumn dataField='email' editable={ { validator: this.emailValidator} }>Email</TableHeaderColumn>
+      <TableHeaderColumn dataField='username' editable={false}>Username</TableHeaderColumn>
+      <TableHeaderColumn dataField='password' editable={false} hidden>Password</TableHeaderColumn>
+      <TableHeaderColumn dataField='email' editable={false}>Email</TableHeaderColumn>
       <TableHeaderColumn dataField='is_staff'  editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
       <TableHeaderColumn dataField='is_superuser' editable={ { type: 'select', options: { values: jobTypes} } }>Is Admin</TableHeaderColumn>
       <TableHeaderColumn dataField='date_joined' editable={false} hiddenOnInsert>Date Joined</TableHeaderColumn>

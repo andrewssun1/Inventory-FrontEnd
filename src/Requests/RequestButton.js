@@ -69,10 +69,10 @@ class RequestButton extends React.Component {
         }
     }
     render() {
-        const isSuperUser = (localStorage.isSuperUser === "true");
+        const isStaff = (localStorage.isStaff === "true");
         return(
             <div style={{marginLeft: "11px"}}>
-                {isSuperUser ?
+                {isStaff ?
                 <div>
                     <Bootstrap.ButtonToolbar>
                         <Button onClick={this.approveClick} bsSize="sm" bsStyle="success">Approve</Button>

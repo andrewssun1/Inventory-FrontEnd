@@ -35,6 +35,7 @@ class RequestTable extends React.Component {
     this.getAllRequest = this.getAllRequests.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.resetTable = this.resetTable.bind(this);
+    this.cleanFilter = this.cleanFilter.bind(this);
   }
 
   componentWillMount(){
@@ -44,6 +45,13 @@ class RequestTable extends React.Component {
   resetTable(){
     this.getAllRequests(null);
     this.setState({selectedRequest: 0});
+  }
+
+  cleanFilter() {
+    if(this._statusFilter != null) {
+      console.log("Cleaning filter");
+      this._statusFilter.cleanFiltered();
+    }
   }
 
   getAllRequests(url_parameter){
@@ -199,7 +207,8 @@ class RequestTable extends React.Component {
       striped hover>
       <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
       <TableHeaderColumn dataField='item_name' width="150px">Requesting User</TableHeaderColumn>
-      <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', options: this.filterFields.status } } editable={ false }>Status</TableHeaderColumn>
+      <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', options: this.filterFields.status } }
+      ref={(child) => { this._statusFilter = child; }} editable={ false }>Status</TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
       </BootstrapTable>
