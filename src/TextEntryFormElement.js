@@ -32,8 +32,8 @@ class TextEntryFormElement extends React.Component {
       {this.props.label}
       </Col>
       <Col sm={10}>
-      <FormControl componentClass={(this.props.type == TypeEnum.LONG_STRING) ? "textarea" : "input"}
-      type={(this.props.type == TypeEnum.INTEGER || this.props.type == TypeEnum.FLOAT) ? "number" : "text"}
+      <FormControl componentClass={(this.props.type === TypeEnum.LONG_STRING) ? "textarea" : "input"}
+      type={(this.props.type === TypeEnum.INTEGER || this.props.type === TypeEnum.FLOAT) ? "number" : "text"}
       value={this.state.value} onChange={this.handleChange}/>
       </Col>
       </FormGroup>

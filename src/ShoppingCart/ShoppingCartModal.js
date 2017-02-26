@@ -1,7 +1,6 @@
 var React = require('react');
-var Bootstrap = require('react-bootstrap');
 
-import { Modal, FormGroup, Col, ControlLabel, FormControl, Button} from 'react-bootstrap';
+import { Modal, FormGroup, ControlLabel, FormControl, Button} from 'react-bootstrap';
 import {restRequest} from "../Utilities.js";
 import Select from 'react-select';
 
@@ -34,7 +33,6 @@ export default class ShoppingCartModal extends React.Component {
       restRequest("GET", "/api/user/large/", "application/JSON", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    var usermap = {};
                     for (var i = 0; i < response.results.length; i++){
                       var username = response.results[i].username;
                       this.state.users.push({label: username, value: response.results[i].id});
@@ -73,7 +71,6 @@ export default class ShoppingCartModal extends React.Component {
     });
     restRequest("PATCH", "/api/shoppingCart/send/"+localStorage.activecartid+"/", "application/JSON", sendJSON,
                 (responseText)=>{
-                  var response = JSON.parse(responseText);
                   this.getNewActiveCart();
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Shopping cart sent!");
@@ -100,7 +97,6 @@ export default class ShoppingCartModal extends React.Component {
     });
     restRequest("PATCH", "/api/disburse/"+localStorage.activecartid, "application/JSON", sendJSON,
                 (responseText)=>{
-                  var response = JSON.parse(responseText);
                   this.getNewActiveCart();
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Disbursement successfully sent.");
@@ -116,15 +112,15 @@ export default class ShoppingCartModal extends React.Component {
     return(
       <Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Request Cart</Modal.Title>
+        <Modal.Title>{isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>
           <FormGroup controlId="formBasicText" >
-                    <ControlLabel>Reason</ControlLabel>
+                    <ControlLabel>{isStaff ? "Comment" : "Reason"}</ControlLabel>
                     <FormControl
                       componentClass="textarea"
-                      placeholder="Enter reason for request (required)"
+                      placeholder={isStaff ? "Enter optional comment" : "Enter reason for request (required)"}
                       onChange={this.handleTextChange}
                     />
           </FormGroup>
@@ -133,7 +129,7 @@ export default class ShoppingCartModal extends React.Component {
       </Modal.Body>
       <Modal.Footer>
         <Button bsStyle="success" onClick={(isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
-        <Button onClick={this.closeModal} >Cancel</Button>
+        <Button bsStyle="danger" onClick={this.closeModal} >Cancel</Button>
       </Modal.Footer>
     </Modal>
     );

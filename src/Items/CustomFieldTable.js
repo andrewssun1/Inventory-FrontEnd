@@ -3,7 +3,6 @@
 
 var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
-var Bootstrap = require('react-bootstrap');
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -11,8 +10,6 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import TypeConstants from "../TypeConstants.js"
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
-
-var xhttp = new XMLHttpRequest();
 
 class CustomFieldTable extends React.Component {
 
@@ -59,7 +56,7 @@ onAddRow(row) {
     var requestBody = {
       "name"    : row.name,
       "type"    : TypeConstants.FormattedToRequestMap[row.type],
-      "private" : (row.private == 'Private')
+      "private" : (row.private === 'Private')
     }
     console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);

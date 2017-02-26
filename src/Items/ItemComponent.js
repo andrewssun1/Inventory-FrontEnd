@@ -8,7 +8,7 @@ import CustomFieldTable from './CustomFieldTable';
 class ItemComponent extends React.Component {
   render() {
     // console.log(localStorage);
-    const isSuperUser = (localStorage.isSuperUser == "true");
+    const isSuperUser = (localStorage.isSuperUser === "true");
 
     return (
       <div>

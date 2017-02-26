@@ -9,10 +9,6 @@ import TypeConstants from "../TypeConstants";
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-var FormGroup = Bootstrap.FormGroup;
-var Col = Bootstrap.Col;
-var ControlLabel = Bootstrap.ControlLabel;
-var FormControl = Bootstrap.FormControl;
 
 class LogQuantityChangeModal extends React.Component {
   constructor(props) {

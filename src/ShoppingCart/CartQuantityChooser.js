@@ -1,11 +1,7 @@
 var React = require('react');
-var ReactBsTable = require('react-bootstrap-table');
-
-var BootstrapTable = ReactBsTable.BootstrapTable;
-var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 import '../DropdownTable.css';
-import {Button, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Modal, Col, ControlLabel, Label} from 'react-bootstrap';
+import {Button, FormGroup, FormControl, InputGroup, Label} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -61,9 +57,11 @@ export default class CartQuantityChooser extends React.Component {
     var url = isStaff ? "/api/disburse/disbursements/"+id : "/api/shoppingCart/modifyQuantityRequested/"+id+"/";
     restRequest("PATCH", url, "application/JSON", updateJSON,
                 (responseText)=>{
-                  var response = JSON.parse(responseText);
                   this.forceUpdate();
-                }, (error, responseText)=>{console.log(JSON.parse(responseText))});
+                  this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
+                }, (status, errResponse)=>{
+                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);}
+                );
   }
 
   onAddtoCartClick(row){
@@ -84,6 +82,7 @@ export default class CartQuantityChooser extends React.Component {
                   localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
                   this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
                   row.inCart = true;
+                  row.cartId = response.id;
                   this.setState({shouldUpdateCart: true});
                   this.forceUpdate();
                 }, (status, errResponse)=>{

@@ -18,7 +18,6 @@ var Form = Bootstrap.Form;
 var moment = require('moment');
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
-import {MenuItem, DropdownButton, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser'
 import AlertComponent from '../AlertComponent'
 
@@ -77,7 +76,7 @@ populateFieldData(response) {
   //Default Fields:
   var data = [
     {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
-    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser != "true")},
+    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true")},
     {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
     {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
   ];
@@ -100,7 +99,7 @@ populateFieldData(response) {
 saveItem(cb) {
   checkAuthAndAdmin(()=>{
     var requestBody;
-    if(localStorage.isSuperUser == "true") {
+    if(localStorage.isSuperUser === "true") {
       requestBody = {
         "name": this.refDict["Name"].state.value,
         "quantity": this.refDict["Quantity"].state.value,
@@ -137,7 +136,7 @@ saveItem(cb) {
         var oldFields = itemDataArrays[i];
         for(var j = 0; j < oldFields.length; j++) {
           var newValue = this.refDict[oldFields[j].field].state.value;
-          if(oldFields[j].value != newValue && this.typeCheck(newValue, types[i])) {
+          if(oldFields[j].value !== newValue && this.typeCheck(newValue, types[i])) {
             this.customFieldRequest(types[i], oldFields[j].id, newValue);
           }
         }
@@ -148,7 +147,7 @@ saveItem(cb) {
   }
 
   typeCheck(value, type) {
-    return (type == 'short_text' || type == 'long_text' || value != "");
+    return (type === 'short_text' || type === 'long_text' || value !== "");
   }
 
   getCarts(item_name){
@@ -264,12 +263,6 @@ saveItem(cb) {
     if(this.state.itemData == null) return null;
 
     const isStaff = (localStorage.isStaff === "true");
-
-    const options = {
-      sizePerPageList: [ 30 ],
-      sizePerPage: 30,
-      page: this.state.currentPage
-    };
 
     const cartTableOptions = {
       onRowClick: this.onRowClickCart

@@ -55,7 +55,7 @@ class ViewRequestModal extends React.Component {
                     for (var j = 0; j < errorItems.length-1; j++){
                       errorString = errorString + errorItems[j] + ", ";
                     }
-                    errorString = errorString + errorItems[errorItems.length-1];
+                    errorString += errorItems[errorItems.length-1];
                     this.setState({requestProblemString: errorString});
                   }
 
@@ -139,7 +139,7 @@ class ViewRequestModal extends React.Component {
   }
 
   renderButtons() {
-    const isStaff = (localStorage.isStaff == "true");
+    const isStaff = (localStorage.isStaff === "true");
     var buttons = [];
     if(this.isOutstanding()) {
       if(isStaff) {
