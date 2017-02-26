@@ -293,7 +293,7 @@ class ItemTable extends React.Component {
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
+      <TableHeaderColumn width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>

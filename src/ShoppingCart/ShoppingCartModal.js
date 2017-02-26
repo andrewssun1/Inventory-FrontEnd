@@ -49,7 +49,8 @@ export default class ShoppingCartModal extends React.Component {
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   this.getNewActiveCart();
-                  this.props.updateCallback.componentWillMount();
+                  this.props.updateCallback.componentDidMount();
+                  this.props.updateCallback._alertchild.generateSuccess("Shopping cart sent!");
                 }, ()=>{});
     this.closeModal();
   }

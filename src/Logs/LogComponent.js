@@ -10,7 +10,6 @@ class LogComponent extends React.Component {
         super(props);
         this.state = {
             data: [],
-            action_map: new Map(),
             action_list: [],
             action_filter_obj: {},
             _loginState: true,
@@ -23,14 +22,15 @@ class LogComponent extends React.Component {
 
     getRequestForLog(url_parameter, cb){
         checkAuthAndAdmin(()=>{
-          var url = url_parameter == null ? "/api/log/" : "/api/log/" + url_parameter;
+          var url = url_parameter == null ? "/api/logger/" : "/api/logger/" + url_parameter;
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
                         var response = JSON.parse(responseText);
+                        console.log(response);
                         for (var i = 0; i < response.results.length; i++){
-                            response.results[i]["action_tag"] = response.results[i].action.tag;
-                            response.results[i]["action_color"] = response.results[i].action.color;
-                            response.results[i]["action_id"] = response.results[i].action.id;
+                            response.results[i]["action_tag"] = response.results[i].nature.tag;
+                            response.results[i]["action_color"] = response.results[i].nature.color;
+                            response.results[i]["action_id"] = response.results[i].nature.id;
                             response.results[i].timestamp = moment(response.results[i].timestamp).format('lll')
                         }
                         this.setState({
@@ -42,33 +42,25 @@ class LogComponent extends React.Component {
         });
     }
 
-    postRequestForLog(action, description, cb){
-        var request = {"action_id": parseInt(this.state.action_map.get(action), 10), "description": description};
-        checkAuthAndAdmin(()=>{
-          restRequest("POST", "/api/log/", "application/json", request,
-                      (responseText)=>{cb(responseText)}, ()=>{console.log('POST Failed!!')})
-                  });
-    }
-
     componentWillMount() {
         //Getting all the Logs
         this.getRequestForLog(null, ()=>{
           checkAuthAndAdmin(()=>{
-            restRequest("GET", "/api/log/action/", "application/json", null,
+            restRequest("GET", "/api/logger/action/", "application/json", null,
                         (responseText)=>{
                           var response = JSON.parse(responseText);
-                          // console.log(response)
-                          var responseMap = new Map();
+                          console.log(response)
                           var actions = [];
                           var action_filters = {};
                           for (var i=0; i<response.results.length; i++){
-                              responseMap.set(response.results[i]['tag'], response.results[i]['id']);
-                              actions.push(response.results[i]['tag']);
-                              action_filters[parseInt(response.results[i]['id'], 10)] = response.results[i]['tag'];
+                            var id = response.results[i].id;
+                            var color = response.results[i].color;
+                            var tag = response.results[i].tag;
+                              actions.push(tag);
+                              action_filters[parseInt(id, 10)] = tag;
                           }
                           // console.log(action_filters);
                           this.setState({
-                              action_map: responseMap,
                               action_list: actions,
                               action_filter_obj: action_filters
                           });
@@ -76,22 +68,6 @@ class LogComponent extends React.Component {
                       });
         });
     }
-
-    onAddRow(row) {
-        if (row){
-                this.postRequestForLog(row['action_tag'], row['description'],
-                (json_response)=>{
-                  var response = JSON.parse(json_response);
-                  response['action_tag'] = response['action']['tag'];
-                  var tempData = this.state.data;
-                  response.timestamp = moment(response.timestamp).format('lll')
-                  tempData.push(response);
-                  this.setState({
-                      data: tempData
-                  });
-                });
-            }
-        }
 
     onFilterChange(filterObj) {
         if (Object.keys(filterObj).length === 0) {
@@ -102,13 +78,18 @@ class LogComponent extends React.Component {
               return;
             });
         }
-        var filter_url_param = "?action__tag=" + this.state.action_filter_obj[filterObj["action_tag"]["value"]];
+        // TODO: there's an error but it doesn't break anything
+        var filter_url_param = "?nature__tag=" + this.state.action_filter_obj[filterObj["action_tag"]["value"]];
         this.getRequestForLog(filter_url_param, ()=>{
           this.setState({
               currentPage:1,
               currentFilterURL: filter_url_param
           });
         });
+    }
+
+    onRowClick(row){
+      
     }
 
     onPageChange(page, sizePerPage) {
@@ -125,9 +106,10 @@ class LogComponent extends React.Component {
     render(){
         return(
             <LogTable ref="logTable"
+                      onRowClick={ this.onRowClick.bind(this) }
                       onPageChange={ this.onPageChange.bind(this) }
                       onFilterChange={ this.onFilterChange.bind(this) }
-                      onAddRow={ this.onAddRow.bind(this) } { ...this.state }/>
+                      { ...this.state }/>
         )
     }
 

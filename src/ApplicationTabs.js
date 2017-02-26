@@ -58,7 +58,7 @@ export default class ApplicationTabs extends React.Component {
     checkAuthAndAdmin(()=>{})
   }
 
-  componentDidMount(){
+  componentWillMount(){
     if (!localStorage.cart_quantity){
       localStorage.cart_quantity = 0;
     }
@@ -117,7 +117,7 @@ export default class ApplicationTabs extends React.Component {
                    </NavItem>
                </Nav>
              </Col>
-             <Col sm={8}>
+             <Col sm={9}>
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
                    You are in the user homepage. Welcome {localStorage.username}!

@@ -279,7 +279,7 @@ saveItem(cb) {
         :
         //Buttons for an admin in viewing mode
         <div>
-        <Button onClick={this.requestItem} bsStyle="success">Disburse</Button>
+        <CartQuantityChooser showLabel={true} disburse={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
         <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>

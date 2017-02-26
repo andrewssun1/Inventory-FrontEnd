@@ -42,7 +42,6 @@ export default class SettingsComponent extends React.Component {
         <FormGroup controlId="formBasicText" >
                   <FormControl
                     componentClass="textarea"
-                    validationState="success"
                     value={this.state.apiKey}
                     placeholder="Your API key will be generated here"
                     readOnly
