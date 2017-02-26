@@ -57,14 +57,6 @@ export default class ManageUsersComponent extends React.Component {
     this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
   }
 
-  // Makes sure name has at least one character
-  nameValidator(value) {
-    if (!value || value === ""){
-      return "Field cannot be blank."
-    }
-    return true;
-  }
-
   onAddRow(row) {
     checkAuthAndAdmin(()=>{
       var sendJSON = {};
@@ -114,14 +106,6 @@ export default class ManageUsersComponent extends React.Component {
     });
   }
 
-  emailValidator(value){
-    var re = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    if (!re.test(value)){
-      return "Please enter a valid email."
-    }
-    return true;
-  }
-
   afterSaveCell(row, cellName, cellValue) {
     console.log("After Save Cell");
     console.log(row);
@@ -153,8 +137,6 @@ export default class ManageUsersComponent extends React.Component {
     const options = {
       onAddRow: this.onAddRow,
       onDeleteRow: this.onDeleteRow,
-      // onRowClick: this.onRowClick,
-      ignoreEditable: true
     };
 
     const cellEdit = {
