@@ -21,6 +21,7 @@ export default class ManageUsersComponent extends React.Component {
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.nameValidator = this.nameValidator.bind(this);
+    this.afterSaveCell = this.afterSaveCell.bind(this);
   }
 
   componentWillMount() {
@@ -117,6 +118,27 @@ export default class ManageUsersComponent extends React.Component {
     return true;
   }
 
+  afterSaveCell(row, cellName, cellValue) {
+    console.log("After Save Cell");
+    console.log(row);
+    checkAuthAndAdmin(()=>{
+      var requestBody = {
+        "email": row.email,
+        "is_staff": (row.is_staff === "true" || row.is_staff),
+        "is_superuser": (row.is_superuser === "true" || row.is_superuser)
+      }
+      var jsonResult = JSON.stringify(requestBody);
+      restRequest("PATCH", "/api/user/" + row.id, "application/json", jsonResult,
+      (responseText)=>{
+        var response = JSON.parse(responseText);
+        console.log("Getting Response");
+        console.log(response);
+      },
+      ()=>{
+        console.log('PATCH Failed!!');
+      });
+    });
+  }
 
   render(){
 
@@ -130,19 +152,25 @@ export default class ManageUsersComponent extends React.Component {
       // onRowClick: this.onRowClick,
     };
 
+    const cellEdit = {
+      mode: 'click', // click cell to edit
+      afterSaveCell: this.afterSaveCell,
+      blurToSave: true
+    };
+
     const jobTypes = [ "true", "false" ];
 
     return(
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <BootstrapTable ref="managetable" options={options} insertRow={true} selectRow={selectRow} data={this.state._users} deleteRow={true} striped hover>
+      <BootstrapTable ref="managetable" options={options} insertRow={true} selectRow={selectRow} data={this.state._users} deleteRow={true} cellEdit={cellEdit} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='username' editable={ { validator: this.nameValidator} }>Username</TableHeaderColumn>
       <TableHeaderColumn dataField='password' editable={ { validator: this.nameValidator} } hidden>Password</TableHeaderColumn>
       <TableHeaderColumn dataField='email' editable={ { validator: this.emailValidator} }>Email</TableHeaderColumn>
-      <TableHeaderColumn dataField='is_staff' editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
+      <TableHeaderColumn dataField='is_staff'  editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
       <TableHeaderColumn dataField='is_superuser' editable={ { type: 'select', options: { values: jobTypes} } }>Is Admin</TableHeaderColumn>
-      <TableHeaderColumn dataField='date_joined' hiddenOnInsert>Date Joined</TableHeaderColumn>
+      <TableHeaderColumn dataField='date_joined' editable={false} hiddenOnInsert>Date Joined</TableHeaderColumn>
       </BootstrapTable>
       </div>
     )

@@ -10,8 +10,8 @@ class TagTable extends React.Component {
             <BootstrapTable ref="logTable"
                             data={ this.props.data }
                             remote={ true }
-                            insertRow={ this.props.isAdmin }
-                            deleteRow={ this.props.isAdmin }
+                            insertRow={ this.props.isStaff }
+                            deleteRow={ this.props.isStaff }
                             options={ this.props.options }
                             selectRow={ this.props.selectRowProp }
                             striped hover>

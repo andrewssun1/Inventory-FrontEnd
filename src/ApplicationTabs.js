@@ -87,7 +87,7 @@ export default class ApplicationTabs extends React.Component {
   }
 
   render() {
-      const isAdmin = (localStorage.isAdmin === "true");
+      const isSuperUser = (localStorage.isSuperUser === "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">
@@ -102,11 +102,11 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="requests">
                    <Glyphicon style={{marginRight: "8px"}} glyph="question-sign" />Requests
                  </NavItem>
-                   {isAdmin ? (<NavItem eventKey="logs">
+                   {isSuperUser ? (<NavItem eventKey="logs">
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
                    }
-                   {isAdmin ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
+                   {isSuperUser ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
                    <NavItem eventKey="settings">
@@ -131,7 +131,7 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComp"></LogComponent>
                  </Tab.Pane>
-                 {isAdmin ? (
+                 {isSuperUser ? (
                  <Tab.Pane eventKey="users">
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}

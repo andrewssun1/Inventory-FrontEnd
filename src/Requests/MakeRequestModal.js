@@ -14,7 +14,7 @@ class MakeRequestModal extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      isAdmin: false,
+      isSuperUser: false,
       requestProblemString: '',
       disableRequestButton: true
     };
@@ -37,7 +37,7 @@ class MakeRequestModal extends React.Component {
   componentWillMount(){
       checkAuthAndAdmin(()=>{
         this.setState({
-          isAdmin: localStorage.isAdmin
+          isSuperUser: localStorage.isSuperUser
         })
       });
 
@@ -101,14 +101,14 @@ class MakeRequestModal extends React.Component {
       initialValue={1} ref={(child) => {this._quantityField = child;}}/>
       <TextEntryFormElement controlId="formHorizontalReason" label="Reason"
       type="text" initialValue="" componentClass="textarea" changeHandleCallback={this} ref={(child) => {this._reasonField = child;}}/>
-      {this.state.isAdmin === 'true' ? (<TextEntryFormElement controlId="formHorizontalReceiver" label="Receiver"
+      {this.state.isSuperUser === 'true' ? (<TextEntryFormElement controlId="formHorizontalReceiver" label="Receiver"
                                                    type="text" initialValue="" ref={(child) => {this._receiverField = child;}}/>) :
            (null)}
       </Form>
       </Modal.Body>
       <Modal.Footer>
       <div>
-          {this.state.isAdmin === 'true' ? (<Button onClick={this.makeDisburse} bsStyle="success">Disburse</Button>) :
+          {this.state.isSuperUser === 'true' ? (<Button onClick={this.makeDisburse} bsStyle="success">Disburse</Button>) :
               (<Button onClick={this.makeRequest} bsStyle="primary" disabled={this.state.disableRequestButton}>Make Request</Button>)}
       <Button onClick={this.closeModal} bsStyle="danger">Cancel</Button>
       </div>

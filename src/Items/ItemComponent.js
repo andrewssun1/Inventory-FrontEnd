@@ -7,12 +7,13 @@ import CustomFieldTable from './CustomFieldTable';
 
 class ItemComponent extends React.Component {
   render() {
-    const isAdmin = (localStorage.isAdmin == "true");
+    console.log(localStorage);
+    const isSuperUser = (localStorage.isSuperUser == "true");
 
     return (
       <div>
       <ItemTable ref="itemTable"/>
-      {isAdmin ?
+      {isSuperUser ?
         <div>
         <h2> Custom Fields </h2>
         <CustomFieldTable />

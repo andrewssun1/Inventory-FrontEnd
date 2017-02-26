@@ -84,7 +84,8 @@ export default class LoginPage extends React.Component {
                 (xhttpResponse)=>{
                   var userResponse = JSON.parse(xhttpResponse);
                   localStorage.username = userResponse.username;
-                  localStorage.isAdmin = userResponse.is_staff;
+                  localStorage.isStaff = userResponse.is_staff;
+                  localStorage.isSuperUser = userResponse.is_superuser;
                   var currUrl = window.location.href;
                   if (currUrl.includes("code=")){
                   currUrl = currUrl.replace(/(\?code=).*/, "");
