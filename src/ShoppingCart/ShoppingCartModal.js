@@ -116,15 +116,15 @@ export default class ShoppingCartModal extends React.Component {
     return(
       <Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Request Cart</Modal.Title>
+        <Modal.Title>{isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>
           <FormGroup controlId="formBasicText" >
-                    <ControlLabel>Reason</ControlLabel>
+                    <ControlLabel>{isStaff ? "Comment" : "Reason"}</ControlLabel>
                     <FormControl
                       componentClass="textarea"
-                      placeholder="Enter reason for request (required)"
+                      placeholder={isStaff ? "Enter optional comment" : "Enter reason for request (required)"}
                       onChange={this.handleTextChange}
                     />
           </FormGroup>

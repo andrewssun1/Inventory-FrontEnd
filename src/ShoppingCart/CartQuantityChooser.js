@@ -27,9 +27,6 @@ export default class CartQuantityChooser extends React.Component {
     }
 
   generateHighQuantityTextBox(row){
-    if (row.name === "Whiteboards"){
-          console.log(row);
-    }
     return(
                   <FormControl
                     type="number"
@@ -84,6 +81,7 @@ export default class CartQuantityChooser extends React.Component {
                   localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
                   this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
                   row.inCart = true;
+                  row.cartId = response.id;
                   this.setState({shouldUpdateCart: true});
                   this.forceUpdate();
                 }, (status, errResponse)=>{

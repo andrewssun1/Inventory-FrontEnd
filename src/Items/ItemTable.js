@@ -76,9 +76,11 @@ class ItemTable extends React.Component {
                                         response_results[i].quantity_cartitem = hash[response_results[i].id][0];
                                         response_results[i].inCart = true;
                                         //console.log(responseCart)
+                                        // TODO: cartId?????
                                         response_results[i].cartId = hash[response_results[i].id][1];
                                       }
                                       else{
+                                        // response_results[i].cartId = currItem.id;
                                         response_results[i].quantity_cartitem = 1;
                                         response_results[i].inCart = false;
                                       }
@@ -88,6 +90,7 @@ class ItemTable extends React.Component {
                                       _products: response_results,
                                       totalDataSize: response.count
                                   });
+                                  console.log(response_results);
                                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
                   },
                   ()=>{
