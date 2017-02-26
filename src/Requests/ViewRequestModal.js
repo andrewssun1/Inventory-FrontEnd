@@ -146,9 +146,11 @@ class ViewRequestModal extends React.Component {
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
         if(this.state.requestProblemString === "") {
-          buttons.push(<Button key="approve" onClick={this.approve} bsStyle="success">Approve Request</Button>);
+          buttons.push(<Button key="approve" onClick={this.approve} bsStyle="success">Approve Cart</Button>);
         }
-        buttons.push(<Button key="deny" onClick={this.deny} bsStyle="danger">Deny Request</Button>);
+        buttons.push(<Button key="deny" onClick={this.deny} bsStyle="danger">Deny Cart</Button>);
+      } else {
+        buttons.push(<Button key="cancel" onClick={this.cancel} bsStyle="danger">Cancel Cart</Button>);
       }
     }
     buttons.push(<Button key="close" onClick={this.closeModal} >Close</Button>);
@@ -167,6 +169,7 @@ class ViewRequestModal extends React.Component {
         <TableHeaderColumn dataField='quantity_requested' dataAlign="center">Quantity</TableHeaderColumn>
         </BootstrapTable>
       <br />
+      <p> Reason: {this.state.requestData.reason} </p>
       {this.renderBottomComponents()}
       <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       </Modal.Body>
