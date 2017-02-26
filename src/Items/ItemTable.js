@@ -12,7 +12,7 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import '../DropdownTable.css';
 import CartQuantityChooser from "../ShoppingCart/CartQuantityChooser";
 
-import {Button, ButtonGroup, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup} from 'react-bootstrap';
+import {Button, ButtonGroup} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -68,19 +68,14 @@ class ItemTable extends React.Component {
                                     hash[currItem.item.id] = [currItem.quantity, currItem.id];
                                   }
                                   for (var i = 0; i < response_results.length; i++){
-                                      // console.log(this.tagsToListString(response_results[i].tags));
                                       response_results[i]["tags_data"] = response_results[i].tags;
                                       response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
                                       if (response_results[i].id in hash){
-                                        //console.log(hash[response_results[i].id]);
                                         response_results[i].quantity_cartitem = hash[response_results[i].id][0];
                                         response_results[i].inCart = true;
-                                        //console.log(responseCart)
-                                        // TODO: cartId?????
                                         response_results[i].cartId = hash[response_results[i].id][1];
                                       }
                                       else{
-                                        // response_results[i].cartId = currItem.id;
                                         response_results[i].quantity_cartitem = 1;
                                         response_results[i].inCart = false;
                                       }
@@ -209,11 +204,7 @@ class ItemTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     this.setState({row: row});
-    // console.log(row);
-    // console.log(isSelected);
-    // console.log(e);
     if (this.state.showModal){
-      //this._child.getRequests(row.name);
       this._child.getDetailedItem(row.id, ()=>{
         this._child.setState({row: row}, ()=>{this._child.openModal();});
       });

@@ -1,5 +1,4 @@
 import React from "react";
-import {hashHistory} from "react-router";
 var Bootstrap = require('react-bootstrap');
 var Button = Bootstrap.Button;
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"

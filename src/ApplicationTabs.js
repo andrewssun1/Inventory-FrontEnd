@@ -58,7 +58,8 @@ export default class ApplicationTabs extends React.Component {
     checkAuthAndAdmin(()=>{})
   }
 
-  componentWillMount(){
+  // TODO: should this be added to component will mount?
+  componentDidMount(){
     if (!localStorage.cart_quantity){
       localStorage.cart_quantity = 0;
     }

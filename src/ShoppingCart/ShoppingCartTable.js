@@ -9,7 +9,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 import '../DropdownTable.css';
-import {Button, DropdownButton, MenuItem, FormGroup, FormControl, InputGroup, Modal, Col, ControlLabel} from 'react-bootstrap';
+import {Button} from 'react-bootstrap';
 import ShoppingCartModal from './ShoppingCartModal';
 import CartQuantityChooser from './CartQuantityChooser';
 import AlertComponent from '../AlertComponent'

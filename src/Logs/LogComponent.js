@@ -54,7 +54,7 @@ class LogComponent extends React.Component {
                           var action_filters = {};
                           for (var i=0; i<response.results.length; i++){
                             var id = response.results[i].id;
-                            var color = response.results[i].color;
+                            // var color = response.results[i].color;
                             var tag = response.results[i].tag;
                               actions.push(tag);
                               action_filters[parseInt(id, 10)] = tag;
@@ -89,7 +89,7 @@ class LogComponent extends React.Component {
     }
 
     onRowClick(row){
-      
+
     }
 
     onPageChange(page, sizePerPage) {

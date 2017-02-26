@@ -76,8 +76,10 @@ export default class ManageUsersComponent extends React.Component {
                   }, (status, errResponse)=>{
                     var errs = JSON.parse(errResponse);
                     for (var key in errs){
-                      console.log(key);
-                      this._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
+                      if (errs.hasOwnProperty(key)){
+                        console.log(key);
+                        this._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
+                      }
                     }
                     if(this._alertchild.state.alertMessage === "Error: This field may not be blank.") {
                       this._alertchild.generateError("Error: Please fill out all fields when adding a user");
@@ -137,6 +139,7 @@ export default class ManageUsersComponent extends React.Component {
     const options = {
       onAddRow: this.onAddRow,
       onDeleteRow: this.onDeleteRow,
+      ignoreEditable: true
     };
 
     const cellEdit = {
