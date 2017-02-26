@@ -108,6 +108,7 @@ class ViewRequestModal extends React.Component {
                   console.log(response);
                   this.props.updateCallback._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                   this.props.updateCallback.getAllRequests(null);
+                  this.props.updateCallback.cleanFilter();
                   this.closeModal();
                 }, (status, errResponse)=>{
                   var errorResponse = JSON.parse(errResponse);
@@ -142,7 +143,7 @@ class ViewRequestModal extends React.Component {
     var buttons = [];
     if(this.isOutstanding()) {
       if(isStaff) {
-        buttons.push(<div> <TextEntryFormElement key="textElements" controlId="formHorizontalComments" label="Comments"
+        buttons.push(<div key="textElements"> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
         if(this.state.requestProblemString === "") {
