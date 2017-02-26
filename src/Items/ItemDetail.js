@@ -9,6 +9,7 @@ import MakeRequestModal from '../Requests/MakeRequestModal';
 import ViewRequestModal from '../Requests/ViewRequestModal';
 import TagComponent from '../Tags/TagComponent'
 import TypeConstants from '../TypeConstants';
+import LogQuantityChangeModal from './LogQuantityChangeModal';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
@@ -45,6 +46,7 @@ class ItemDetail extends React.Component {
     this.renderEditFields = this.renderEditFields.bind(this);
     this.customFieldRequest = this.customFieldRequest.bind(this);
     this.typeCheck = this.typeCheck.bind(this);
+    this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
   }
 
   getDetailedItem(id, cb) {
@@ -219,6 +221,11 @@ saveItem(cb) {
     this._requestModal.openModal();
   }
 
+  logItemQuantityChange() {
+    this.closeModal();
+    this._lqcModal.openModal();
+  }
+
   renderDisplayFields() {
     if(this.state.fieldData != null) {
       let displayFields = this.state.fieldData.map((field) => {
@@ -258,6 +265,8 @@ saveItem(cb) {
     return (
       <div>
       <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._requestModal = child; }} />
+      <LogQuantityChangeModal item_id={this.state.itemData.id} item={this.state.itemData.name}
+      updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
@@ -286,6 +295,7 @@ saveItem(cb) {
         //Buttons for an admin in viewing mode
         <div>
         <Button onClick={this.requestItem} bsStyle="success">Disburse</Button>
+        <Button onClick={this.logItemQuantityChange} bsStyle="info">Log</Button>
         <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
