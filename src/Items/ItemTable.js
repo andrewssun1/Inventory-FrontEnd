@@ -260,7 +260,7 @@ class ItemTable extends React.Component {
   render() {
 
     //TODO: Configure options to change cursor when hovering over row
-
+    const isStaff = (localStorage.isStaff === "true");
     const isSuperUser = (localStorage.isSuperUser === "true");
 
     const selectRow = isSuperUser ? {
@@ -290,7 +290,7 @@ class ItemTable extends React.Component {
         <p>{this.state.tagSearchText}</p>
       </div>
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
-      fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isSuperUser} selectRow={selectRow}
+      fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>

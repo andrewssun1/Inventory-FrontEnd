@@ -71,7 +71,7 @@ populateFieldData(response) {
   //Default Fields:
   var data = [
     {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
-    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity},
+    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser != "true")},
     {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
     {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
   ];
@@ -83,7 +83,9 @@ populateFieldData(response) {
     console.log(responseDataArrays[i]);
     for(var j = 0; j < responseDataArrays[i].length; j++) {
       var field = responseDataArrays[i][j];
-      data.push({name: field.field, type: typesArray[i], value: field.value});
+      if((localStorage.isStaff === "true") || !field.private) {
+        data.push({name: field.field, type: typesArray[i], value: field.value});
+      }
     }
   }
   this.setState({fieldData: data});
@@ -91,12 +93,22 @@ populateFieldData(response) {
 
 saveItem(cb) {
   checkAuthAndAdmin(()=>{
-    var requestBody = {
-      "name": this.refDict["Name"].state.value,
-      "quantity": this.refDict["Quantity"].state.value,
-      "model_number": this.refDict["Model Number"].state.value,
-      "description": this.refDict["Description"].state.value
+    var requestBody;
+    if(localStorage.isSuperUser == "true") {
+      requestBody = {
+        "name": this.refDict["Name"].state.value,
+        "quantity": this.refDict["Quantity"].state.value,
+        "model_number": this.refDict["Model Number"].state.value,
+        "description": this.refDict["Description"].state.value
+      }
+    } else {
+      requestBody = {
+        "name": this.refDict["Name"].state.value,
+        "model_number": this.refDict["Model Number"].state.value,
+        "description": this.refDict["Description"].state.value
+      }
     }
+
     var jsonResult = JSON.stringify(requestBody);
     restRequest("PATCH", "/api/item/" + this.state.itemData.id, "application/json", jsonResult,
     (responseText)=>{
@@ -136,7 +148,7 @@ saveItem(cb) {
   getRequests(item_name){
     // GET request to get all outstanding requests for this item by this user
     var url;
-    if (localStorage.isSuperUser === "true") {
+    if (localStorage.isStaff === "true") {
       url = "/api/request/?item__name="+item_name+"&status=outstanding";
     } else {
       url = "/api/request/?item__name="+item_name+"&status=outstanding";
@@ -220,9 +232,13 @@ saveItem(cb) {
     if(this.state.fieldData != null) {
       console.log(this.state.fieldData);
       let editFields = this.state.fieldData.map((field) => {
-        return(<TextEntryFormElement key={field.name} controlId={"formHorizontal" + field.name}
-        label={field.name} type={field.type} initialValue={field.value}
-        ref={child => this.refDict[field.name] = child}/>);
+        if(field.isImmutable) {
+          return null;
+        } else {
+          return(<TextEntryFormElement key={field.name} controlId={"formHorizontal" + field.name}
+          label={field.name} type={field.type} initialValue={field.value}
+          ref={child => this.refDict[field.name] = child}/>);
+        }
       });
       return(editFields);
     }
@@ -231,7 +247,7 @@ saveItem(cb) {
   render() {
     if(this.state.itemData == null) return null;
 
-    const isSuperUser = (localStorage.isSuperUser === "true");
+    const isStaff = (localStorage.isStaff === "true");
 
     const options = {
       sizePerPageList: [ 30 ],
@@ -255,21 +271,11 @@ saveItem(cb) {
         <p> Tags: </p>
         <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        {/*<h4> Requests </h4>
-        <BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} insertRow={false}
-        data={this.state.outstandingRequests} deleteRow={false} search={false} striped hover>
-        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-        <TableHeaderColumn dataField='item' width="120px">Item</TableHeaderColumn>
-        <TableHeaderColumn dataField='quantity' width="50px">Quantity</TableHeaderColumn>
-        <TableHeaderColumn dataField='status' width="100px">Status</TableHeaderColumn>
-        <TableHeaderColumn dataField='timestamp' width="150px">Timestamp</TableHeaderColumn>
-        <TableHeaderColumn dataField='reason' width="200px">Reason</TableHeaderColumn>
-        </BootstrapTable>*/}
         </div>
       }
       </Modal.Body>
       <Modal.Footer>
-      {isSuperUser ?
+      {isStaff ?
         this.state.isEditing ?
         //Buttons for an admin in editing mode
         <div>
