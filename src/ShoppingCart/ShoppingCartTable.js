@@ -45,25 +45,32 @@ export default class ShoppingCartTable extends React.Component {
     return true;
   }
 
-  componentWillMount(){
-    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+  componentDidMount(){
+    // get active cart
+    const isStaff = (localStorage.isStaff === "true");
+    var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activeCart = response.id;
-                  for (var i = 0; i < response.requests.length; i++){
-                    response.requests[i].name = response.requests[i].item.name;
+                  var disburseRequest = isStaff ? response.disbursements : response.requests;
+                  for (var i = 0; i < disburseRequest.length; i++){
+                    disburseRequest[i].name = disburseRequest[i].item.name;
+                    disburseRequest[i].quantity_cartitem = disburseRequest[i].quantity;
                     response.shouldUpdate = false;
-                    response.requests[i].inCart = true;
+                    disburseRequest[i].inCart = true;
                   }
-                  localStorage.setItem("cart_quantity", response.requests.length);
-                  this.setState({_cart: response.requests});
+                  localStorage.setItem("cart_quantity", disburseRequest.length);
+                  this.setState({_cart: disburseRequest});
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
   }
 
   onDeleteRow(rows){
+    const isStaff = (localStorage.isStaff === "true");
     for (let i = 0; i < rows.length; i++){
       console.log(rows);
-      restRequest("DELETE", "/api/shoppingCart/deleteItem/"+rows[i]+"/", "application/json", null,
+      var url = isStaff ? "/api/disburse/disbursements/"+rows[i] : "/api/shoppingCart/deleteItem/"+rows[i]+"/";
+      restRequest("DELETE", url, "application/json", null,
                   ()=>{
                     localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) - 1);
                     this._alertchild.generateSuccess("Successfully deleted item from cart.");
@@ -90,6 +97,7 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   render(){
+    const isStaff = (localStorage.isStaff === "true");
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
     };
@@ -105,7 +113,7 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
       </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>Send Cart</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{isStaff ? "Disburse" : "Send Cart"}</Button>
       </div>
     );
   }

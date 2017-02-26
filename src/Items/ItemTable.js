@@ -30,7 +30,7 @@ class ItemTable extends React.Component {
         "model_number": "12344567",
         "description": "This is super lit",
         "tags": [{"tag": "first tag"}, {"tag": "second tags"}],
-        "quantity_requested": 1
+        "quantity_cartitem": 1
       }],
       _loginState: true,
       currentSearchURL: null,
@@ -55,14 +55,17 @@ class ItemTable extends React.Component {
       restRequest("GET", url, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    var response_results = response.results
-                    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+                    var response_results = response.results;
+                    const isStaff = (localStorage.isStaff === "true");
+                    var cartUrl = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+                    restRequest("GET", cartUrl, "application/JSON", null,
                                 (responseText)=>{
                                   var responseCart = JSON.parse(responseText);
                                   var hash = {};
-                                  for (var j = 0; j < responseCart.requests.length; j++){
-                                    var currItem = responseCart.requests[j];
-                                    hash[currItem.item.id] = [currItem.quantity_requested, currItem.id];
+                                  var disburseRequest = isStaff ? responseCart.disbursements : responseCart.requests;
+                                  for (var j = 0; j < disburseRequest.length; j++){
+                                    var currItem = disburseRequest[j];
+                                    hash[currItem.item.id] = [currItem.quantity, currItem.id];
                                   }
                                   for (var i = 0; i < response_results.length; i++){
                                       // console.log(this.tagsToListString(response_results[i].tags));
@@ -70,13 +73,13 @@ class ItemTable extends React.Component {
                                       response_results[i]["tags"] = this.tagsToListString(response_results[i].tags);
                                       if (response_results[i].id in hash){
                                         //console.log(hash[response_results[i].id]);
-                                        response_results[i].quantity_requested = hash[response_results[i].id][0];
+                                        response_results[i].quantity_cartitem = hash[response_results[i].id][0];
                                         response_results[i].inCart = true;
                                         //console.log(responseCart)
                                         response_results[i].cartId = hash[response_results[i].id][1];
                                       }
                                       else{
-                                        response_results[i].quantity_requested = 1;
+                                        response_results[i].quantity_cartitem = 1;
                                         response_results[i].inCart = false;
                                       }
 
@@ -153,7 +156,7 @@ class ItemTable extends React.Component {
                     (responseText)=>{
                       var response = JSON.parse(responseText);
                       row.id = response.id;
-                      row.quantity_requested = 1;
+                      row.quantity_cartitem = 1;
                       this._alertchild.generateSuccess("Successfully added " + row.name + " to database.");
                       this.forceUpdate();
                     }, (status, errResponse)=>{
@@ -294,7 +297,7 @@ class ItemTable extends React.Component {
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
+      <TableHeaderColumn width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>

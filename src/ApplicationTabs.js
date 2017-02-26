@@ -8,6 +8,7 @@ import LogComponent from './Logs/LogComponent'
 import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
+import SettingsComponent from './SettingsComponent'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -41,7 +42,7 @@ export default class ApplicationTabs extends React.Component {
       }, 500);
     }
     else if (key === "cart"){
-      this.refs.shoppingCartTable.componentWillMount();
+      this.refs.shoppingCartTable.componentDidMount();
       // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
       // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
@@ -57,17 +58,20 @@ export default class ApplicationTabs extends React.Component {
     checkAuthAndAdmin(()=>{})
   }
 
-  componentDidMount(){
+  componentWillMount(){
     if (!localStorage.cart_quantity){
       localStorage.cart_quantity = 0;
     }
     var originalSetItem = localStorage.setItem;
     // TODO: Get cart here!
-    restRequest("GET", "/api/shoppingCart/active/", "application/JSON", null,
+    const isStaff = (localStorage.isStaff === "true");
+    var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activecartid = response.id;
-                  localStorage.setItem("cart_quantity", response.requests.length);
+                  var disburseRequest = isStaff ? response.disbursements : response.requests;
+                  localStorage.setItem("cart_quantity", disburseRequest.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
 
@@ -108,12 +112,15 @@ export default class ApplicationTabs extends React.Component {
                    {isSuperUser ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
+                   <NavItem eventKey="settings">
+                     <Glyphicon style={{marginRight: "8px"}} glyph="wrench" />Settings
+                   </NavItem>
                    <NavItem eventKey="cart">
                      <Glyphicon style={{marginRight: "8px"}} glyph="shopping-cart" />{"Cart ("+this.state.cart_quantity+")"}
                    </NavItem>
                </Nav>
              </Col>
-             <Col sm={8}>
+             <Col sm={9}>
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
                    You are in the user homepage. Welcome {localStorage.username}!
@@ -131,6 +138,9 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="users">
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}
+                 <Tab.Pane eventKey="settings">
+                   <SettingsComponent />
+                 </Tab.Pane>
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
                  </Tab.Pane>

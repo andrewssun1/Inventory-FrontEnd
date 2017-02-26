@@ -20,7 +20,7 @@ export default class ManageUsersComponent extends React.Component {
     }
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
-    this.nameValidator = this.nameValidator.bind(this);
+    // this.nameValidator = this.nameValidator.bind(this);
     this.afterSaveCell = this.afterSaveCell.bind(this);
   }
 
