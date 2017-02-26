@@ -165,7 +165,6 @@ saveItem(cb) {
   }
 
   static editGetResponse(data) {
-    console.log(data);
     for(var index=0; index< data.length; index++){
       data[index]['username'] = data[index].owner.username === null ? 'UNKNOWN USER' : data[index].owner.username;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
@@ -230,7 +229,6 @@ saveItem(cb) {
   }
 
   onRowClickCart(row, isSelected, e) {
-    console.log("row click");
     this.closeModal();
     this._viewRequestModal.getDetailedRequest(row.id, ()=>{
       this._viewRequestModal.openModal();
