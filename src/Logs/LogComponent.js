@@ -89,7 +89,6 @@ class LogComponent extends React.Component {
     }
 
     onRowClick(row){
-
     }
 
     onPageChange(page, sizePerPage) {

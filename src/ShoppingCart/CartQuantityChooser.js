@@ -23,6 +23,9 @@ export default class CartQuantityChooser extends React.Component {
     }
 
   generateHighQuantityTextBox(row){
+    if (row.name === "Whiteboards"){
+          console.log(row);
+    }
     return(
                   <FormControl
                     type="number"
