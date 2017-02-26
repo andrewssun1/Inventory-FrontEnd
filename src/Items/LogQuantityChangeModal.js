@@ -61,8 +61,7 @@ class LogQuantityChangeModal extends React.Component {
         this.setState({
           requestProblemString: 'A problem occured, please contact system administrator'
         })
-      }
-      else if(status === 400 || status === 405){
+      } else {
         var response = JSON.parse(responseText);
         this.setState({
           requestProblemString: response.detail
