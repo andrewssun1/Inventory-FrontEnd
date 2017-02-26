@@ -17,7 +17,8 @@ export function checkAuthAndAdmin(cb, errorCb){
               (responseText) => {
                 var userResponse = JSON.parse(responseText);
                 localStorage.username = userResponse.username;
-                localStorage.isAdmin = userResponse.is_staff;
+                localStorage.isStaff = userResponse.is_staff;
+                localStorage.isSuperUser = userResponse.is_superuser;
                 cb();
               },
               () =>{

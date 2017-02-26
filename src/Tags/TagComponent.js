@@ -8,7 +8,7 @@ class TagComponent extends React.Component {
         this.state = {
             data: this.props.item_detail,
             selected: [],
-            isAdmin: false,
+            isStaff: false,
             item_id: this.props.item_id
         }
     }
@@ -16,7 +16,7 @@ class TagComponent extends React.Component {
     componentWillMount(){
         checkAuthAndAdmin(()=>{
           this.setState({
-              isAdmin: localStorage.isAdmin === 'true'
+              isStaff: (localStorage.isStaff === 'true')
           })
         });
     }
@@ -58,11 +58,11 @@ class TagComponent extends React.Component {
     }
 
     render(){
-        const selectRowProp = this.state.isAdmin ? {
+        const selectRowProp = this.state.isStaff ? {
                 mode: 'checkbox' //radio or checkbox
             } : {};
 
-        const options = this.state.isAdmin ? {
+        const options = this.state.isStaff ? {
             onAddRow: this.onAddRow.bind(this),
             onDeleteRow: this.onDeleteRow.bind(this)
         } : {};

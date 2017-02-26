@@ -62,7 +62,6 @@ class ItemTable extends React.Component {
                                   var hash = {};
                                   for (var j = 0; j < responseCart.requests.length; j++){
                                     var currItem = responseCart.requests[j];
-                                    console.log(currItem);
                                     hash[currItem.item.id] = [currItem.quantity_requested, currItem.id];
                                   }
                                   for (var i = 0; i < response_results.length; i++){
@@ -261,10 +260,10 @@ class ItemTable extends React.Component {
   render() {
 
     //TODO: Configure options to change cursor when hovering over row
+    const isStaff = (localStorage.isStaff === "true");
+    const isSuperUser = (localStorage.isSuperUser === "true");
 
-    const isAdmin = (localStorage.isAdmin === "true");
-
-    const selectRow = isAdmin ? {
+    const selectRow = isSuperUser ? {
       mode: 'checkbox' //radio or checkbox
     } : {};
 
@@ -290,7 +289,9 @@ class ItemTable extends React.Component {
         </ButtonGroup>
         <p>{this.state.tagSearchText}</p>
       </div>
-      {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options} fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isAdmin} selectRow={selectRow} data={this.state._products} deleteRow={isAdmin} search={ true } striped hover>
+      {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
+      fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
+      data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
