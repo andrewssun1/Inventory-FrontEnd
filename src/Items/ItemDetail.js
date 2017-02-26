@@ -15,6 +15,7 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
+var moment = require('moment');
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 import {MenuItem, DropdownButton, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
@@ -30,8 +31,9 @@ class ItemDetail extends React.Component {
       showModal: false,
       isEditing: false,
       itemData: null,
-      outstandingRequests: null,
+      selectedRequest: null,
       fieldData: null,
+      cartData: [],
       row: []
     }
     this.openModal = this.openModal.bind(this);
@@ -39,7 +41,7 @@ class ItemDetail extends React.Component {
     this.toggleEditing = this.toggleEditing.bind(this);
     this.saveEdits = this.saveEdits.bind(this);
     this.requestItem = this.requestItem.bind(this);
-    this.getRequests = this.getRequests.bind(this);
+    this.getCarts = this.getCarts.bind(this);
     this.getDetailedItem = this.getDetailedItem.bind(this);
     this.populateFieldData = this.populateFieldData.bind(this);
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
@@ -47,6 +49,7 @@ class ItemDetail extends React.Component {
     this.customFieldRequest = this.customFieldRequest.bind(this);
     this.typeCheck = this.typeCheck.bind(this);
     this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
+    this.onRowClickCart = this.onRowClickCart.bind(this);
   }
 
   getDetailedItem(id, cb) {
@@ -62,6 +65,7 @@ class ItemDetail extends React.Component {
           }
         });
         this.populateFieldData(response);
+        this.getCarts(response.name);
         //this.refs.tagComponent.refs.tagTable.forceUpdate();
       },
       ()=>{console.log('GET Failed!!');}
@@ -147,27 +151,25 @@ saveItem(cb) {
     return (type == 'short_text' || type == 'long_text' || value != "");
   }
 
-  getRequests(item_name){
-    // GET request to get all outstanding requests for this item by this user
-    var url;
-    if (localStorage.isStaff === "true") {
-      url = "/api/request/?item__name="+item_name+"&status=outstanding";
-    } else {
-      url = "/api/request/?item__name="+item_name+"&status=outstanding";
-    }
-    restRequest("GET", url, "application/json", null,
+  getCarts(item_name){
+    // GET request to get all outstanding carts for this item by this user
+    restRequest("GET", "/api/shoppingCart/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log(response);
-      var response_results = response.results;
-      for (var i = 0; i < response_results.length; i++){
-        response_results[i]["item"] = response_results[i].item.name;
-      }
+      var results = ItemDetail.editGetResponse(response.results);
       this.setState({
-        outstandingRequests: response.results,
-        totalDataSize: response.count
+        cartData: results
       });
     }, ()=>{console.log('GET Failed!!');});
+  }
+
+  static editGetResponse(data) {
+    for(var index=0; index< data.length; index++){
+      data[index]['username'] = data[index].owner.username === null ? 'UNKNOWN USER' : data[index].owner.username;
+      data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
+    }
+    return data;
   }
 
   customFieldRequest(type, id, value) {
@@ -226,6 +228,13 @@ saveItem(cb) {
     this._lqcModal.openModal();
   }
 
+  onRowClickCart(row, isSelected, e) {
+    this.closeModal();
+    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+      this._viewRequestModal.openModal();
+    });
+  }
+
   renderDisplayFields() {
     if(this.state.fieldData != null) {
       let displayFields = this.state.fieldData.map((field) => {
@@ -262,11 +271,16 @@ saveItem(cb) {
       page: this.state.currentPage
     };
 
+    const cartTableOptions = {
+      onRowClick: this.onRowClickCart
+    };
+
     return (
       <div>
-      <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._requestModal = child; }} />
+      <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._makeRequestModal = child; }} />
       <LogQuantityChangeModal item_id={this.state.itemData.id} item={this.state.itemData.name}
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
+      <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
@@ -280,6 +294,17 @@ saveItem(cb) {
         <p> Tags: </p>
         <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
+        <p> Outstanding carts containing this item: </p>
+        <BootstrapTable ref="logTable"
+                        data={ this.state.cartData }
+                        options={ cartTableOptions }
+                        striped hover>
+                        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
+                        <TableHeaderColumn dataField='username' width="150px">Requesting User</TableHeaderColumn>
+                        <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
+                        <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
+                        <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
+        </BootstrapTable>
         </div>
       }
       </Modal.Body>
