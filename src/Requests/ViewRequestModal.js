@@ -42,7 +42,7 @@ class ViewRequestModal extends React.Component {
                   var errorItems = [];
                   for (var i = 0; i < response.requests.length; i++){
                     response.requests[i].name = response.requests[i].item.name;
-                    if(response.requests[i].quantity_requested > response.requests[i].item.quantity) {
+                    if(response.requests[i].quantity > response.requests[i].item.quantity) {
                       errorItems.push(response.requests[i].name);
                       // this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
                     }
@@ -164,7 +164,7 @@ class ViewRequestModal extends React.Component {
         <BootstrapTable ref="viewRequestModal" data={this.state.requestData.requests} striped hover>
         <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
         <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
-        <TableHeaderColumn dataField='quantity_requested' dataAlign="center">Quantity</TableHeaderColumn>
+        <TableHeaderColumn dataField='quantity' dataAlign="center">Quantity</TableHeaderColumn>
         </BootstrapTable>
       <br />
       {this.renderBottomComponents()}

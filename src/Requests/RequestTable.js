@@ -48,15 +48,15 @@ class RequestTable extends React.Component {
 
   getAllRequests(url_parameter){
     var url = url_parameter === null ? "/api/shoppingCart/" : "/api/shoppingCart/" + url_parameter;
-    console.log(url);
+    // console.log(url);
     checkAuthAndAdmin(()=>{
       restRequest("GET", url, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    console.log(response);
+                    // console.log(response);
                     var unselectable_ids = [];
                     var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
-                    console.log(response_results);
+                    // console.log(response_results);
                     this.setState({
                       data: response_results,
                       totalDataSize: response.count,
@@ -68,7 +68,7 @@ class RequestTable extends React.Component {
   }
 
   static editGetResponse(data,unselectable_arr) {
-    console.log(data);
+    // console.log(data);
     for(var index=0; index< data.length; index++){
       data[index]['item_name'] = data[index].owner.username === null ? 'UNKNOWN USER' : data[index].owner.username;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
