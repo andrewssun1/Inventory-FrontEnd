@@ -186,9 +186,11 @@ class ItemTable extends React.Component {
 
   // Makes sure quantity is an integer
   quantityValidator(value) {
-    const nan = isNaN(parseInt(value, 10));
-    if (nan) {
+    const intValue = parseInt(value, 10);
+    if (isNaN(intValue)) {
       return 'Quantity must be a integer!';
+    } else if (intValue < 0) {
+      return 'Quantity must be non-negative!';
     }
     return true;
   }
