@@ -45,6 +45,7 @@ class RequestTable extends React.Component {
   resetTable(){
     this.getAllRequests(null);
     this.setState({selectedRequest: 0});
+    this.cleanFilter();
   }
 
   cleanFilter() {
@@ -78,7 +79,7 @@ class RequestTable extends React.Component {
   static editGetResponse(data,unselectable_arr) {
     // console.log(data);
     for(var index=0; index< data.length; index++){
-      data[index]['item_name'] = data[index].owner.username === null ? 'UNKNOWN USER' : data[index].owner.username;
+      data[index]['item_name'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
       if(data[index]['status']!=='outstanding'){
         unselectable_arr.push(data[index]['id'])
@@ -188,6 +189,8 @@ class RequestTable extends React.Component {
       onSelect: this.onRowSelect.bind(this),
       onSelectAll: this.onSelectAll.bind(this),
     };
+
+    console.log(this.state.data);
 
     return(
       <div>
