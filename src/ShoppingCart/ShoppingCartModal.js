@@ -13,7 +13,8 @@ export default class ShoppingCartModal extends React.Component {
       reason: "",
       selectedUser: "",
       users: [],
-      userIdMap: {}
+      userIdMap: {},
+      isSubmitDisabled : false
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -25,6 +26,11 @@ export default class ShoppingCartModal extends React.Component {
 
   handleTextChange(e) {
     this.setState({reason: e.target.value});
+    if(localStorage.isStaff === "false" && (e.target.value == "" || e.target.value == null)) {
+      this.setState({isSubmitDisabled: true});
+    } else {
+      this.setState({isSubmitDisabled: false});
+    }
   }
 
   openModal(){
@@ -43,6 +49,7 @@ export default class ShoppingCartModal extends React.Component {
     }
     else{
       this.setState({showModal: true});
+      this.setState({isSubmitDisabled: true});
     }
   }
 
@@ -128,7 +135,7 @@ export default class ShoppingCartModal extends React.Component {
       {isStaff ? this.createUserChooser() : null}
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="success" onClick={(isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
+        <Button bsStyle="success" disabled={this.state.isSubmitDisabled} onClick={(isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
         <Button bsStyle="danger" onClick={this.closeModal} >Cancel</Button>
       </Modal.Footer>
     </Modal>
