@@ -7,8 +7,7 @@ export default class SettingsComponent extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      apiKey: "",
-      keyIsGenerated: false
+      apiKey: ""
     };
     this.generateKey = this.generateKey.bind(this);
     this.deleteKey = this.deleteKey.bind(this);
@@ -25,7 +24,6 @@ export default class SettingsComponent extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     this.setState({apiKey: response.token});
-                    this.setState({keyIsGenerated: true});
                   }, ()=>{});
     });
   }
@@ -37,7 +35,6 @@ export default class SettingsComponent extends React.Component {
                     // console.log(responseText);
                     // var response = JSON.parse(responseText);
                     this.setState({apiKey: ""});
-                    this.setState({keyIsGenerated: false});
                     cb();
                   }, (status, errResponse)=>{console.log(JSON.parse(errResponse))});
     });
