@@ -23,9 +23,6 @@ export default class CartQuantityChooser extends React.Component {
     }
 
   generateHighQuantityTextBox(row){
-    if (row.name === "Whiteboards"){
-          console.log(row);
-    }
     return(
                   <FormControl
                     type="number"
@@ -46,10 +43,7 @@ export default class CartQuantityChooser extends React.Component {
     row.shouldUpdate = false;
     console.log(row);
     var id = (row.cartId ? row.cartId : row.id);
-    this.updateCart(id, parseInt(row.quantity_cartitem, 10));
-  }
-
-  updateCart(id, Quantity){
+    var Quantity = parseInt(row.quantity_cartitem, 10);
     const isStaff = (localStorage.isStaff === "true");
     var updateJSON = JSON.stringify({
       quantity: Quantity
@@ -59,9 +53,17 @@ export default class CartQuantityChooser extends React.Component {
                 (responseText)=>{
                   this.forceUpdate();
                   this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
+                  row.original_quantity = row.quantity_cartitem;
                 }, (status, errResponse)=>{
-                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);}
+                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
+                  console.log(row.original_quantity);
+                  row.quantity_cartitem = row.original_quantity;
+                }
                 );
+  }
+
+  updateCart(id, Quantity){
+
   }
 
   onAddtoCartClick(row){

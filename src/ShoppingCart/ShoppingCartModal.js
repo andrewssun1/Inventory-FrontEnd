@@ -101,7 +101,7 @@ export default class ShoppingCartModal extends React.Component {
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Disbursement successfully sent.");
                 }, (status, errResponse)=>{
-                  console.log(errResponse);
+                  this.props.updateCallback._alertchild.generateError(JSON.parse(errResponse).detail);
                 });
     this.closeModal();
   }

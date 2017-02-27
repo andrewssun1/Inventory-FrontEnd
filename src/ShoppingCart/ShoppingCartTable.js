@@ -34,6 +34,7 @@ export default class ShoppingCartTable extends React.Component {
     }
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.openCartModal = this.openCartModal.bind(this);
+    this.createChooserAndButton = this.createChooserAndButton.bind(this);
   }
 
 
@@ -92,7 +93,7 @@ export default class ShoppingCartTable extends React.Component {
   createChooserAndButton(cell, row){
     //console.log(row);
     return(
-      <CartQuantityChooser ref="cartChooser" row={row} shouldUpdateCart={true}></CartQuantityChooser>
+      <CartQuantityChooser ref="cartChooser" row={row} shouldUpdateCart={true} cb={this}></CartQuantityChooser>
     );
   }
 
