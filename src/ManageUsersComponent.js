@@ -11,6 +11,13 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {restRequest, checkAuthAndAdmin} from './Utilities'
 import AlertComponent from './AlertComponent';
 
+
+const PermissionsEnum = {
+    UNPRIVILEGED: "Unprivileged",
+    MANAGER: "Manager",
+    ADMIN: "Admin"
+};
+
 export default class ManageUsersComponent extends React.Component {
 
   constructor(props) {
@@ -32,9 +39,18 @@ export default class ManageUsersComponent extends React.Component {
                       var response = JSON.parse(responseText);
                       var response_results = response.results;
                       for (var i = 0; i < response_results.length; i++){
-                        response.results[i].last_login = moment(response.results[i].last_login).format('lll')
-                        response.results[i].date_joined = moment(response.results[i].date_joined).format('lll')
+                        response_results[i].last_login = moment(response_results[i].last_login).format('lll')
+                        response_results[i].date_joined = moment(response_results[i].date_joined).format('lll')
+                        if (response_results[i].is_superuser) {
+                          response_results[i]["permission_level"] = PermissionsEnum.ADMIN;
+                        } else if (response_results[i].is_staff) {
+                          response_results[i]["permission_level"] = PermissionsEnum.MANAGER;
+                        } else {
+                          response_results[i]["permission_level"] = PermissionsEnum.UNPRIVILEGED;
+                        }
                       }
+                      console.log("Response results:");
+                      console.log(response_results);
                       this.setState({
                           _users: response_results
                       });
@@ -63,8 +79,8 @@ export default class ManageUsersComponent extends React.Component {
       sendJSON.username = row.username;
       sendJSON.password = row.password;
       sendJSON.email = row.email;
-      sendJSON.is_staff = (row.is_staff === 'true');
-      sendJSON.is_superuser = (row.is_superuser === 'true');
+      sendJSON.is_staff = (row.permission_level === PermissionsEnum.MANAGER || row.permission_level === PermissionsEnum.ADMIN);
+      sendJSON.is_superuser = (row.permission_level === PermissionsEnum.ADMIN);
       var jsonResult = JSON.stringify(sendJSON);
       restRequest("POST", "/api/user/", "application/json", jsonResult,
                   (responseText)=>{
@@ -114,8 +130,8 @@ export default class ManageUsersComponent extends React.Component {
     checkAuthAndAdmin(()=>{
       var requestBody = {
         "email": row.email,
-        "is_staff": (row.is_staff === "true" || row.is_staff),
-        "is_superuser": (row.is_superuser === "true" || row.is_superuser)
+        "is_staff": (row.permission_level === PermissionsEnum.MANAGER || row.permission_level === PermissionsEnum.ADMIN),
+        "is_superuser": (row.permission_level === PermissionsEnum.ADMIN)
       }
       var jsonResult = JSON.stringify(requestBody);
       restRequest("PATCH", "/api/user/" + row.id, "application/json", jsonResult,
@@ -148,7 +164,8 @@ export default class ManageUsersComponent extends React.Component {
       blurToSave: true
     };
 
-    const jobTypes = [ "true", "false" ];
+    //const permissionTypes = ["Unprivileged", "Manager", "Admin"];
+    const permissionTypes = [PermissionsEnum.UNPRIVILEGED, PermissionsEnum.MANAGER, PermissionsEnum.ADMIN];
 
     return(
       <div>
@@ -158,8 +175,7 @@ export default class ManageUsersComponent extends React.Component {
       <TableHeaderColumn dataField='username' editable={false}>Username</TableHeaderColumn>
       <TableHeaderColumn dataField='password' editable={false} hidden>Password</TableHeaderColumn>
       <TableHeaderColumn dataField='email' editable={false}>Email</TableHeaderColumn>
-      <TableHeaderColumn dataField='is_staff'  editable={ { type: 'select', options: { values: jobTypes } } } >Is Manager</TableHeaderColumn>
-      <TableHeaderColumn dataField='is_superuser' editable={ { type: 'select', options: { values: jobTypes} } }>Is Admin</TableHeaderColumn>
+      <TableHeaderColumn dataField='permission_level' editable={ { type: 'select', options: { values: permissionTypes } } }> Permission Level</TableHeaderColumn>
       <TableHeaderColumn dataField='date_joined' editable={false} hiddenOnInsert>Date Joined</TableHeaderColumn>
       </BootstrapTable>
       </div>
