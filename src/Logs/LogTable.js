@@ -84,7 +84,7 @@ class LogTable extends React.Component {
 
   getDateRangePicker(filterHandler){
     return(
-      <DateRangePicker></DateRangePicker>
+      <DateRangePicker cb={this.props.cb}></DateRangePicker>
     );
   }
 

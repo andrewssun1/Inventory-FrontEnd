@@ -30,6 +30,8 @@ class LogComponent extends React.Component {
             initiatingUserURLParam: "",
             actionURLParam: "",
             selectedRequest: 0,
+            minTime: "",
+            maxTime: ""
         };
     }
 
@@ -38,7 +40,9 @@ class LogComponent extends React.Component {
           // var url = url_parameter == null ? "/api/logger/" : "/api/logger/" + url_parameter;
           var url = "/api/logger/" + "?nature__tag=" + this.state.actionURLParam +
                     "&initiating_user__username=" + this.state.initiatingUserURLParam +
-                    "&affected_user__username=" + this.state.affectedUserURLParam;
+                    "&affected_user__username=" + this.state.affectedUserURLParam +
+                    "&min_time=" + this.state.minTime +
+                    "&max_time=" + this.state.maxTime;
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
