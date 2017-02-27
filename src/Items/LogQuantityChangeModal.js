@@ -50,6 +50,7 @@ class LogQuantityChangeModal extends React.Component {
     restRequest("POST", "/api/item/quantity", "application/json", jsonResult,
     ()=>{
       this.closeModal();
+      this.props.updateCallback._alertchild.generateSuccess("Quantity change successfully logged");
       this.props.updateCallback.componentWillMount();
     },
     (status, responseText)=>{
