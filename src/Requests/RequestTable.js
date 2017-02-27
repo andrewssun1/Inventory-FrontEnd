@@ -190,8 +190,6 @@ class RequestTable extends React.Component {
       onSelectAll: this.onSelectAll.bind(this),
     };
 
-    console.log(this.state.data);
-
     return(
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
