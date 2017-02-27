@@ -11,6 +11,11 @@ export default class SettingsComponent extends React.Component {
     };
     this.generateKey = this.generateKey.bind(this);
     this.deleteKey = this.deleteKey.bind(this);
+    this.refreshKey = this.refreshKey.bind(this);
+  }
+
+  componentWillMount() {
+    this.generateKey();
   }
 
   generateKey(){
@@ -23,15 +28,20 @@ export default class SettingsComponent extends React.Component {
     });
   }
 
-  deleteKey(){
+  deleteKey(cb){
     checkAuthAndAdmin(()=>{
       restRequest("DELETE", "/api/user/auth/token", "application/json", null,
                   (responseText)=>{
                     // console.log(responseText);
                     // var response = JSON.parse(responseText);
                     this.setState({apiKey: ""});
+                    cb();
                   }, (status, errResponse)=>{console.log(JSON.parse(errResponse))});
     });
+  }
+
+  refreshKey() {
+    this.deleteKey(this.generateKey);
   }
 
   render(){
@@ -48,8 +58,7 @@ export default class SettingsComponent extends React.Component {
                   />
         </FormGroup>
       </form>
-      <Button bsStyle="primary" onClick={this.generateKey}>Generate Key</Button>
-      <Button bsStyle="danger" onClick={this.deleteKey}>Delete Key</Button>
+       <Button bsStyle="primary" onClick={this.refreshKey}>Refresh Key</Button>
       </div>
     );
   }
