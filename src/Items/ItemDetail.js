@@ -131,7 +131,6 @@ saveItem(cb) {
           this._alertchild.generateError(errs.quantity[i]);
         }
       }
-      console.log(this._alertchild);
     });
 
     //Save Custom Fields
