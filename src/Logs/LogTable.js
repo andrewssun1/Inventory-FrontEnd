@@ -10,12 +10,14 @@ import { Button } from 'react-bootstrap';
 
 import { ButtonGroup } from 'react-bootstrap-table';
 
+import {restRequest} from '../Utilities'
+
 class LogTable extends React.Component {
 
   constructor(props){
     super(props);
     this.state = {
-      users: [{label: "admin", value: "admin"}, {label: "ankit", value: "ankit"}],
+      users: [],
       selectedUserInitiating: "",
       selectedUserAffected: ""
     }
@@ -24,6 +26,18 @@ class LogTable extends React.Component {
     this.getAffectedUserFilter = this.getAffectedUserFilter.bind(this);
     this.getInitiatingUserFilter = this.getInitiatingUserFilter.bind(this);
     this.getBlah = this.getBlah.bind(this);
+  }
+
+  componentDidMount(){
+    restRequest("GET", "/api/user/large/", "application/JSON", null,
+                (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  for (var i = 0; i < response.results.length; i++){
+                    var username = response.results[i].username;
+                    this.state.users.push({label: username, value: username});
+                  }
+                  this.setState({showModal: true});
+                }, ()=>{});
   }
 
   handleSelectChangeAffected(value){
