@@ -9,6 +9,7 @@ import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
 import SettingsComponent from './SettingsComponent'
+import DisbursementTable from './Disbursements/DisbursementTable'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -92,6 +93,7 @@ export default class ApplicationTabs extends React.Component {
 
   render() {
       const isSuperUser = (localStorage.isSuperUser === "true");
+      const isStaff = (localStorage.isStaff === "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">
@@ -106,7 +108,10 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="requests">
                    <Glyphicon style={{marginRight: "8px"}} glyph="question-sign" />Requests
                  </NavItem>
-                   {isSuperUser ? (<NavItem eventKey="logs">
+                 <NavItem eventKey="disbursements">
+                   <Glyphicon style={{marginRight: "8px"}} glyph="cloud-upload" />Disbursements
+                 </NavItem>
+                   {isStaff ? (<NavItem eventKey="logs">
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
                    }
@@ -133,6 +138,9 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
                    <RequestComponent ref="requestComponent"></RequestComponent>
+                 </Tab.Pane>
+                 <Tab.Pane eventKey="disbursements">
+                   <DisbursementTable ref="disbursementComponent"></DisbursementTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComp"></LogComponent>

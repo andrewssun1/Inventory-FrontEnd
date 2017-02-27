@@ -33,7 +33,8 @@ class ItemDetail extends React.Component {
       selectedRequest: null,
       fieldData: null,
       cartData: [],
-      row: []
+      row: [],
+      showCartChange: true
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -172,7 +173,7 @@ saveItem(cb) {
 
   static editGetResponse(data) {
     for(var index=0; index< data.length; index++){
-      data[index]['username'] = data[index].owner.username === null ? 'UNKNOWN USER' : data[index].owner.username;
+      data[index]['username'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
     }
     return data;
@@ -203,7 +204,7 @@ saveItem(cb) {
     if(this.state.isEditing) {
       this.toggleEditing();
     }
-    this.props.updateCallback.componentWillMount();
+    // this.props.updateCallback.componentWillMount();
     this.setState({showModal: false});
   }
 
@@ -325,7 +326,9 @@ saveItem(cb) {
         :
         //Buttons for an admin in viewing mode
         <div>
+        {this.state.showCartChange ?
         <CartQuantityChooser showLabel={true} disburse={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
+        : null}
         <Button onClick={this.logItemQuantityChange} bsStyle="info">Log</Button>
         <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
@@ -333,7 +336,10 @@ saveItem(cb) {
         :
         //Buttons for a user
         <div>
-        <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
+          {this.state.showCartChange ?
+          <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser> :
+          null
+          }
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       }
