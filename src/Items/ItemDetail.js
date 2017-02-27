@@ -50,6 +50,7 @@ class ItemDetail extends React.Component {
     this.typeCheck = this.typeCheck.bind(this);
     this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
     this.onRowClickCart = this.onRowClickCart.bind(this);
+    this.clearAlert = this.clearAlert.bind(this);
   }
 
   getDetailedItem(id, cb) {
@@ -123,8 +124,14 @@ saveItem(cb) {
       console.log(response);
       cb();
     },
-    ()=>{
+    (status, errResponse)=>{
+      let errs = JSON.parse(errResponse);
       console.log('PATCH Failed!!');
+      if(errs.quantity != null) {
+        for(var i = 0; i < errs.quantity.length; i ++) {
+          this._alertchild.generateError(errs.quantity[i]);
+        }
+      }
     });
 
     //Save Custom Fields
@@ -213,6 +220,7 @@ saveItem(cb) {
     if (r) {
       this.saveItem(()=>{
         this.props.updateCallback.componentWillMount();
+        this.clearAlert();
         this.toggleEditing();
       });
     }
@@ -233,6 +241,11 @@ saveItem(cb) {
     this._viewRequestModal.getDetailedRequest(row.id, ()=>{
       this._viewRequestModal.openModal();
     });
+  }
+
+  clearAlert() {
+    this._alertchild.setState({showAlert: false});
+    this._alertchild.setState({alertMessage: ""});
   }
 
   renderDisplayFields() {

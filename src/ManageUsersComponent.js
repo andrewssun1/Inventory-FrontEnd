@@ -53,7 +53,8 @@ export default class ManageUsersComponent extends React.Component {
                           _users: response_results
                       });
                     },
-                    ()=>{
+                    (status, errResponse)=>{
+                      this._alertchild.generateError("Error retrieving user data. Please contact the system administrator." + " (Error Code: " + status + ")");
                       console.log('GET Failed!!');
                       this.setState({
                           _loginState: false
@@ -117,7 +118,9 @@ export default class ManageUsersComponent extends React.Component {
                     });
                     this._alertchild.generateSuccess("Successfully deleted user.");
                   },
-                  ()=>{}
+                  (status, errResponse)=>{
+                    this._alertchild.generateError("There was an error deleting the users. Please contact the system administrator." + " (Error Code: " + status + ")");
+                  }
                 );
     });
   }
@@ -135,8 +138,10 @@ export default class ManageUsersComponent extends React.Component {
         var response = JSON.parse(responseText);
         console.log("Getting Response");
         console.log(response);
+        this._alertchild.generateSuccess("Successfully changed user permission level");
       },
-      ()=>{
+      (status, errResponse)=>{
+        this._alertchild.generateError("There was an error changing user permission level. Please contact the system administrator." + " (Error Code: " + status + ")");
         console.log('PATCH Failed!!');
       });
     });

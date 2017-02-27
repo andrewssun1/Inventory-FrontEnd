@@ -45,6 +45,7 @@ class RequestTable extends React.Component {
   resetTable(){
     this.getAllRequests(null);
     this.setState({selectedRequest: 0});
+    this.cleanFilter();
   }
 
   cleanFilter() {

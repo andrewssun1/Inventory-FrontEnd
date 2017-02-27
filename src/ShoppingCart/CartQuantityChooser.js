@@ -84,7 +84,12 @@ export default class CartQuantityChooser extends React.Component {
                   this.setState({shouldUpdateCart: true});
                   this.forceUpdate();
                 }, (status, errResponse)=>{
-                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
+                  let err = JSON.parse(errResponse);
+                  if(err.quantity != null) {
+                    this.props.cb._alertchild.generateError(JSON.parse(errResponse).quantity[0]);
+                  } else if(err.detail != null) {
+                    this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
+                  }
                 });
   }
 

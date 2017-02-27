@@ -13,7 +13,7 @@ import DisbursementTable from './Disbursements/DisbursementTable'
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
-import {Tab, Row, Col, Nav, NavItem, Glyphicon, Image} from 'react-bootstrap';
+import {Tab, Row, Col, Nav, NavItem, Glyphicon} from 'react-bootstrap';
 
 export default class ApplicationTabs extends React.Component {
 
@@ -131,7 +131,6 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="home">
                    <div>
                    <p> You are in the user homepage. Welcome {localStorage.username}! </p>
-                   <Image src="https://s3-us-west-2.amazonaws.com/neshsolutionswebpage/sun.jpg" rounded responsive/>
                     </div>
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
