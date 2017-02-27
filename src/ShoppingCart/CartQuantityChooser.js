@@ -62,10 +62,6 @@ export default class CartQuantityChooser extends React.Component {
                 );
   }
 
-  updateCart(id, Quantity){
-
-  }
-
   onAddtoCartClick(row){
     // console.log(row);
     //this.setState({showModal: false});

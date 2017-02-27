@@ -21,11 +21,9 @@ class LogTable extends React.Component {
       selectedUserInitiating: "",
       selectedUserAffected: ""
     }
-    this.handleSelectChangeAffected = this.handleSelectChangeAffected.bind(this);
-    this.handleSelectChangeInitiating = this.handleSelectChangeInitiating.bind(this);
-    this.getAffectedUserFilter = this.getAffectedUserFilter.bind(this);
-    this.getInitiatingUserFilter = this.getInitiatingUserFilter.bind(this);
-    this.getBlah = this.getBlah.bind(this);
+    this.handleSelectChange = this.handleSelectChange.bind(this);
+    this.getUserFilter = this.getUserFilter.bind(this);
+    this.getDateRangePicker = this.getDateRangePicker.bind(this);
   }
 
   componentDidMount(){
@@ -40,10 +38,16 @@ class LogTable extends React.Component {
                 }, ()=>{});
   }
 
-  handleSelectChangeAffected(value){
-    this.setState({selectedUserAffected: value});
+  handleSelectChange(value, type){
+    var stateVar = ((type === "initiating") ? "initiatingUserURLParam" : "affectedUserURLParam");
+    var state = {};
+    var valVar = ((type === "initiating") ? "selectedUserInitiating" : "selectedUserAffected");
+    var valState = {};
+    valState[valVar] = value;
+    this.setState(valState);
     if (value === null){
-      this.props.cb.setState({affectedUserURLParam: ""},
+      state[stateVar] = "";
+      this.props.cb.setState(state,
         ()=>{
           this.props.cb.getRequestForLog("", ()=>{
             this.props.cb.setState({
@@ -55,7 +59,8 @@ class LogTable extends React.Component {
     }
     else{
       // do filter here....
-      this.props.cb.setState({affectedUserURLParam: value},
+      state[stateVar] = value;
+      this.props.cb.setState(state,
         ()=>{
           this.props.cb.getRequestForLog("", ()=>{
             this.props.cb.setState({
@@ -67,42 +72,17 @@ class LogTable extends React.Component {
     }
   }
 
-  handleSelectChangeInitiating(value){
-    this.setState({selectedUserInitiating: value});
-    if (value === null){
-      this.props.cb.setState({initiatingUserURLParam: ""},
-        ()=>{
-          this.props.cb.getRequestForLog("", ()=>{
-            this.props.cb.setState({
-                currentPage:1
-            });
-          });
-        }
-      );
-    }
-    else{
-      // do filter here....
-      this.props.cb.setState({initiatingUserURLParam: value},
-        ()=>{
-          this.props.cb.getRequestForLog("", ()=>{
-            this.props.cb.setState({
-                currentPage:1
-            });
-          });
-        }
-      );
-    }
+  getUserFilter(filterHandler, customFilterParameters){
+    var type = customFilterParameters.type;
+    return <Select simpleValue
+                   value={(type === "initiating") ? this.state.selectedUserInitiating : this.state.selectedUserAffected}
+                   placeholder="Select"
+                   options={this.state.users}
+                   onChange={(value)=>{this.handleSelectChange(value, type)}} />
   }
 
-  getAffectedUserFilter(filterHandler){
-    return <Select simpleValue value={this.state.selectedUserAffected} placeholder="Select" options={this.state.users} onChange={this.handleSelectChangeAffected} />
-  }
 
-  getInitiatingUserFilter(filterHandler){
-    return <Select simpleValue value={this.state.selectedUserInitiating} placeholder="Select" options={this.state.users} onChange={this.handleSelectChangeInitiating} />
-  }
-
-  getBlah(filterHandler){
+  getDateRangePicker(filterHandler){
     return(
       <DateRangePicker></DateRangePicker>
     );
@@ -126,10 +106,10 @@ class LogTable extends React.Component {
                             } }
                             striped hover>
                 <TableHeaderColumn dataField='id' isKey hidden hiddenOnInsert autoValue={true}>Id</TableHeaderColumn>
-                <TableHeaderColumn dataField='initiating_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getInitiatingUserFilter }}>Initiating User</TableHeaderColumn>
-                <TableHeaderColumn dataField='affected_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getAffectedUserFilter }}>Affected User</TableHeaderColumn>
+                <TableHeaderColumn dataField='initiating_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "initiating"} }}>Initiating User</TableHeaderColumn>
+                <TableHeaderColumn dataField='affected_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "affected"}  }}>Affected User</TableHeaderColumn>
                 <TableHeaderColumn dataField='action_tag' width="170px" filter={ { type: 'SelectFilter', options: this.props.action_filter_obj } } editable={ { type: 'select', options: { values: this.props.action_list } } }>Action</TableHeaderColumn>
-                <TableHeaderColumn dataField='timestamp' className='my-class' width="170px" filter={{ type: 'CustomFilter', getElement: this.getBlah }}>Timestamp</TableHeaderColumn>
+                <TableHeaderColumn dataField='timestamp' className='my-class' width="170px" filter={{ type: 'CustomFilter', getElement: this.getDateRangePicker }}>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn dataField='comment'>Comment</TableHeaderColumn>
                 <TableHeaderColumn dataField='item_log' hidden hiddenOnInsert></TableHeaderColumn>
                 <TableHeaderColumn dataField='shopping_cart_log' hidden hiddenOnInsert></TableHeaderColumn>
