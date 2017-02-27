@@ -14,7 +14,7 @@ export default class CartQuantityChooser extends React.Component {
       shouldUpdateCart: false
     }
     //this.generateMenuItems = this.generateMenuItems.bind(this);
-    this.updateCart = this.updateCart.bind(this);
+    // this.updateCart = this.updateCart.bind(this);
   }
 
   componentDidMount(){
