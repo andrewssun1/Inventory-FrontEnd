@@ -49,8 +49,6 @@ export default class ManageUsersComponent extends React.Component {
                           response_results[i]["permission_level"] = PermissionsEnum.UNPRIVILEGED;
                         }
                       }
-                      console.log("Response results:");
-                      console.log(response_results);
                       this.setState({
                           _users: response_results
                       });
@@ -125,8 +123,6 @@ export default class ManageUsersComponent extends React.Component {
   }
 
   afterSaveCell(row, cellName, cellValue) {
-    console.log("After Save Cell");
-    console.log(row);
     checkAuthAndAdmin(()=>{
       var requestBody = {
         "email": row.email,
@@ -164,7 +160,6 @@ export default class ManageUsersComponent extends React.Component {
       blurToSave: true
     };
 
-    //const permissionTypes = ["Unprivileged", "Manager", "Admin"];
     const permissionTypes = [PermissionsEnum.UNPRIVILEGED, PermissionsEnum.MANAGER, PermissionsEnum.ADMIN];
 
     return(
