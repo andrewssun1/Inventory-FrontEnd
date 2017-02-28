@@ -36,7 +36,7 @@ export default class MasterPage extends React.Component {
     //        <Button className="pull-right" style={{marginRight: '2cm'}} bsSize="large"><Glyphicon glyph="shopping-cart" />  Cart</Button>
     return(
       <div>
-        <button type="button" className="btn btn-primary btn-lg pull-right" style={loginStyle} onClick={this.handleLoginButton}>{!!localStorage.token ? "Logout" : "Login"}</button>
+        {!!localStorage.token ? <button type="button" className="btn btn-primary btn-lg pull-right" style={loginStyle} onClick={this.handleLoginButton}>Logout</button> : null}
         <h1 style={hStyle}>Welcome to Duke ECE Inventory System</h1>
         {this.props.children}
       </div>
