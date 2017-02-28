@@ -56,8 +56,13 @@ export default class CartQuantityChooser extends React.Component {
                 this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
                 row.original_quantity = row.quantity_cartitem;
             }, (status, errResponse)=>{
-                this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
-                console.log(row.original_quantity);
+              let errs = JSON.parse(errResponse);
+              for (var key in errs){
+                if (errs.hasOwnProperty(key)){
+                  console.log(key);
+                  this.props.cb._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
+                }
+              }
                 row.quantity_cartitem = row.original_quantity;
             }
         );
