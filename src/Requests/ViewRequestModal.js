@@ -147,8 +147,9 @@ class ViewRequestModal extends React.Component {
 
   renderButtons() {
     var buttons = [];
+    const isStaff = (localStorage.isStaff === "true");
     if(this.isOutstanding()) {
-      if(this.state.isStaff) {
+      if(isStaff) {
         buttons.push(<div key="textElements"> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
