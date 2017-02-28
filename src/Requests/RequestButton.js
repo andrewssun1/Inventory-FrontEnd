@@ -9,7 +9,8 @@ class RequestButton extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            requestProblemString: ''
+            requestProblemString: '',
+            isStaff: false
         };
         this.approveClick = this.approveClick.bind(this);
         this.denyClick = this.denyClick.bind(this);
@@ -17,7 +18,9 @@ class RequestButton extends React.Component {
         this.patchRequest = this.patchRequest.bind(this);
     }
     componentWillMount() {
-        checkAuthAndAdmin(()=>{})
+        checkAuthAndAdmin(()=>{
+            this.setState({isStaff: (localStorage.isStaff === "true")})
+        })
     }
 
     patchRequest(requestID, type, patchRequestBodyKey, patchRequestBodyValue) {
@@ -68,10 +71,9 @@ class RequestButton extends React.Component {
         }
     }
     render() {
-        const isStaff = (localStorage.isStaff === "true");
         return(
             <div style={{marginLeft: "11px"}}>
-                {isStaff ?
+                {this.state.isStaff ?
                 <div>
                     <Bootstrap.ButtonToolbar>
                         <Button onClick={this.approveClick} bsSize="sm" bsStyle="success">Approve</Button>

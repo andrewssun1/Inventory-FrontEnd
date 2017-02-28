@@ -8,7 +8,7 @@ import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
 const SERVER = "https://asap-test.colab.duke.edu";
-// const SERVER = "http://localhost:3000";
+//const SERVER = "http://localhost:3000";
 
 export default class LoginPage extends React.Component {
   constructor(props) {
