@@ -52,7 +52,7 @@ export default class ApplicationTabs extends React.Component {
     }
     else if (key === "requests"){
       this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
-      this.refs.requestComponent.refs.requestTable.componentWillMount();
+      this.refs.requestComponent.refs.requestTable.resetTable();
     }
     else if (key === "log"){
       // this.refs.logComponent.componentWillMount();
