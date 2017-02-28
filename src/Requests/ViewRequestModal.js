@@ -146,8 +146,10 @@ class ViewRequestModal extends React.Component {
           </div>);
       case "active":
         return(<h4><Label bsStyle="primary"> Active </Label></h4>);
-      default:
+      case "outstanding":
         return(<h4><Label bsStyle="warning"> Outstanding </Label></h4>);
+      default:
+        return(<h4><Label bsStyle="danger"> Cancelled </Label></h4>);
     }
   }
 
