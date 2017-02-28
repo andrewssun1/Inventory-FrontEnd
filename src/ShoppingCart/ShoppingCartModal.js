@@ -90,7 +90,10 @@ export default class ShoppingCartModal extends React.Component {
                   this.getNewActiveCart();
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Shopping cart sent!");
-                }, ()=>{});
+                }, (status, errResponse)=>{
+                  console.log(JSON.parse(errResponse));
+                  // this.props.updateCallback._alertchild.generateError("Shopping cart sent!");
+                });
     this.closeModal();
   }
 
@@ -117,7 +120,7 @@ export default class ShoppingCartModal extends React.Component {
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Disbursement successfully sent.");
                 }, (status, errResponse)=>{
-                  this.props.updateCallback._alertchild.generateError(JSON.parse(errResponse).detail);
+                  this.props.updateCallback._alertchild.generateError("User field may not be empty.");
                 });
     this.closeModal();
   }
