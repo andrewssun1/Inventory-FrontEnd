@@ -289,7 +289,7 @@ saveItem(cb) {
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
       <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
-      <Modal.Header closeButton>
+      <Modal.Header>
       <Modal.Title>View Item</Modal.Title>
       </Modal.Header>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>

@@ -124,8 +124,8 @@ export default class ShoppingCartModal extends React.Component {
   render(){
     // TODO: front end make sure user enters something
     return(
-      <Modal show={this.state.showModal} onHide={this.closeModal}>
-      <Modal.Header closeButton>
+      <Modal show={this.state.showModal}>
+      <Modal.Header>
         <Modal.Title>{this.state.isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>

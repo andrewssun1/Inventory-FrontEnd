@@ -169,7 +169,7 @@ class ViewRequestModal extends React.Component {
       (this.state.requestData.length !== 0) ?
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
-      <Modal.Header closeButton>
+      <Modal.Header>
       <Modal.Title>View Request</Modal.Title>
       </Modal.Header>
       <Modal.Body>
