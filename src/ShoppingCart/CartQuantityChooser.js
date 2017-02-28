@@ -31,7 +31,7 @@ export default class CartQuantityChooser extends React.Component {
                     style={{width: "72px"}}
                     onChange={(e)=>{
                       row.quantity_cartitem=e.target.value;
-                      row.shouldUpdate = this.state.shouldUpdateCart;
+                      row.shouldUpdate = row.inCart;
                       this.forceUpdate();
                     }}
                   />

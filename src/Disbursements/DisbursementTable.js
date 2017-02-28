@@ -24,7 +24,12 @@ export default class DisbursementTable extends React.Component {
                     var response = JSON.parse(responseText);
                     for (var i = 0; i < response.results.length; i++){
                       response.results[i].disburser_name = response.results[i].disburser.username;
-                      response.results[i].receiver_name = response.results[i].receiver.username;
+                      if (response.results[i].receiver !== null){
+                        response.results[i].receiver_name = response.results[i].receiver.username;
+                      }
+                      else{
+                        response.results[i].comment = "ACTIVE CART";
+                      }
                       var disbursements = response.results[i].disbursements;
                       for (var j = 0; j < disbursements.length; j++){
                         disbursements[j].item_name = disbursements[j].item.name;

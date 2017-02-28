@@ -54,6 +54,9 @@ export default class ApplicationTabs extends React.Component {
       this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
       this.refs.requestComponent.refs.requestTable.componentWillMount();
     }
+    else if (key === "log"){
+      // this.refs.logComponent.componentWillMount();
+    }
   });
 }
 
@@ -147,7 +150,7 @@ export default class ApplicationTabs extends React.Component {
                    <DisbursementTable ref="disbursementComponent"></DisbursementTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="logs">
-                   <LogComponent ref="logComp"></LogComponent>
+                   <LogComponent ref="logComponent"></LogComponent>
                  </Tab.Pane>
                  {this.state.is_superuser ? (
                  <Tab.Pane eventKey="users">

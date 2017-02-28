@@ -21,7 +21,8 @@ class RequestTable extends React.Component {
       unselectable: [],
       selected: [],
       showModal: false,
-      selectedRequest: 0
+      selectedRequest: 0,
+      currentValue: null
     }
 
     this.filterFields = {
@@ -208,7 +209,7 @@ class RequestTable extends React.Component {
       striped hover>
       <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
       <TableHeaderColumn dataField='item_name' width="150px">Requesting User</TableHeaderColumn>
-      <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', options: this.filterFields.status } }
+      <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.status } }
       ref={(child) => { this._statusFilter = child; }} editable={ false }>Status</TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
