@@ -39,24 +39,31 @@ export default class ApplicationTabs extends React.Component {
      */
     if (key === "items") {
       this.refs.itemComponent.refs.itemTable._alertchild.closeAlert();
-      this.refs.itemComponent.refs.itemTable.componentWillMount();
+      this.refs.itemComponent.refs.itemTable.resetTable();
       setTimeout(() => {
         this.refs.itemComponent.forceUpdate();
       }, 500);
-    }
-    else if (key === "cart"){
-      this.refs.shoppingCartTable.componentDidMount();
-      // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
-      // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
-      this.refs.shoppingCartTable._alertchild.closeAlert();
     }
     else if (key === "requests"){
       this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
       this.refs.requestComponent.refs.requestTable.resetTable();
     }
-    else if (key === "log"){
-      // this.refs.logComponent.componentWillMount();
+    else if (key === "disbursements"){
+      this.refs.disbursementComponent.resetTable();
     }
+    else if (key === "log"){
+      this.refs.logComponent.resetTable();
+    }
+    else if (key === "users"){
+      this.refs.manage.resetTable();
+    }
+    else if (key === "cart"){
+      this.refs.shoppingCartTable.resetTable();
+      // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
+      // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
+      this.refs.shoppingCartTable._alertchild.closeAlert();
+    }
+
   });
 }
 

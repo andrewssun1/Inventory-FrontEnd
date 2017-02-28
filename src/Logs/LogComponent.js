@@ -2,9 +2,7 @@ import React from "react";
 import LogTable from "./LogTable";
 import {checkAuthAndAdmin, restRequest} from "../Utilities.js";
 import DateRangePicker from './DateRangePicker';
-import ItemDetail from '../Items/ItemDetail';
-import DisbursementModal from '../Disbursements/DisbursementModal';
-import ViewRequestModal from '../Requests/ViewRequestModal';
+
 import LogDetail from './LogDetail';
 import AlertComponent from '../AlertComponent';
 
@@ -112,6 +110,10 @@ class LogComponent extends React.Component {
                     });
     }
 
+    resetTable(){
+      this.getRequestForLog(null, ()=>{});
+    }
+
     onFilterChange(filterObj) {
       console.log(filterObj);
         if (Object.keys(filterObj).length === 0) {
@@ -168,11 +170,6 @@ class LogComponent extends React.Component {
                     onChange={this.handleNameChange}
                     style={{width: "200px", marginLeft: "10px"}} />
             <LogDetail ref={(child) => { this._logchild = child; }} cb={this} ></LogDetail>
-            <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
-            <ViewRequestModal id={this.state.selectedRequest}
-              updateCallback={this}
-              ref={(child) => { this._requestModal = child; }} />
-            <DisbursementModal cb={this} ref={(child) => { this.disbursementModal = child; }} />
             <LogTable ref="logTable"
                       onRowClick={ this.onRowClick.bind(this) }
                       onPageChange={ this.onPageChange.bind(this) }

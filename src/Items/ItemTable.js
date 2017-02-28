@@ -47,6 +47,7 @@ class ItemTable extends React.Component {
     this.onRowClick = this.onRowClick.bind(this);
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
     this.cartFormatter = this.cartFormatter.bind(this);
+    this.resetTable = this.resetTable.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -97,6 +98,10 @@ class ItemTable extends React.Component {
 
   componentWillMount() {
     this.getAllItem(null)
+  }
+
+  resetTable(){
+    this.getAllItem();
   }
 
   // Converts JSON tags to a comma-separated string of tags

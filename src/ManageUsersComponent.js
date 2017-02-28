@@ -32,8 +32,20 @@ export default class ManageUsersComponent extends React.Component {
   }
 
   componentWillMount() {
+    this.resetTable();
+  }
+
+  componentDidMount(){
+    this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
+  }
+
+  resetTable() {
+    this.getAllUsers();
+  }
+
+  getAllUsers() {
     checkAuthAndAdmin(()=>{
-        // GET request to get all items from database
+        // GET request to get all users from database
         restRequest("GET", "/api/user/", "application/json", null,
                     (responseText)=>{
                       var response = JSON.parse(responseText);
@@ -66,10 +78,6 @@ export default class ManageUsersComponent extends React.Component {
               _loginState: false
           });
     });
-  }
-
-  componentDidMount(){
-    this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
   }
 
   onAddRow(row) {

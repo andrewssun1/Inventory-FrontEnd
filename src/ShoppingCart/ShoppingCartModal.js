@@ -142,7 +142,6 @@ export default class ShoppingCartModal extends React.Component {
       {this.state.isStaff ? this.createUserChooser() : null}
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="success" onClick={(this.state.isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
         <Button bsStyle="success" disabled={this.state.isSubmitDisabled} onClick={(this.state.isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
         <Button bsStyle="danger" onClick={this.closeModal} >Cancel</Button>
       </Modal.Footer>
