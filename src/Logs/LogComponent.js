@@ -46,11 +46,9 @@ class LogComponent extends React.Component {
                     "&affected_user__username=" + this.state.affectedUserURLParam +
                     "&min_time=" + this.state.minTime +
                     "&max_time=" + this.state.maxTime +
-                    "&item_name=" + this.state.currentUser +
+                    "&item_name=" + ((this.props.itemFilter != null) ? this.props.itemFilter : this.state.currentUser) +
                     "&page=" + this.state.currentPage;
-          if(this.props.itemFilter != null) {
-            url = url + "&item_name=" + this.props.itemFilter;
-          }
+          console.log(url);
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
@@ -157,6 +155,7 @@ class LogComponent extends React.Component {
     }
 
     handleNameChange(value){
+      console.log(value);
       this.setState({currentUser: (value === null) ? "" : value, currentPage: 1}, ()=>{
         this.getRequestForLog("", ()=>{});
       })
@@ -166,12 +165,13 @@ class LogComponent extends React.Component {
         return(
           <div>
             <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-            <Select simpleValue
+            {this.props.lightMode ? null :
+              <Select simpleValue
                     value={this.state.currentUser}
                     placeholder="Filter by item name"
                     options={this.state.item_names}
                     onChange={this.handleNameChange}
-                    style={{width: "200px", marginLeft: "10px"}} />
+                    style={{width: "200px", marginLeft: "10px"}} />}
             <LogDetail ref={(child) => { this._logchild = child; }} cb={this} ></LogDetail>
             <LogTable ref="logTable"
                       onRowClick={ this.onRowClick.bind(this) }
