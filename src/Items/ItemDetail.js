@@ -228,7 +228,7 @@ saveItem(cb) {
   }
 
   requestItem() {
-    this.closeModal();
+    // this.closeModal();
     this._requestModal.openModal();
   }
 
@@ -288,12 +288,12 @@ saveItem(cb) {
       <MakeRequestModal item_id={this.state.itemData.id} item={this.state.itemData.name} ref={(child) => { this._makeRequestModal = child; }} />
       <LogQuantityChangeModal item_id={this.state.itemData.id} item={this.state.itemData.name}
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
-      <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} />
+      <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} updateCallback={this.props.updateCallback} />
       <Bootstrap.Modal show={this.state.showModal}>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Item</Modal.Title>
       </Modal.Header>
-      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
       {this.state.isEditing ?
         <Form horizontal ref={(child) => { this._editForm = child; }}>
