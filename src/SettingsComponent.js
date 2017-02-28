@@ -59,6 +59,7 @@ export default class SettingsComponent extends React.Component {
         </FormGroup>
       </form>
        <Button bsStyle="primary" onClick={this.refreshKey}>Refresh Key</Button>
+       <Button bsStyle="link" href="https://docs.google.com/document/d/1bFCMXP2e2ngGwASKsgFcCOHWxO4gdMQgd2BWEZndO7s/edit#heading=h.mnsbob22yv53">Link to API Docs</Button>
       </div>
     );
   }

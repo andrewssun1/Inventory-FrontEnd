@@ -43,6 +43,7 @@ export default class DisbursementTable extends React.Component {
   }
 
   onRowClick(row){
+    console.log(row);
     this.disbursementModal.openModal(row);
   }
 
