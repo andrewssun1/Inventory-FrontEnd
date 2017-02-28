@@ -67,30 +67,38 @@ class LogComponent extends React.Component {
     }
 
     componentWillMount() {
-        //Getting all the Logs
-        this.getRequestForLog(null, ()=>{
-          checkAuthAndAdmin(()=>{
-            restRequest("GET", "/api/logger/action/", "application/json", null,
-                        (responseText)=>{
-                          var response = JSON.parse(responseText);
-                          // console.log(response)
-                          var actions = [];
-                          var action_filters = {};
-                          for (var i=0; i<response.results.length; i++){
-                            var id = response.results[i].id;
-                            // var color = response.results[i].color;
-                            var tag = response.results[i].tag;
-                              actions.push(tag);
-                              action_filters[parseInt(id, 10)] = tag;
-                          }
-                          // console.log(action_filters);
-                          this.setState({
-                              action_list: actions,
-                              action_filter_obj: action_filters
-                          });
-                        }, ()=>{})
-                      });
-        });
+      this.resetTable();
+    }
+
+    resetTable(){
+      this.getAllLogs();
+    }
+
+    getAllLogs() {
+      //Getting all the Logs
+      this.getRequestForLog(null, ()=>{
+        checkAuthAndAdmin(()=>{
+          restRequest("GET", "/api/logger/action/", "application/json", null,
+                      (responseText)=>{
+                        var response = JSON.parse(responseText);
+                        // console.log(response)
+                        var actions = [];
+                        var action_filters = {};
+                        for (var i=0; i<response.results.length; i++){
+                          var id = response.results[i].id;
+                          // var color = response.results[i].color;
+                          var tag = response.results[i].tag;
+                            actions.push(tag);
+                            action_filters[parseInt(id, 10)] = tag;
+                        }
+                        // console.log(action_filters);
+                        this.setState({
+                            action_list: actions,
+                            action_filter_obj: action_filters
+                        });
+                      }, ()=>{})
+                    });
+      });
     }
 
     onFilterChange(filterObj) {

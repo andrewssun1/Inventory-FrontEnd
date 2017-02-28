@@ -17,6 +17,14 @@ export default class DisbursementTable extends React.Component {
   }
 
   componentWillMount(){
+    this.resetTable();
+  }
+
+  resetTable(){
+    this.getAllDisbursements();
+  }
+
+  getAllDisbursements() {
     // Get all disbursements
     checkAuthAndAdmin(()=>{
       restRequest("GET", "/api/disburse/", "application/json", null,
