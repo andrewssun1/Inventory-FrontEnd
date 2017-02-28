@@ -1,6 +1,7 @@
 var React = require('react');
 
 import { Modal, FormGroup, ControlLabel, FormControl, Button} from 'react-bootstrap';
+import {checkAuthAndAdmin} from "../Utilities";
 import {restRequest} from "../Utilities.js";
 import Select from 'react-select';
 
@@ -14,6 +15,7 @@ export default class ShoppingCartModal extends React.Component {
       selectedUser: "",
       users: [],
       userIdMap: {},
+      isStaff: false,
       isSubmitDisabled : false
     }
     this.openModal = this.openModal.bind(this);
@@ -22,6 +24,12 @@ export default class ShoppingCartModal extends React.Component {
     this.submitCart = this.submitCart.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.submitDisbursement = this.submitDisbursement.bind(this);
+  }
+
+  componentWillMount(){
+      checkAuthAndAdmin(()=>{
+          this.setState({isStaff : (localStorage.isStaff === "true")})
+      })
   }
 
   handleTextChange(e) {
@@ -114,28 +122,28 @@ export default class ShoppingCartModal extends React.Component {
   }
 
   render(){
-    const isStaff = (localStorage.isStaff === "true");
     // TODO: front end make sure user enters something
     return(
       <Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Header closeButton>
-        <Modal.Title>{isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
+        <Modal.Title>{this.state.isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>
           <FormGroup controlId="formBasicText" >
-                    <ControlLabel>{isStaff ? "Comment" : "Reason"}</ControlLabel>
+                    <ControlLabel>{this.state.isStaff ? "Comment" : "Reason"}</ControlLabel>
                     <FormControl
                       componentClass="textarea"
-                      placeholder={isStaff ? "Enter optional comment" : "Enter reason for request (required)"}
+                      placeholder={this.state.isStaff ? "Enter optional comment" : "Enter reason for request (required)"}
                       onChange={this.handleTextChange}
                     />
           </FormGroup>
         </form>
-      {isStaff ? this.createUserChooser() : null}
+      {this.state.isStaff ? this.createUserChooser() : null}
       </Modal.Body>
       <Modal.Footer>
-        <Button bsStyle="success" disabled={this.state.isSubmitDisabled} onClick={(isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
+        <Button bsStyle="success" onClick={(this.state.isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
+        <Button bsStyle="success" disabled={this.state.isSubmitDisabled} onClick={(this.state.isStaff ? this.submitDisbursement: this.submitCart)}>Submit</Button>
         <Button bsStyle="danger" onClick={this.closeModal} >Cancel</Button>
       </Modal.Footer>
     </Modal>

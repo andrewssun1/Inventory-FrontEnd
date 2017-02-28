@@ -21,7 +21,9 @@ export default class ApplicationTabs extends React.Component {
   super(props);
   this.state = {
     key: 2,
-    cart_quantity: 0
+    cart_quantity: 0,
+    is_staff: false,
+    is_superuser: false
   };
   this.onCartChanged = this.onCartChanged.bind(this);
 }
@@ -56,7 +58,12 @@ export default class ApplicationTabs extends React.Component {
 }
 
   componentWillMount(){
-    checkAuthAndAdmin(()=>{})
+    checkAuthAndAdmin(()=>{
+      this.setState({
+        is_staff: (localStorage.isStaff === "true"),
+        is_superuser: (localStorage.isSuperUser === "true")
+      })
+    })
   }
 
   // TODO: should this be added to component will mount?
@@ -66,13 +73,12 @@ export default class ApplicationTabs extends React.Component {
     }
     var originalSetItem = localStorage.setItem;
     // TODO: Get cart here!
-    const isStaff = (localStorage.isStaff === "true");
-    var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    var url = this.state.is_staff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
     restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activecartid = response.id;
-                  var disburseRequest = isStaff ? response.disbursements : response.requests;
+                  var disburseRequest = this.state.is_staff ? response.disbursements : response.requests;
                   localStorage.setItem("cart_quantity", disburseRequest.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
@@ -92,8 +98,6 @@ export default class ApplicationTabs extends React.Component {
   }
 
   render() {
-      const isSuperUser = (localStorage.isSuperUser === "true");
-      const isStaff = (localStorage.isStaff === "true");
        return (
          <ReactBootstrap.Tab.Container id="left-tabs-example" defaultActiveKey="home" onSelect={ this.handleTabChange }>
            <Row className="clearfix">
@@ -111,11 +115,11 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="disbursements">
                    <Glyphicon style={{marginRight: "8px"}} glyph="cloud-upload" />Disbursements
                  </NavItem>
-                   {isStaff ? (<NavItem eventKey="logs">
+                   {this.state.is_staff ? (<NavItem eventKey="logs">
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
                    }
-                   {isSuperUser ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
+                   {this.state.is_superuser ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
                    <NavItem eventKey="settings">
@@ -145,7 +149,7 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComp"></LogComponent>
                  </Tab.Pane>
-                 {isSuperUser ? (
+                 {this.state.is_superuser ? (
                  <Tab.Pane eventKey="users">
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}
