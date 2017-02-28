@@ -71,6 +71,10 @@ export default class DisbursementModal extends React.Component {
     <TableHeaderColumn dataField='item_name'>Item</TableHeaderColumn>
     <TableHeaderColumn dataField='quantity'>Quantity</TableHeaderColumn>
     </BootstrapTable>
+    <br />
+    <p><b>Disbursed By: </b>{this.state.modal_data.disburser_name}</p>
+    <p><b>Receiver: </b>{this.state.modal_data.receiver_name}</p>
+    <p><b>Comment: </b>{this.state.modal_data.comment}</p>
     </Modal.Body>
     <Modal.Footer>
       <Button bsStyle="danger" onClick={this.closeModal} >Close</Button>
