@@ -46,6 +46,9 @@ class LogComponent extends React.Component {
                     "&min_time=" + this.state.minTime +
                     "&max_time=" + this.state.maxTime +
                     "&page=" + this.state.currentPage;
+          if(this.props.itemFilter != null) {
+            url = url + "&item_name=" + this.props.itemFilter;
+          }
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
@@ -156,6 +159,7 @@ class LogComponent extends React.Component {
                       onPageChange={ this.onPageChange.bind(this) }
                       onFilterChange={ this.onFilterChange.bind(this) }
                       cb={this}
+                      lightMode={this.props.lightMode}
                       { ...this.state }/>
           </div>
         )
