@@ -46,13 +46,14 @@ export default class ShoppingCartModal extends React.Component {
     if (isStaff === true){
       restRequest("GET", "/api/user/large/", "application/JSON", null,
                   (responseText)=>{
+                    var currUsers = [];
                     var response = JSON.parse(responseText);
                     for (var i = 0; i < response.results.length; i++){
                       var username = response.results[i].username;
-                      this.state.users.push({label: username, value: response.results[i].id});
+                      currUsers.push({label: username, value: response.results[i].id});
                       // usermap[response.results[i].username] = response.results[i].id
                     }
-                    this.setState({showModal: true});
+                    this.setState({users: currUsers, showModal: true});
                   }, ()=>{});
     }
     else{
