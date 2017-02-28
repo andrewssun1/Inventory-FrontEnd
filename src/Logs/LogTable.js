@@ -101,10 +101,10 @@ class LogTable extends React.Component {
                             } }
                             striped hover>
                 <TableHeaderColumn dataField='id' isKey hidden hiddenOnInsert autoValue={true}>Id</TableHeaderColumn>
-                <TableHeaderColumn dataField='initiating_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "initiating"} }}>Initiating User</TableHeaderColumn>
-                <TableHeaderColumn dataField='affected_user' className='my-class' width="130px" filter={{ type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "affected"}  }}>Affected User</TableHeaderColumn>
-                <TableHeaderColumn dataField='action_tag' width="170px" filter={ { type: 'SelectFilter', options: this.props.action_filter_obj } } editable={ { type: 'select', options: { values: this.props.action_list } } }>Action</TableHeaderColumn>
-                <TableHeaderColumn dataField='timestamp' className='my-class' width="170px" filter={{ type: 'CustomFilter', getElement: this.getDateRangePicker }}>Timestamp</TableHeaderColumn>
+                <TableHeaderColumn dataField='initiating_user' className='my-class' width={this.props.lightMode ? "108px" : "130px"} filter={this.props.lightMode ? null : { type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "initiating"} }}>Initiating User</TableHeaderColumn>
+                <TableHeaderColumn dataField='affected_user' className='my-class' width={this.props.lightMode ? "108px" : "130px"} filter={this.props.lightMode ? null : { type: 'CustomFilter', getElement: this.getUserFilter, customFilterParameters: {type: "affected"}  }}>Affected User</TableHeaderColumn>
+                <TableHeaderColumn dataField='action_tag' width="170px" filter={this.props.lightMode ? null : { type: 'SelectFilter', options: this.props.action_filter_obj } } editable={ { type: 'select', options: { values: this.props.action_list } } }>Action</TableHeaderColumn>
+                <TableHeaderColumn dataField='timestamp' width="160px" className='my-class'  filter={this.props.lightMode ? null : { type: 'CustomFilter', getElement: this.getDateRangePicker }}>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn dataField='comment'>Comment</TableHeaderColumn>
                 <TableHeaderColumn dataField='item_log' hidden hiddenOnInsert></TableHeaderColumn>
                 <TableHeaderColumn dataField='shopping_cart_log' hidden hiddenOnInsert></TableHeaderColumn>

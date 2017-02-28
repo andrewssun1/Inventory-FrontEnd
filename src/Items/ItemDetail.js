@@ -10,6 +10,7 @@ import ViewRequestModal from '../Requests/ViewRequestModal';
 import TagComponent from '../Tags/TagComponent'
 import TypeConstants from '../TypeConstants';
 import LogQuantityChangeModal from './LogQuantityChangeModal';
+import LogComponent from '../Logs/LogComponent'
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
@@ -315,6 +316,12 @@ saveItem(cb) {
                         <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
                         <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
         </BootstrapTable>
+        {isStaff ?
+        <div>
+        <b> Logs involving this item: </b>
+        <LogComponent lightMode={true} itemFilter={this.state.itemData.name}> </LogComponent>
+        </div>
+        : null}
         </div>
       }
       </Modal.Body>
