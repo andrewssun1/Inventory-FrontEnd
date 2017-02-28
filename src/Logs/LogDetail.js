@@ -66,7 +66,7 @@ export default class LogDetail extends React.Component {
 
   shouldShowDetail(){
     var row = this.state.row;
-    return (row.item_log.length !== 0) || (row.shopping_cart_log.length !== 0) || (row.disbursement_log.length !== 0)
+    return (row.item_log.length !== 0 && !this.props.cb.props.lightMode) || (row.shopping_cart_log.length !== 0) || (row.disbursement_log.length !== 0)
   }
 
   render(){
@@ -90,7 +90,7 @@ export default class LogDetail extends React.Component {
       </Modal.Body>
       <Modal.Footer>
         <div>
-        {(this.shouldShowDetail() && !this.props.cb.props.lightMode) ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
+        {(this.shouldShowDetail()) ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       </Modal.Footer>
