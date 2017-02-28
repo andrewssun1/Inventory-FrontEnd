@@ -68,7 +68,7 @@ export default class CartQuantityChooser extends React.Component {
     checkAuthAndAdmin(()=>{
         const isStaff = (localStorage.isStaff === "true");
         var addItemJson = JSON.stringify({
-            cart_id: localStorage.activecartid,
+            cart_id: parseInt(localStorage.activecartid, 10),
             item_id: row.id,
             quantity: row.quantity_cartitem
         });
