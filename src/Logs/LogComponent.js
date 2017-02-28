@@ -8,6 +8,7 @@ import ViewRequestModal from '../Requests/ViewRequestModal';
 import LogDetail from './LogDetail';
 import AlertComponent from '../AlertComponent';
 
+import { Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 var moment = require('moment');
@@ -33,8 +34,10 @@ class LogComponent extends React.Component {
             actionURLParam: "",
             selectedRequest: 0,
             minTime: "",
-            maxTime: ""
+            maxTime: "",
+            currentUser: ""
         };
+        this.handleNameChange = this.handleNameChange.bind(this);
     }
 
     getRequestForLog(url_parameter, cb){
@@ -45,6 +48,7 @@ class LogComponent extends React.Component {
                     "&affected_user__username=" + this.state.affectedUserURLParam +
                     "&min_time=" + this.state.minTime +
                     "&max_time=" + this.state.maxTime +
+                    "&item_name=" + this.state.currentUser +
                     "&page=" + this.state.currentPage;
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
@@ -91,6 +95,21 @@ class LogComponent extends React.Component {
                         }, ()=>{})
                       });
         });
+        // Get all items
+        checkAuthAndAdmin(()=>{
+          restRequest("GET", "/api/item/unique/", "application/json", null,
+                      (responseText)=>{
+                        var response = JSON.parse(responseText);
+                        var items = [];
+                        for (var i=0; i<response.results.length; i++){
+                          var currItemName = response.results[i].name;
+                          items.push({label: currItemName, value: currItemName});
+                        }
+                        this.setState({
+                          item_names: items
+                        });
+                      }, ()=>{})
+                    });
     }
 
     onFilterChange(filterObj) {
@@ -132,11 +151,22 @@ class LogComponent extends React.Component {
 
     }
 
+    handleNameChange(value){
+      this.setState({currentUser: (value === null) ? "" : value, currentPage: 1}, ()=>{
+        this.getRequestForLog("", ()=>{});
+      })
+    }
 
     render(){
         return(
           <div>
             <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+            <Select simpleValue
+                    value={this.state.currentUser}
+                    placeholder="Filter by item name"
+                    options={this.state.item_names}
+                    onChange={this.handleNameChange}
+                    style={{width: "200px", marginLeft: "10px"}} />
             <LogDetail ref={(child) => { this._logchild = child; }} cb={this} ></LogDetail>
             <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
             <ViewRequestModal id={this.state.selectedRequest}
