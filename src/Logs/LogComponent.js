@@ -2,12 +2,11 @@ import React from "react";
 import LogTable from "./LogTable";
 import {checkAuthAndAdmin, restRequest} from "../Utilities.js";
 import DateRangePicker from './DateRangePicker';
-import ItemDetail from '../Items/ItemDetail';
-import DisbursementModal from '../Disbursements/DisbursementModal';
-import ViewRequestModal from '../Requests/ViewRequestModal';
+
 import LogDetail from './LogDetail';
 import AlertComponent from '../AlertComponent';
 
+import { Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 var moment = require('moment');
@@ -33,8 +32,10 @@ class LogComponent extends React.Component {
             actionURLParam: "",
             selectedRequest: 0,
             minTime: "",
-            maxTime: ""
+            maxTime: "",
+            currentUser: ""
         };
+        this.handleNameChange = this.handleNameChange.bind(this);
     }
 
     getRequestForLog(url_parameter, cb){
@@ -45,10 +46,9 @@ class LogComponent extends React.Component {
                     "&affected_user__username=" + this.state.affectedUserURLParam +
                     "&min_time=" + this.state.minTime +
                     "&max_time=" + this.state.maxTime +
+                    "&item_name=" + ((this.props.itemFilter != null) ? this.props.itemFilter : this.state.currentUser) +
                     "&page=" + this.state.currentPage;
-          if(this.props.itemFilter != null) {
-            url = url + "&item_name=" + this.props.itemFilter;
-          }
+          console.log(url);
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
@@ -70,38 +70,49 @@ class LogComponent extends React.Component {
     }
 
     componentWillMount() {
-      this.resetTable();
-    }
-
-    resetTable(){
-      this.getAllLogs();
-    }
-
-    getAllLogs() {
-      //Getting all the Logs
-      this.getRequestForLog(null, ()=>{
+        //Getting all the Logs
+        this.getRequestForLog(null, ()=>{
+          checkAuthAndAdmin(()=>{
+            restRequest("GET", "/api/logger/action/", "application/json", null,
+                        (responseText)=>{
+                          var response = JSON.parse(responseText);
+                          // console.log(response)
+                          var actions = [];
+                          var action_filters = {};
+                          for (var i=0; i<response.results.length; i++){
+                            var id = response.results[i].id;
+                            // var color = response.results[i].color;
+                            var tag = response.results[i].tag;
+                              actions.push(tag);
+                              action_filters[parseInt(id, 10)] = tag;
+                          }
+                          // console.log(action_filters);
+                          this.setState({
+                              action_list: actions,
+                              action_filter_obj: action_filters
+                          });
+                        }, ()=>{})
+                      });
+        });
+        // Get all items
         checkAuthAndAdmin(()=>{
-          restRequest("GET", "/api/logger/action/", "application/json", null,
+          restRequest("GET", "/api/item/unique/", "application/json", null,
                       (responseText)=>{
                         var response = JSON.parse(responseText);
-                        // console.log(response)
-                        var actions = [];
-                        var action_filters = {};
+                        var items = [];
                         for (var i=0; i<response.results.length; i++){
-                          var id = response.results[i].id;
-                          // var color = response.results[i].color;
-                          var tag = response.results[i].tag;
-                            actions.push(tag);
-                            action_filters[parseInt(id, 10)] = tag;
+                          var currItemName = response.results[i].name;
+                          items.push({label: currItemName, value: currItemName});
                         }
-                        // console.log(action_filters);
                         this.setState({
-                            action_list: actions,
-                            action_filter_obj: action_filters
+                          item_names: items
                         });
                       }, ()=>{})
                     });
-      });
+    }
+
+    resetTable(){
+      this.getRequestForLog(null, ()=>{});
     }
 
     onFilterChange(filterObj) {
@@ -143,17 +154,25 @@ class LogComponent extends React.Component {
 
     }
 
+    handleNameChange(value){
+      console.log(value);
+      this.setState({currentUser: (value === null) ? "" : value, currentPage: 1}, ()=>{
+        this.getRequestForLog("", ()=>{});
+      })
+    }
 
     render(){
         return(
           <div>
             <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+            {this.props.lightMode ? null :
+              <Select simpleValue
+                    value={this.state.currentUser}
+                    placeholder="Filter by item name"
+                    options={this.state.item_names}
+                    onChange={this.handleNameChange}
+                    style={{width: "200px", marginLeft: "10px"}} />}
             <LogDetail ref={(child) => { this._logchild = child; }} cb={this} ></LogDetail>
-            <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
-            <ViewRequestModal id={this.state.selectedRequest}
-              updateCallback={this}
-              ref={(child) => { this._requestModal = child; }} />
-            <DisbursementModal cb={this} ref={(child) => { this.disbursementModal = child; }} />
             <LogTable ref="logTable"
                       onRowClick={ this.onRowClick.bind(this) }
                       onPageChange={ this.onPageChange.bind(this) }

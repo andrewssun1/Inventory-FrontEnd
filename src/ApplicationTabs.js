@@ -49,7 +49,7 @@ export default class ApplicationTabs extends React.Component {
       this.refs.requestComponent.refs.requestTable.resetTable();
     }
     else if (key === "disbursements"){
-      this.refs.disbursementComponent.resetTable()
+      this.refs.disbursementComponent.resetTable();
     }
     else if (key === "log"){
       this.refs.logComponent.resetTable();

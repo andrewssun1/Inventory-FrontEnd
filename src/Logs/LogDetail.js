@@ -2,6 +2,9 @@ var React = require('react');
 
 import { Modal, Button } from 'react-bootstrap';
 import AlertComponent from '../AlertComponent';
+import ItemDetail from '../Items/ItemDetail';
+import DisbursementModal from '../Disbursements/DisbursementModal';
+import ViewRequestModal from '../Requests/ViewRequestModal';
 
 export default class LogDetail extends React.Component {
 
@@ -42,32 +45,38 @@ export default class LogDetail extends React.Component {
   viewDetail(){
     var row = this.state.row;
     if (row.item_log.length !== 0){
-      this.props.cb._child.getDetailedItem(row.item_log[0].item.id, ()=>{
-        this.props.cb._child.setState({showCartChange: false}, ()=>{this.props.cb._child.openModal();});
+      this._child.getDetailedItem(row.item_log[0].item.id, ()=>{
+        this._child.setState({showCartChange: false}, ()=>{this._child.openModal();});
       });
     }
     else if (row.shopping_cart_log.length !== 0){
       this.setState({selectedRequest: row.shopping_cart_log[0].shopping_cart.id}, ()=>{
         // get detailed view of shopping cart
-        this.props.cb._requestModal.getDetailedRequest(row.shopping_cart_log[0].shopping_cart.id, ()=>{
-          this.props.cb._requestModal.openModal();
+        this._requestModal.getDetailedRequest(row.shopping_cart_log[0].shopping_cart.id, ()=>{
+          this._requestModal.openModal();
         });
       });
     }
     else if (row.disbursement_log.length !== 0){
-      this.props.cb.disbursementModal.getDetailedDisbursement(row.disbursement_log[0].cart.id, ()=>{
-        this.props.cb.disbursementModal.openModal(null);
+      this.disbursementModal.getDetailedDisbursement(row.disbursement_log[0].cart.id, ()=>{
+        this.disbursementModal.openModal(null);
       });
     }
   }
 
   shouldShowDetail(){
     var row = this.state.row;
-    return (row.item_log.length !== 0) || (row.shopping_cart_log.length !== 0) || (row.disbursement_log.length !== 0)
+    return (row.item_log.length !== 0 && !this.props.cb.props.lightMode) || (row.shopping_cart_log.length !== 0) || (row.disbursement_log.length !== 0)
   }
 
   render(){
     return(
+      <div>
+      <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
+      <ViewRequestModal id={this.state.selectedRequest}
+        updateCallback={this}
+        ref={(child) => { this._requestModal = child; }} />
+      <DisbursementModal cb={this} ref={(child) => { this.disbursementModal = child; }} />
       <Modal show={this.state.showModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
@@ -81,11 +90,12 @@ export default class LogDetail extends React.Component {
       </Modal.Body>
       <Modal.Footer>
         <div>
-        {this.shouldShowDetail() ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
+        {(this.shouldShowDetail()) ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       </Modal.Footer>
       </Modal>
+      </div>
     );
   }
 

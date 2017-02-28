@@ -114,14 +114,20 @@ class ViewRequestModal extends React.Component {
                   console.log("Getting Response");
                   console.log(response);
                   this.props.updateCallback._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
-                  this.props.updateCallback.getAllRequests(null);
-                  this.props.updateCallback.cleanFilter();
+                  if (typeof this.props.updateCallback.getAllRequests == 'function') {
+                      this.props.updateCallback.getAllRequests(null);
+                  }
+                  if (typeof this.props.updateCallback.cleanFilter == 'function') {
+                    this.props.updateCallback.cleanFilter();
+                  }
                   this.closeModal();
                 }, (status, errResponse)=>{
                   var errorResponse = JSON.parse(errResponse);
                   console.log("PATCH FAILED!");
                   this.props.updateCallback._alertchild.generateError(errorResponse.detail);
-                  this.props.updateCallback.getAllRequests(null);
+                  if (typeof this.props.updateCallback.getAllRequests == 'function') {
+                      this.props.updateCallback.getAllRequests(null);
+                  }
                   this.closeModal();
                 })
   }
@@ -161,7 +167,7 @@ class ViewRequestModal extends React.Component {
         buttons.push(<Button key="cancel" onClick={this.cancel} bsStyle="danger">Cancel Cart</Button>);
       }
     }
-    buttons.push(<Button key="close" onClick={this.closeModal} >Close</Button>);
+    buttons.push(<Button key="close" bsStyle="danger" onClick={this.closeModal} >Close</Button>);
     return buttons;
   }
 
