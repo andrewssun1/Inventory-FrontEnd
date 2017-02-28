@@ -304,7 +304,7 @@ saveItem(cb) {
         <p><b>Tags: </b></p>
         <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        <p><b>Outstanding carts containing this item: </b></p>
+        <p><b>Outstanding requests containing this item: </b></p>
         <BootstrapTable ref="logTable"
                         data={ this.state.cartData }
                         options={ cartTableOptions }

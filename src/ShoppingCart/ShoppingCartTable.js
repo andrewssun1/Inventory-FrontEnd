@@ -30,7 +30,8 @@ export default class ShoppingCartTable extends React.Component {
         "description": "This is super lit",
         "tags": [{"tag": "first tag"}, {"tag": "second tag"}],
         "cart_quantity": 1
-      }]
+      }],
+      isStaff : false
     }
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.openCartModal = this.openCartModal.bind(this);
@@ -44,6 +45,12 @@ export default class ShoppingCartTable extends React.Component {
       return "Name must be at least one character!"
     }
     return true;
+  }
+
+  componentWillMount(){
+    checkAuthAndAdmin(()=>{
+      this.setState({isStaff: (localStorage.isStaff === "true")})
+    })
   }
 
   componentDidMount(){
@@ -98,7 +105,6 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   render(){
-    const isStaff = (localStorage.isStaff === "true");
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
     };
@@ -114,7 +120,7 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
       </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{isStaff ? "Disburse" : "Send Cart"}</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Disburse" : "Send Cart"}</Button>
       </div>
     );
   }

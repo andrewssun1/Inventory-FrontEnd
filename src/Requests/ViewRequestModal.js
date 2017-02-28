@@ -3,9 +3,10 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from '../TextEntryFormElement';
-import {restRequest} from "../Utilities.js";
-import TypeConstants from "../TypeConstants.js";
+import TextEntryFormElement from '../TextEntryFormElement'
+import {checkAuthAndAdmin} from "../Utilities";
+import {restRequest} from "../Utilities.js"
+import TypeConstants from "../TypeConstants.js"
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -18,7 +19,8 @@ class ViewRequestModal extends React.Component {
     this.state = {
       showModal: false,
       requestData: [],
-      requestProblemString: ""
+      requestProblemString: "",
+      isStaff: false
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -30,6 +32,12 @@ class ViewRequestModal extends React.Component {
     this.isOutstanding = this.isOutstanding.bind(this);
     this.renderBottomComponents = this.renderBottomComponents.bind(this);
     this.renderButtons = this.renderButtons.bind(this);
+  }
+
+  componentWillMount(){
+    checkAuthAndAdmin(()=>{
+        this.setState({isStaff: (localStorage.isStaff === "true")})
+    })
   }
 
   getDetailedRequest(id, cb) {
@@ -138,10 +146,9 @@ class ViewRequestModal extends React.Component {
   }
 
   renderButtons() {
-    const isStaff = (localStorage.isStaff === "true");
     var buttons = [];
     if(this.isOutstanding()) {
-      if(isStaff) {
+      if(this.state.isStaff) {
         buttons.push(<div key="textElements"> <TextEntryFormElement controlId="formHorizontalComments" label="Comments"
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);

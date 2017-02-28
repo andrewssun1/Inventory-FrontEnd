@@ -40,57 +40,59 @@ export default class CartQuantityChooser extends React.Component {
   }
 
   updateRowQuantity(row){
-    row.shouldUpdate = false;
-    console.log(row);
-    var id = (row.cartId ? row.cartId : row.id);
-    var Quantity = parseInt(row.quantity_cartitem, 10);
-    const isStaff = (localStorage.isStaff === "true");
-    var updateJSON = JSON.stringify({
-      quantity: Quantity
-    });
-    var url = isStaff ? "/api/disburse/disbursements/"+id : "/api/shoppingCart/modifyQuantityRequested/"+id+"/";
-    restRequest("PATCH", url, "application/JSON", updateJSON,
-                (responseText)=>{
-                  this.forceUpdate();
-                  this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
-                  row.original_quantity = row.quantity_cartitem;
-                }, (status, errResponse)=>{
-                  this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
-                  console.log(row.original_quantity);
-                  row.quantity_cartitem = row.original_quantity;
-                }
-                );
+    checkAuthAndAdmin(()=>{
+        row.shouldUpdate = false;
+        console.log(row);
+        var id = (row.cartId ? row.cartId : row.id);
+        var Quantity = parseInt(row.quantity_cartitem, 10);
+        const isStaff = (localStorage.isStaff === "true");
+        var updateJSON = JSON.stringify({
+            quantity: Quantity
+        });
+        var url = isStaff ? "/api/disburse/disbursements/"+id : "/api/shoppingCart/modifyQuantityRequested/"+id+"/";
+        restRequest("PATCH", url, "application/JSON", updateJSON,
+            (responseText)=>{
+                this.forceUpdate();
+                this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
+                row.original_quantity = row.quantity_cartitem;
+            }, (status, errResponse)=>{
+                this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
+                console.log(row.original_quantity);
+                row.quantity_cartitem = row.original_quantity;
+            }
+        );
+    })
   }
 
   onAddtoCartClick(row){
-    // console.log(row);
-    //this.setState({showModal: false});
-    const isStaff = (localStorage.isStaff === "true");
-    var addItemJson = JSON.stringify({
-      cart_id: localStorage.activecartid,
-      item_id: row.id,
-      quantity: row.quantity_cartitem
-    });
-    var url = isStaff ? "/api/disburse/disbursements/create/" : "/api/shoppingCart/addItem/";
-    restRequest("POST", url, "application/json", addItemJson,
-                (responseText)=>{
-                  var response = JSON.parse(responseText);
-                  console.log(response);
-                  //alert("Added " + row.quantity + " of " + row.name + " to cart!");
-                  localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
-                  this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
-                  row.inCart = true;
-                  row.cartId = response.id;
-                  this.setState({shouldUpdateCart: true});
-                  this.forceUpdate();
-                }, (status, errResponse)=>{
-                  let err = JSON.parse(errResponse);
-                  if(err.quantity != null) {
+    checkAuthAndAdmin(()=>{
+        const isStaff = (localStorage.isStaff === "true");
+        var addItemJson = JSON.stringify({
+            cart_id: localStorage.activecartid,
+            item_id: row.id,
+            quantity: row.quantity_cartitem
+        });
+        var url = isStaff ? "/api/disburse/disbursements/create/" : "/api/shoppingCart/addItem/";
+        restRequest("POST", url, "application/json", addItemJson,
+            (responseText)=>{
+                var response = JSON.parse(responseText);
+                console.log(response);
+                //alert("Added " + row.quantity + " of " + row.name + " to cart!");
+                localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
+                this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
+                row.inCart = true;
+                row.cartId = response.id;
+                this.setState({shouldUpdateCart: true});
+                this.forceUpdate();
+            }, (status, errResponse)=>{
+                let err = JSON.parse(errResponse);
+                if(err.quantity != null) {
                     this.props.cb._alertchild.generateError(JSON.parse(errResponse).quantity[0]);
-                  } else if(err.detail != null) {
+                } else if(err.detail != null) {
                     this.props.cb._alertchild.generateError(JSON.parse(errResponse).detail);
-                  }
-                });
+                }
+            });
+    })
   }
 
   render(){
