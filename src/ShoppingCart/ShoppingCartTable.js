@@ -54,6 +54,14 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   componentDidMount(){
+    this.resetTable();
+  }
+
+  resetTable() {
+    this.getCart();
+  }
+
+  getCart() {
     // get active cart
     const isStaff = (localStorage.isStaff === "true");
     var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
