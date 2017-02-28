@@ -90,7 +90,7 @@ export default class LogDetail extends React.Component {
       </Modal.Body>
       <Modal.Footer>
         <div>
-        {this.shouldShowDetail() ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
+        {(this.shouldShowDetail() && !this.props.cb.props.lightMode) ? <Button onClick={this.viewDetail} bsStyle="primary">View Detail</Button> : null}
         <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
         </div>
       </Modal.Footer>

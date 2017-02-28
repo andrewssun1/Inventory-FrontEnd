@@ -167,7 +167,7 @@ class ViewRequestModal extends React.Component {
         buttons.push(<Button key="cancel" onClick={this.cancel} bsStyle="danger">Cancel Cart</Button>);
       }
     }
-    buttons.push(<Button key="close" onClick={this.closeModal} >Close</Button>);
+    buttons.push(<Button key="close" bsStyle="danger" onClick={this.closeModal} >Close</Button>);
     return buttons;
   }
 
