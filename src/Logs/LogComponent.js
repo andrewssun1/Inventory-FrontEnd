@@ -5,6 +5,8 @@ import DateRangePicker from './DateRangePicker';
 import ItemDetail from '../Items/ItemDetail';
 import DisbursementModal from '../Disbursements/DisbursementModal';
 import ViewRequestModal from '../Requests/ViewRequestModal';
+import LogDetail from './LogDetail';
+import AlertComponent from '../AlertComponent';
 
 import Select from 'react-select';
 
@@ -42,7 +44,8 @@ class LogComponent extends React.Component {
                     "&initiating_user__username=" + this.state.initiatingUserURLParam +
                     "&affected_user__username=" + this.state.affectedUserURLParam +
                     "&min_time=" + this.state.minTime +
-                    "&max_time=" + this.state.maxTime;
+                    "&max_time=" + this.state.maxTime +
+                    "&page=" + this.state.currentPage;
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
@@ -93,25 +96,19 @@ class LogComponent extends React.Component {
     onFilterChange(filterObj) {
       console.log(filterObj);
         if (Object.keys(filterObj).length === 0) {
-          this.setState({actionURLParam: ""},
+          this.setState({actionURLParam: "", currentPage: 1},
             ()=>{
               this.getRequestForLog("", ()=>{
-                this.setState({
-                    currentPage:1
-                });
+
               });
             }
           );
         }
         // TODO: there's an error but it doesn't break anything
         else{
-        this.setState({actionURLParam: this.state.action_filter_obj[filterObj["action_tag"]["value"]]},
+        this.setState({actionURLParam: this.state.action_filter_obj[filterObj["action_tag"]["value"]], currentPage: 1},
           ()=>{
-            this.getRequestForLog("", ()=>{
-              this.setState({
-                  currentPage:1
-              });
-            });
+            this.getRequestForLog("", ()=>{});
           }
         );
       }
@@ -119,40 +116,28 @@ class LogComponent extends React.Component {
 
     onRowClick(row){
       console.log(row);
-      if (row.item_log.length !== 0){
-        this._child.getDetailedItem(row.item_log[0].item.id, ()=>{
-          this._child.setState({showCartChange: false}, ()=>{this._child.openModal();});
-        });
-      }
-      else if (row.shopping_cart_log.length !== 0){
-        this.setState({selectedRequest: row.shopping_cart_log[0].shopping_cart.id}, ()=>{
-          // get detailed view of shopping cart
-          this._requestModal.getDetailedRequest(row.shopping_cart_log[0].shopping_cart.id, ()=>{
-            this._requestModal.openModal();
-          });
-        });
-      }
-      // else if (row.disbursement_log.length !== 0){
-      //   this.disbursementModal.openModal(row);
-      // }
+      this._logchild.openModal(row);
     }
 
     onPageChange(page, sizePerPage) {
-        var page_argument = "page=" + page;
-        var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
+        // var page_argument = "page=" + page;
+        // var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
         // console.log(url_param);
-        this.getRequestForLog(url_param, ()=>{
-          this.setState({
-              currentPage: page
-          })
+        this.setState({
+            currentPage: page
+        }, ()=>{
+          this.getRequestForLog("", ()=>{
+          });
         });
-    }
 
+    }
 
 
     render(){
         return(
           <div>
+            <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+            <LogDetail ref={(child) => { this._logchild = child; }} cb={this} ></LogDetail>
             <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
             <ViewRequestModal id={this.state.selectedRequest}
               updateCallback={this}

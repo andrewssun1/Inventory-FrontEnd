@@ -44,15 +44,13 @@ class LogTable extends React.Component {
     var valVar = ((type === "initiating") ? "selectedUserInitiating" : "selectedUserAffected");
     var valState = {};
     valState[valVar] = value;
+    state["currentPage"] = 1;
     this.setState(valState);
     if (value === null){
       state[stateVar] = "";
       this.props.cb.setState(state,
         ()=>{
           this.props.cb.getRequestForLog("", ()=>{
-            this.props.cb.setState({
-                currentPage:1
-            });
           });
         }
       );
@@ -63,9 +61,6 @@ class LogTable extends React.Component {
       this.props.cb.setState(state,
         ()=>{
           this.props.cb.getRequestForLog("", ()=>{
-            this.props.cb.setState({
-                currentPage:1
-            });
           });
         }
       );

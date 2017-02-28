@@ -3,14 +3,13 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from '../TextEntryFormElement'
-import {restRequest} from "../Utilities.js"
-import TypeConstants from "../TypeConstants.js"
-var Modal = Bootstrap.Modal;
-var Button = Bootstrap.Button;
+import TextEntryFormElement from '../TextEntryFormElement';
+import {restRequest} from "../Utilities.js";
+import TypeConstants from "../TypeConstants.js";
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+import {Modal, Button, Label} from 'react-bootstrap';
 var moment = require('moment');
 
 class ViewRequestModal extends React.Component {
@@ -126,15 +125,15 @@ class ViewRequestModal extends React.Component {
       case "denied":
         return(
           <div>
-          {(this.state.requestData.status === "approved") ? <h4> Approved </h4> : <h4> Denied </h4>}
-          <p> By: {data.admin.username} </p>
-          <p> At time: {moment(data.admin_timestamp).format('lll')} </p>
-          <p> Comments: {data.admin_comment} </p>
+          {(this.state.requestData.status === "approved") ? <h4><Label bsStyle="success"> Approved </Label></h4> : <h4><Label bsStyle="danger"> Denied </Label></h4>}
+          <p> <b>By: </b>{data.admin} </p>
+          <p> <b>At time: </b>{moment(data.admin_timestamp).format('lll')} </p>
+          <p> <b>Comments: </b>{data.admin_comment} </p>
           </div>);
       case "active":
-        return(<h4> Active </h4>);
+        return(<h4><Label bsStyle="primary"> Active </Label></h4>);
       default:
-        return(<h4> Outstanding </h4>);
+        return(<h4><Label bsStyle="warning"> Outstanding </Label></h4>);
     }
   }
 
@@ -163,6 +162,9 @@ class ViewRequestModal extends React.Component {
       (this.state.requestData.length !== 0) ?
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
+      <Modal.Header closeButton>
+      <Modal.Title>View Request</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
         <BootstrapTable ref="viewRequestModal" data={this.state.requestData.requests} striped hover>
         <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
@@ -170,7 +172,7 @@ class ViewRequestModal extends React.Component {
         <TableHeaderColumn dataField='quantity' dataAlign="center">Quantity</TableHeaderColumn>
         </BootstrapTable>
       <br />
-      <p> Reason: {this.state.requestData.reason} </p>
+      <p> <b>Request Reason: </b>{this.state.requestData.reason} </p>
       {this.renderBottomComponents()}
       <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       </Modal.Body>

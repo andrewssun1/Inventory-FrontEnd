@@ -8,6 +8,7 @@ import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
 const SERVER = "https://asap-test.colab.duke.edu";
+const CLIENT_ID = "2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy";
 // const SERVER = "http://localhost:3000";
 
 export default class LoginPage extends React.Component {
@@ -61,7 +62,6 @@ export default class LoginPage extends React.Component {
                   (xhttpResponse)=>{
                     var userResponse = JSON.parse(xhttpResponse);
                     var dukeToken = userResponse.access_token;
-                    const CLIENT_ID = "2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy";
                     var sendString = "grant_type=convert_token&client_id="+CLIENT_ID+"&backend=duke&token="+dukeToken;
                     restRequest("POST", "/auth/convert-token/", "application/x-www-form-urlencoded", sendString,
                                 (xhttpResponse)=>{
@@ -109,7 +109,7 @@ export default class LoginPage extends React.Component {
     this.setState({_alert_both: false});
 
     // Create the http request to do REST calls
-    const clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy';
+    // const clientID = '2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy';
 
     // Validate username/password - trigger alert if invalid
     if (this.state._username.length < 1 || this.state._password.length < 1){
@@ -118,7 +118,7 @@ export default class LoginPage extends React.Component {
     }
 
     // REST call parameters
-    var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+clientID;
+    var request_str = "grant_type=password&username="+this.state._username+"&password="+this.state._password+"&client_id="+CLIENT_ID;
     restRequest("POST", "/api/o/token/",
                 "application/x-www-form-urlencoded", request_str,
                 this.testSuccessCb, this.testErrorCb);

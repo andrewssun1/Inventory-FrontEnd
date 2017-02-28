@@ -251,7 +251,7 @@ saveItem(cb) {
   renderDisplayFields() {
     if(this.state.fieldData != null) {
       let displayFields = this.state.fieldData.map((field) => {
-        return(<p key={field.name}> {field.name} : {field.value} </p>);
+        return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
       });
       return (displayFields);
     }
@@ -289,6 +289,9 @@ saveItem(cb) {
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
       <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} />
       <Bootstrap.Modal show={this.state.showModal}>
+      <Modal.Header closeButton>
+      <Modal.Title>View Item</Modal.Title>
+      </Modal.Header>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
       {this.state.isEditing ?
@@ -298,10 +301,10 @@ saveItem(cb) {
         :
         <div>
         {this.renderDisplayFields()}
-        <p> Tags: </p>
+        <p><b>Tags: </b></p>
         <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        <p> Outstanding carts containing this item: </p>
+        <p><b>Outstanding carts containing this item: </b></p>
         <BootstrapTable ref="logTable"
                         data={ this.state.cartData }
                         options={ cartTableOptions }
