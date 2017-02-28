@@ -76,12 +76,13 @@ export default class ApplicationTabs extends React.Component {
     }
     var originalSetItem = localStorage.setItem;
     // TODO: Get cart here!
-    var url = this.state.is_staff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    const is_staff = (localStorage.isStaff === "true");
+    var url = is_staff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
     restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activecartid = response.id;
-                  var disburseRequest = this.state.is_staff ? response.disbursements : response.requests;
+                  var disburseRequest = is_staff ? response.disbursements : response.requests;
                   localStorage.setItem("cart_quantity", disburseRequest.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
