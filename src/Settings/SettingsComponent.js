@@ -13,8 +13,12 @@ export default class SettingsComponent extends React.Component {
     return(
       <div>
       <APIKeyComponent />
+      {localStorage.isStaff === "true" ?
+      <div>
       <hr />
       <EmailComponent />
+      </div>
+      : null}
       </div>
     );
   }

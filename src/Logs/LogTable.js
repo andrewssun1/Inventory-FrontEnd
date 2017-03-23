@@ -4,7 +4,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import Select from 'react-select';
 import '../DropdownTable.css';
-import DateRangePicker from './DateRangePicker';
+import DateRangePicker from '../DateRangePicker';
 
 import { Button } from 'react-bootstrap';
 
