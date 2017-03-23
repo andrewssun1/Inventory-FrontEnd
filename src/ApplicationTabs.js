@@ -48,9 +48,9 @@ export default class ApplicationTabs extends React.Component {
       this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
       this.refs.requestComponent.refs.requestTable.resetTable();
     }
-    else if (key === "disbursements"){
-      this.refs.disbursementComponent.resetTable();
-    }
+    // else if (key === "disbursements"){
+    //   this.refs.disbursementComponent.resetTable();
+    // }
     else if (key === "log"){
       this.refs.logComponent.resetTable();
     }
@@ -84,12 +84,12 @@ export default class ApplicationTabs extends React.Component {
     var originalSetItem = localStorage.setItem;
     // TODO: Get cart here!
     const is_staff = (localStorage.isStaff === "true");
-    var url = is_staff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    var url = "/api/request/active/";
     restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activecartid = response.id;
-                  var disburseRequest = is_staff ? response.disbursements : response.requests;
+                  var disburseRequest = response.cart_disbursements;
                   localStorage.setItem("cart_quantity", disburseRequest.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
@@ -123,9 +123,6 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="requests">
                    <Glyphicon style={{marginRight: "8px"}} glyph="question-sign" />Requests
                  </NavItem>
-                 <NavItem eventKey="disbursements">
-                   <Glyphicon style={{marginRight: "8px"}} glyph="cloud-upload" />Disbursements
-                 </NavItem>
                    {this.state.is_staff ? (<NavItem eventKey="logs">
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
@@ -153,9 +150,6 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
                    <RequestComponent ref="requestComponent"></RequestComponent>
-                 </Tab.Pane>
-                 <Tab.Pane eventKey="disbursements">
-                   <DisbursementTable ref="disbursementComponent"></DisbursementTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComponent"></LogComponent>

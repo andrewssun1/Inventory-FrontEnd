@@ -58,12 +58,12 @@ class ItemTable extends React.Component {
                     var response = JSON.parse(responseText);
                     var response_results = response.results;
                     const isStaff = (localStorage.isStaff === "true");
-                    var cartUrl = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+                    var cartUrl = "/api/request/active/";
                     restRequest("GET", cartUrl, "application/JSON", null,
                                 (responseText)=>{
                                   var responseCart = JSON.parse(responseText);
                                   var hash = {};
-                                  var disburseRequest = isStaff ? responseCart.disbursements : responseCart.requests;
+                                  var disburseRequest = responseCart.cart_disbursements;
                                   for (var j = 0; j < disburseRequest.length; j++){
                                     var currItem = disburseRequest[j];
                                     hash[currItem.item.id] = [currItem.quantity, currItem.id];

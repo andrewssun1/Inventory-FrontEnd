@@ -41,16 +41,17 @@ class ViewRequestModal extends React.Component {
   }
 
   getDetailedRequest(id, cb) {
-    restRequest("GET", "/api/shoppingCart/detailed/"+id+"/", "application/json", null,
+    restRequest("GET", "/api/request/"+id, "application/json", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   console.log("Getting Response");
                   console.log(response);
                   var errorItems = [];
-                  for (var i = 0; i < response.requests.length; i++){
-                    response.requests[i].name = response.requests[i].item.name;
-                    if(response.requests[i].quantity > response.requests[i].item.quantity) {
-                      errorItems.push(response.requests[i].name);
+                  var cartDisbursements = response.cart_disbursements;
+                  for (var i = 0; i < cartDisbursements.length; i++){
+                    cartDisbursements[i].name = cartDisbursements[i].item.name;
+                    if(cartDisbursements[i].quantity > cartDisbursements[i].item.quantity) {
+                      errorItems.push(cartDisbursements[i].name);
                       // this.setState({requestProblemString: "Cannot approve: requested quantity exceeds quantity in stock for this item"});
                     }
                   }
@@ -69,7 +70,7 @@ class ViewRequestModal extends React.Component {
                   this.setState({requestData: response}, cb);
 
                   //cb();
-                }, ()=>{console.log("Get detailed request failed");}
+                }, ()=>{console.log("Get detailed request failed!");}
                 )
   }
 
@@ -84,19 +85,19 @@ class ViewRequestModal extends React.Component {
   cancel() {
     //TODO: change placeholder
     var requestBody = {"id": this.state.requestData.id,
-    "reason":"Placeholder for now"};
+    "comment":"Placeholder for now"};
     this.patchRequest('cancel', requestBody);
   }
 
   approve() {
     var requestBody = {"id": this.state.requestData.id,
-    "admin_comment":this._commentsField.state.value};
+    "staff_comment":this._commentsField.state.value};
     this.patchRequest('approve', requestBody);
   }
 
   deny() {
     var requestBody = {"id": this.state.requestData.id,
-    "admin_comment":this._commentsField.state.value};
+    "staff_comment":this._commentsField.state.value};
     this.patchRequest('deny', requestBody);
   }
 
@@ -107,7 +108,7 @@ class ViewRequestModal extends React.Component {
   patchRequest(type, requestBody) {
     var jsonResult = JSON.stringify(requestBody);
     var dict = {deny: "denied", cancel: "cancelled", approve: "approved"};
-    restRequest("PATCH", "/api/shoppingCart/"+type+"/"+this.state.requestData.id+"/", "application/json",
+    restRequest("PATCH", "/api/request/"+type+"/"+this.state.requestData.id+"/", "application/json",
                 jsonResult,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
@@ -182,7 +183,7 @@ class ViewRequestModal extends React.Component {
       <Modal.Title>View Request</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <BootstrapTable ref="viewRequestModal" data={this.state.requestData.requests} striped hover>
+        <BootstrapTable ref="viewRequestModal" data={this.state.requestData.cart_disbursements} striped hover>
         <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
         <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
         <TableHeaderColumn dataField='quantity' dataAlign="center">Quantity</TableHeaderColumn>
