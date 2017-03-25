@@ -18,9 +18,10 @@ var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 var moment = require('moment');
 
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
-import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser'
-import AlertComponent from '../AlertComponent'
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
+import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
+import AlertComponent from '../AlertComponent';
+import Select from 'react-select';
 
 class ItemDetail extends React.Component {
 
@@ -161,7 +162,7 @@ saveItem(cb) {
 
   getCarts(item_name){
     // GET request to get all outstanding carts for this item by this user
-    restRequest("GET", "/api/shoppingCart/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
+    restRequest("GET", "/api/request/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log(response);
@@ -254,6 +255,11 @@ saveItem(cb) {
       let displayFields = this.state.fieldData.map((field) => {
         return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
       });
+      displayFields.push(
+        <div key="tagComponent">
+        <p><b>Tags: </b></p>
+        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
+        </div>);
       return (displayFields);
     }
   }
@@ -270,6 +276,7 @@ saveItem(cb) {
           ref={child => this.refDict[field.name] = child}/>);
         }
       });
+      // editFields.push(<>);
       return(editFields);
     }
   }
@@ -302,8 +309,6 @@ saveItem(cb) {
         :
         <div>
         {this.renderDisplayFields()}
-        <p><b>Tags: </b></p>
-        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
         <p><b>Outstanding requests containing this item: </b></p>
         <BootstrapTable ref="logTable"
