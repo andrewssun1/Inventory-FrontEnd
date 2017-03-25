@@ -4,6 +4,7 @@ import {Button, Label, Form, FormGroup, FormControl} from 'react-bootstrap';
 import TypeConstants from '../TypeConstants.js';
 import TextEntryFormElement from '../TextEntryFormElement.js';
 import DateRangePicker from '../DateRangePicker.js';
+import ConfigureEmailModal from './ConfigureEmailModal.js';
 
 export default class EmailComponent extends React.Component {
 
@@ -18,6 +19,7 @@ export default class EmailComponent extends React.Component {
     this.subscribeManager = this.subscribeManager.bind(this);
     this.unsubscribeManager = this.unsubscribeManager.bind(this);
     this.renderSubscribeButton = this.renderSubscribeButton.bind(this);
+    this.didPressConfigureEmail = this.didPressConfigureEmail.bind(this);
   }
 
   componentWillMount() {
@@ -49,21 +51,18 @@ export default class EmailComponent extends React.Component {
     return null;
   }
 
+  didPressConfigureEmail() {
+    this._configureEmailModal.openModal();
+  }
+
   render(){
     return(
       <div>
       <h2> Email </h2>
       {this.renderSubscribeButton()}
-      <DateRangePicker cb={this}></DateRangePicker>
-      <Form horizontal>
-      <TextEntryFormElement controlId="formHorizontalSubject"
-      label="Subject" type={TypeConstants.Enum.SHORT_STRING} initialValue=""
-      ref={child => this._subjectElement = child}/>
-      <TextEntryFormElement controlId="formHorizontalBody"
-      label="Body" type={TypeConstants.Enum.LONG_STRING} initialValue=""
-      ref={child => this._bodyElement = child}/>
-      </Form>
-
+      <br/> <br/>
+      <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>
+      <ConfigureEmailModal ref={child => this._configureEmailModal = child} />
       </div>
     );
   }
