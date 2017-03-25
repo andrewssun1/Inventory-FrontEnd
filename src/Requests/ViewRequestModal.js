@@ -145,8 +145,8 @@ class ViewRequestModal extends React.Component {
           <p> <b>At time: </b>{moment(data.admin_timestamp).format('lll')} </p>
           <p> <b>Comments: </b>{data.admin_comment} </p>
           </div>);
-      case "active":
-        return(<h4><Label bsStyle="primary"> Active </Label></h4>);
+      case "fulfilled":
+        return(<h4><Label bsStyle="primary"> Fulfilled </Label></h4>);
       case "outstanding":
         return(<h4><Label bsStyle="warning"> Outstanding </Label></h4>);
       default:

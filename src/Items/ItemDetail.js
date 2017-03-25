@@ -256,7 +256,7 @@ saveItem(cb) {
         return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
       });
       displayFields.push(
-        <div>
+        <div key="tagComponent">
         <p><b>Tags: </b></p>
         <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         </div>);
