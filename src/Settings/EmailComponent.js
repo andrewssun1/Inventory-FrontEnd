@@ -5,6 +5,7 @@ import TypeConstants from '../TypeConstants.js';
 import TextEntryFormElement from '../TextEntryFormElement.js';
 import DateRangePicker from '../DateRangePicker.js';
 import ConfigureEmailModal from './ConfigureEmailModal.js';
+import SubscribedManagerTable from './SubscribedManagerTable.js';
 
 export default class EmailComponent extends React.Component {
 
@@ -23,23 +24,39 @@ export default class EmailComponent extends React.Component {
   }
 
   componentWillMount() {
-    if(localStorage.isStaff === "true") {
-      //TODO: HTTP Request to get initial subscription status
-    }
+    restRequest("GET", "/api/email/subscribedManagers/", "application/json", null,
+                  (responseText)=>{
+                    let response = JSON.parse(responseText);
+                    console.log(response);
+                    //TODO: is there a better way to do this?
+                    var hasUsername = false;
+                    for(var i = 0; i < response.results.length; i ++) {
+                      if(response.results[i].member.username === localStorage.username) {
+                        hasUsername = true;
+                      }
+                    }
+                    this.setState({isSubscribed: hasUsername});
+                  }, ()=>{});
   }
 
   didFinishChangeState(url_parameter, cb) {}
 
   subscribeManager() {
     console.log("Subscribe");
-    this.setState({isSubscribed: true});
-    //TODO: HTTP Request to subscribe
+    restRequest("POST", "/api/email/subscribe/", "application/json", null,
+                (responseText)=>{
+                  console.log("Successfully Subscribed");
+                  this.setState({isSubscribed: true});
+                }, ()=>{});
   }
 
   unsubscribeManager() {
     console.log("Unsubscribe");
-    this.setState({isSubscribed: false});
-    //TODO: HTTP Request to unsubscribe
+    restRequest("POST", "/api/email/unsubscribe/", "application/json", null,
+                (responseText)=>{
+                  console.log("Successfully Unsubscribed");
+                  this.setState({isSubscribed: false});
+                }, ()=>{});
   }
 
   renderSubscribeButton() {
@@ -55,7 +72,7 @@ export default class EmailComponent extends React.Component {
     this._configureEmailModal.openModal();
   }
 
-  render(){
+  render() {
     return(
       <div>
       <h2> Email </h2>
@@ -63,6 +80,7 @@ export default class EmailComponent extends React.Component {
       <br/> <br/>
       <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>
       <ConfigureEmailModal ref={child => this._configureEmailModal = child} />
+      {localStorage.isSuperUser ? <SubscribedManagerTable /> : null}
       </div>
     );
   }
