@@ -64,12 +64,12 @@ export default class ShoppingCartTable extends React.Component {
   getCart() {
     // get active cart
     const isStaff = (localStorage.isStaff === "true");
-    var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    var url = "/api/request/active/";
     restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
                   localStorage.activeCart = response.id;
-                  var disburseRequest = isStaff ? response.disbursements : response.requests;
+                  var disburseRequest = response.cart_disbursements;
                   for (var i = 0; i < disburseRequest.length; i++){
                     disburseRequest[i].name = disburseRequest[i].item.name;
                     disburseRequest[i].quantity_cartitem = disburseRequest[i].quantity;
@@ -85,7 +85,7 @@ export default class ShoppingCartTable extends React.Component {
     const isStaff = (localStorage.isStaff === "true");
     for (let i = 0; i < rows.length; i++){
       console.log(rows);
-      var url = isStaff ? "/api/disburse/disbursements/"+rows[i] : "/api/shoppingCart/deleteItem/"+rows[i]+"/";
+      var url = "/api/request/deleteItem/"+rows[i]+"/";
       restRequest("DELETE", url, "application/json", null,
                   ()=>{
                     localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) - 1);

@@ -47,9 +47,10 @@ export default class CartQuantityChooser extends React.Component {
         var Quantity = parseInt(row.quantity_cartitem, 10);
         const isStaff = (localStorage.isStaff === "true");
         var updateJSON = JSON.stringify({
+            type: "disbursement",
             quantity: Quantity
         });
-        var url = isStaff ? "/api/disburse/disbursements/"+id : "/api/shoppingCart/modifyQuantityRequested/"+id+"/";
+        var url = "/api/request/modifyQuantityRequested/"+id+"/";
         restRequest("PATCH", url, "application/JSON", updateJSON,
             (responseText)=>{
                 this.forceUpdate();
@@ -69,15 +70,15 @@ export default class CartQuantityChooser extends React.Component {
     })
   }
 
+// TODO: account for disbusement vs. loan
   onAddtoCartClick(row){
     checkAuthAndAdmin(()=>{
         const isStaff = (localStorage.isStaff === "true");
         var addItemJson = JSON.stringify({
-            cart_id: parseInt(localStorage.activecartid, 10),
             item_id: row.id,
             quantity: row.quantity_cartitem
         });
-        var url = isStaff ? "/api/disburse/disbursements/create/" : "/api/shoppingCart/addItem/";
+        var url = "/api/request/disbursement/";
         restRequest("POST", url, "application/json", addItemJson,
             (responseText)=>{
                 var response = JSON.parse(responseText);

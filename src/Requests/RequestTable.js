@@ -57,7 +57,7 @@ class RequestTable extends React.Component {
   }
 
   getAllRequests(url_parameter){
-    var url = url_parameter === null ? "/api/shoppingCart/" : "/api/shoppingCart/" + url_parameter;
+    var url = url_parameter === null ? "/api/request/" : "/api/request/" + url_parameter;
     // console.log(url);
     checkAuthAndAdmin(()=>{
       restRequest("GET", url, "application/json", null,
