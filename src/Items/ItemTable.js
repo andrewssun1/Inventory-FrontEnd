@@ -6,6 +6,7 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 import ItemDetail from './ItemDetail';
 import TagModal from '../TagModal';
+import BulkImportModal from './BulkImportModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -48,6 +49,7 @@ class ItemTable extends React.Component {
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
     this.cartFormatter = this.cartFormatter.bind(this);
     this.resetTable = this.resetTable.bind(this);
+    this.openBulkImportModal = this.openBulkImportModal.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -221,7 +223,7 @@ class ItemTable extends React.Component {
   }
 
   onTagSearchClick() {
-    this._tagchild.openModal();
+    this._tagChild.openModal();
   }
 
     onSearchChange(searchText, colInfos, multiColumnSearch) {
@@ -259,6 +261,9 @@ class ItemTable extends React.Component {
     );
   }
 
+  openBulkImportModal() {
+    this._bulkImportChild.openModal();
+  }
 
   render() {
 
@@ -285,6 +290,7 @@ class ItemTable extends React.Component {
 
     return(
       <div>
+      <Button onClick={this.openBulkImportModal} bsStyle="primary">Import Items from CSV</Button>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
@@ -306,8 +312,9 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
       </BootstrapTable>) : null}
 
+      <BulkImportModal ref={(child) => {this._bulkImportChild= child; }} />
       <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
-      <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
+      <TagModal ref={(child) => {this._tagChild = child; }} updateCallback={this}/>
       </div>
     )
   }
