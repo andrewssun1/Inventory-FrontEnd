@@ -133,6 +133,17 @@ class ViewRequestModal extends React.Component {
                 })
   }
 
+  renderStaffInfo(){
+    let data = this.state.requestData;
+    return(
+      <div>
+        <p> <b>By: </b>{data.staff} </p>
+        <p> <b>At time: </b>{moment(data.staff_timestamp).format('lll')} </p>
+        <p> <b>Comments: </b>{data.staff_comment} </p>
+      </div>
+    );
+  }
+
   renderBottomComponents() {
     let data = this.state.requestData;
     switch (this.state.requestData.status) {
@@ -141,12 +152,13 @@ class ViewRequestModal extends React.Component {
         return(
           <div>
           {(this.state.requestData.status === "approved") ? <h4><Label bsStyle="success"> Approved </Label></h4> : <h4><Label bsStyle="danger"> Denied </Label></h4>}
-          <p> <b>By: </b>{data.admin} </p>
-          <p> <b>At time: </b>{moment(data.admin_timestamp).format('lll')} </p>
-          <p> <b>Comments: </b>{data.admin_comment} </p>
+          {this.renderStaffInfo()}
           </div>);
       case "fulfilled":
-        return(<h4><Label bsStyle="primary"> Fulfilled </Label></h4>);
+        return(<div>
+          <h4><Label bsStyle="primary"> Fulfilled </Label></h4>
+          {this.renderStaffInfo()}
+        </div>);
       case "outstanding":
         return(<h4><Label bsStyle="warning"> Outstanding </Label></h4>);
       default:
