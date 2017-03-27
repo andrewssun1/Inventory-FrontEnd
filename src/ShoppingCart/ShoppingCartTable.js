@@ -137,7 +137,6 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
-      <TableHeaderColumn dataField='status'>Request Type</TableHeaderColumn>
     </BootstrapTable>
       <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Disbursement" : "Checkout Cart"}</Button>
       </div>

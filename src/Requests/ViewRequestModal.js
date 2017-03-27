@@ -345,6 +345,7 @@ class ViewRequestModal extends React.Component {
   }
 
   renderRequestTable(data, type){
+    const isStaff = (localStorage.isStaff === "true");
     return (
       <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
@@ -352,7 +353,7 @@ class ViewRequestModal extends React.Component {
       <TableHeaderColumn dataField='quantity' width="80px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
       <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
-                        hidden={!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan")}></TableHeaderColumn>
+                        hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
       </BootstrapTable>
     )
   }
