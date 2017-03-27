@@ -90,9 +90,12 @@ export default class ShoppingCartTable extends React.Component {
 
   onDeleteRow(rows){
     const isStaff = (localStorage.isStaff === "true");
-    for (let i = 0; i < rows.length; i++){
-      console.log(rows);
-      var url = "/api/request/disbursement/deleteItem/"+rows[i]+"/";
+    var itemsToDelete = this.state._cart.filter((product) => {
+      return rows.indexOf(product.id) !== -1;
+    });
+    for (let i = 0; i < itemsToDelete.length; i++){
+      console.log(itemsToDelete);
+      var url = "/api/request/" + itemsToDelete[i].status + "/deleteItem/"+itemsToDelete[i].id+"/";
       restRequest("DELETE", url, "application/json", null,
                   ()=>{
                     localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) - 1);
@@ -136,7 +139,7 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='status'>Request Type</TableHeaderColumn>
     </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Disburse" : "Send Cart"}</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Disbursement" : "Checkout Cart"}</Button>
       </div>
     );
   }

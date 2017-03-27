@@ -90,7 +90,8 @@ export default class ApplicationTabs extends React.Component {
                   var response = JSON.parse(responseText);
                   localStorage.activecartid = response.id;
                   var disburseRequest = response.cart_disbursements;
-                  localStorage.setItem("cart_quantity", disburseRequest.length);
+                  var loanRequest = response.cart_loans;
+                  localStorage.setItem("cart_quantity", disburseRequest.length + loanRequest.length);
                   console.log(response);
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
 
