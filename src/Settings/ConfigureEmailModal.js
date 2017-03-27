@@ -82,7 +82,6 @@ class ConfigureEmailModal extends React.Component {
     return (
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
-      <DateRangePicker cb={this}></DateRangePicker>
       <Form horizontal>
       <TextEntryFormElement controlId="formHorizontalSubject"
       label="Subject" type={TypeConstants.Enum.SHORT_STRING} initialValue={this.state.subjectTag}
