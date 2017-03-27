@@ -27,6 +27,7 @@ export default class EmailComponent extends React.Component {
       <br/>
       <h4> Configure </h4>
       <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>
+      <br/>
       <ConfigureEmailModal ref={child => this._configureEmailModal = child} />
       <br/>
       <DateComponent />
