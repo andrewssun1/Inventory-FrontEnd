@@ -54,10 +54,11 @@ class TagComponent extends React.Component {
                     var response = JSON.parse(responseText);
                     var temp_data = this.state.data;
                     this.state.tagDict[response.tag] = response.id;
+                    this.props.cb._alertchild.generateSuccess("Successfully added tag: " + response.tag);
                     console.log("Successfully added: ", tag);
                   },
                 ()=>{
-                  console.log('POST Failed!!');
+                  this.props.cb._alertchild.generateError("Tag creation error! Please contact system admin.");
                 })
     }
 
@@ -65,9 +66,9 @@ class TagComponent extends React.Component {
       var tagId = this.state.tagDict[tag];
       restRequest("DELETE", "/api/item/tag/"+tagId, "application/json", null,
                   ()=>{
-                    console.log("Successfully deleted: ", tag);
+                    this.props.cb._alertchild.generateSuccess("Successfully deleted tag: " + tag);
                   },
-                ()=>{alert("DELETE FAILED. Please contact system admin.")});
+                ()=>{this.props.cb._alertchild.generateError("Tag deletion error! Please contact system admin");});
     }
 
     handleSelectChange (value) {
