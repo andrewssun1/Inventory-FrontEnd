@@ -7,10 +7,11 @@ import TextEntryFormElement from '../TextEntryFormElement'
 import {checkAuthAndAdmin} from "../Utilities";
 import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
+import AlertComponent from "../AlertComponent.js"
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-import {Modal, Button, Label, FormControl, FormGroup, InputGroup} from 'react-bootstrap';
+import {Modal, Button, Label, FormControl, FormGroup, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap';
 var moment = require('moment');
 
 class ViewRequestModal extends React.Component {
@@ -232,7 +233,7 @@ class ViewRequestModal extends React.Component {
               // this.forceUpdate();
               this.getDetailedRequest(this.state.requestData.id, ()=>{});
           }, (status, errResponse)=>{
-
+            this._alertchild.generateError("Invalid quantity!");
           }
       );
     });
@@ -248,14 +249,12 @@ class ViewRequestModal extends React.Component {
                     onChange={(e)=>{
                       try {
                         var valNum = parseInt(e.target.value, 10);
-                        if (valNum <= row.quantity){
                           row.changeQuantity=valNum;
                           console.log(row.changeQuantity);
                           row.shouldUpdate=(row.status === "loan" && row.returned_quantity !== 0);
                           this.forceUpdate();
-                        }
                       } catch (e) {
-                          this.props.updateCallback._alertchild.generateError("Invalid. Must be integer.");
+                          this.props.updateCallback._alertchild.generateError("Invalid. Must be integer!!!!");
                       }
                     }}
                   />
@@ -273,16 +272,20 @@ class ViewRequestModal extends React.Component {
       restRequest("PATCH", url, "application/JSON", returnJSON,
           (responseText)=>{
               var response = JSON.parse(responseText);
+              console.log(response);
               // this.forceUpdate();
               this.getDetailedRequest(this.state.requestData.id, ()=>{});
           }, (status, errResponse)=>{
-
+            this._alertchild.generateError("Invalid quantity!");
           }
       );
     });
   }
 
   renderReturnButton(row){
+    const tooltip = (
+      <Tooltip id="tooltip">Click to change quantity to a disbursement.</Tooltip>
+    );
     if (row.returned_timestamp != null) {
       return(
         <Label bsStyle="success">Fully Returned</Label>
@@ -290,18 +293,22 @@ class ViewRequestModal extends React.Component {
     }
     else {
       if (row.returned_quantity !== 0 && !row.shouldUpdate) {
-        row.changeQuantity = row.returned_quantity;
+        row.changeQuantity = row.quantity - row.returned_quantity;
       }
       return(
         <div>
         {this.generateHighQuantityTextBox(row)}
-        {row.shouldUpdate === true ? <Button bsStyle="success" onClick={() => this.returnItem(row)}>Update</Button> : null}
-          {row.returned_quantity !== 0 ? <Label bsStyle="warning">Partially Returned</Label> :
             <Button bsSize="small"
                             bsStyle="warning"
                             style={{marginTop: "3px"}}
                             onClick={()=>{this.returnItem(row)}}>
-                            Return</Button>}
+                            Return</Button>
+          <OverlayTrigger placement="top" overlay={tooltip}>
+          <Button bsSize="small"
+                    bsStyle="primary"
+                    style={{marginTop: "3px"}}
+                    onClick={()=>{this.changeRequestType(row)}}>
+                    Convert</Button></OverlayTrigger>
         </div>
       )
     }
@@ -337,13 +344,15 @@ class ViewRequestModal extends React.Component {
     return null;
   }
 
-  renderRequestTable(data){
+  renderRequestTable(data, type){
     return (
       <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' width="80px" dataAlign="center">Quantity</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
+      <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
+      <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+                        hidden={!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan")}></TableHeaderColumn>
       </BootstrapTable>
     )
   }
@@ -353,14 +362,15 @@ class ViewRequestModal extends React.Component {
       (this.state.requestData.length !== 0) ?
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Request</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <p> <b>Disbursements: </b> </p>
-        {this.renderRequestTable(this.state.requestData.cart_disbursements)}
+        {this.renderRequestTable(this.state.requestData.cart_disbursements, "disbursement")}
         <p> <b>Loans: </b> </p>
-        {this.renderRequestTable(this.state.requestData.cart_loans)}
+        {this.renderRequestTable(this.state.requestData.cart_loans, "loan")}
       <br />
       <p> <b>Request Reason: </b>{this.state.requestData.reason} </p>
       {this.renderBottomComponents()}
