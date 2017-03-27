@@ -66,7 +66,19 @@ class RequestTable extends React.Component {
                     // console.log(response);
                     var unselectable_ids = [];
                     var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
-                    // console.log(response_results);
+                    console.log(response_results);
+                    for (var i = 0; i < response_results.length; i++){
+                      var currRequest = response_results[i];
+                      if (currRequest.cart_disbursements.length !== 0 && currRequest.cart_loans.length !== 0) {
+                        currRequest.type = "both";
+                      }
+                      else if (currRequest.cart_disbursements.length !== 0 ) {
+                        currRequest.type = "disbursement";
+                      }
+                      else {
+                        currRequest.type = "loan";
+                      }
+                    }
                     this.setState({
                       data: response_results,
                       totalDataSize: response.count,
@@ -214,6 +226,7 @@ class RequestTable extends React.Component {
     <TableHeaderColumn dataField='staff' width="150px"> Associated Staff </TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
+      <TableHeaderColumn dataField='type' >Type</TableHeaderColumn>
       </BootstrapTable>
       </div>
     )

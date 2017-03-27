@@ -27,7 +27,7 @@ class RequestButton extends React.Component {
         this.setState({
             requestProblemString: ''
         })
-        var url = "/api/shoppingCart/" + type + "/" + requestID + "/";
+        var url = "/api/request/" + type + "/" + requestID + "/";
         var requestBody = {"id": requestID}; // id unnecessary just too lazy to change
         var dict = {deny: "denied", cancel: "cancelled", approve: "approved"};
         requestBody[patchRequestBodyKey] = patchRequestBodyValue;
