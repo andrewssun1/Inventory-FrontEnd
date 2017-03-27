@@ -310,7 +310,7 @@ saveItem(cb) {
         <div>
         {this.renderDisplayFields()}
         <br />
-        <p><b>Outstanding requests containing this item: </b></p>
+        <p><b>Outstanding disbursements containing this item: </b></p>
         <BootstrapTable ref="logTable"
                         data={ this.state.cartData }
                         options={ cartTableOptions }
@@ -321,6 +321,8 @@ saveItem(cb) {
                         <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
                         <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
         </BootstrapTable>
+        <p><b>Outstanding loans containing this item: </b></p>
+        <p><b>Current loans containing this item: </b></p>
         {isStaff ?
         <div>
         <b> Logs involving this item: </b>
