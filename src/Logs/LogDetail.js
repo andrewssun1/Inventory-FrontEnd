@@ -19,8 +19,7 @@ export default class LogDetail extends React.Component {
         timestamp: "",
         comment: "",
         item_log: [],
-        shopping_cart_log: [],
-        disbursement_log: []
+        request_cart_log: []
       }
     }
     this.openModal = this.openModal.bind(this);
@@ -49,24 +48,19 @@ export default class LogDetail extends React.Component {
         this._child.setState({showCartChange: false}, ()=>{this._child.openModal();});
       });
     }
-    else if (row.shopping_cart_log.length !== 0){
-      this.setState({selectedRequest: row.shopping_cart_log[0].shopping_cart.id}, ()=>{
+    else if (row.request_cart_log.length !== 0){
+      this.setState({selectedRequest: row.request_cart_log[0].request_cart.id}, ()=>{
         // get detailed view of shopping cart
-        this._requestModal.getDetailedRequest(row.shopping_cart_log[0].shopping_cart.id, ()=>{
+        this._requestModal.getDetailedRequest(row.request_cart_log[0].request_cart.id, ()=>{
           this._requestModal.openModal();
         });
-      });
-    }
-    else if (row.disbursement_log.length !== 0){
-      this.disbursementModal.getDetailedDisbursement(row.disbursement_log[0].cart.id, ()=>{
-        this.disbursementModal.openModal(null);
       });
     }
   }
 
   shouldShowDetail(){
     var row = this.state.row;
-    return (row.item_log.length !== 0 && !this.props.cb.props.lightMode) || (row.shopping_cart_log.length !== 0) || (row.disbursement_log.length !== 0)
+    return (row.item_log.length !== 0 && !this.props.cb.props.lightMode) || (row.request_cart_log.length !== 0)
   }
 
   render(){
@@ -76,7 +70,6 @@ export default class LogDetail extends React.Component {
       <ViewRequestModal id={this.state.selectedRequest}
         updateCallback={this}
         ref={(child) => { this._requestModal = child; }} />
-      <DisbursementModal cb={this} ref={(child) => { this.disbursementModal = child; }} />
       <Modal show={this.state.showModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>

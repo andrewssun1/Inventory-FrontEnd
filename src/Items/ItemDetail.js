@@ -258,7 +258,7 @@ saveItem(cb) {
       displayFields.push(
         <div key="tagComponent">
         <p><b>Tags: </b></p>
-        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
+        <TagComponent ref="tagComponent" cb={this} item_id={this.state.itemData.id} item_detail={this.state.itemData.tags} />
         </div>);
       return (displayFields);
     }

@@ -119,7 +119,16 @@ export default class ShoppingCartModal extends React.Component {
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Disbursement successfully sent.");
                 }, (status, errResponse)=>{
-                  this.props.updateCallback._alertchild.generateError("User field may not be empty.");
+
+                  if (JSON.parse(errResponse).owner_id != null){
+                    this.props.updateCallback._alertchild.generateError("User field may not be empty.");
+                  }
+                  else if (JSON.parse(errResponse).detail != null){
+                    this.props.updateCallback._alertchild.generateError(JSON.parse(errResponse).detail);
+                  }
+                  else{
+                    this.props.updateCallback._alertchild.generateError("Server error. Contact system admin.");
+                  }
                 });
     this.closeModal();
   }
