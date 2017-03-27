@@ -80,7 +80,7 @@ class RequestTable extends React.Component {
   static editGetResponse(data,unselectable_arr) {
     // console.log(data);
     for(var index=0; index< data.length; index++){
-      data[index]['item_name'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
+      data[index]['owner'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
       if(data[index]['status']!=='outstanding'){
         unselectable_arr.push(data[index]['id'])
@@ -163,7 +163,7 @@ class RequestTable extends React.Component {
 
   onRowClick(row, isSelected, e) {
     console.log(this._requestModal.state.requestData);
-    console.log(row.id);
+    // console.log(row.id);
     this._requestModal.getDetailedRequest(row.id, ()=>{
       this._requestModal.openModal();
     });
@@ -208,9 +208,10 @@ class RequestTable extends React.Component {
       selectRow={ selectRowProp }
       striped hover>
       <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-      <TableHeaderColumn dataField='item_name' width="150px">Requesting User</TableHeaderColumn>
+      <TableHeaderColumn dataField='owner' width="150px">Requesting User</TableHeaderColumn>
       <TableHeaderColumn dataField='status' width="150px" filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.status } }
       ref={(child) => { this._statusFilter = child; }} editable={ false }>Status</TableHeaderColumn>
+    <TableHeaderColumn dataField='staff' width="150px"> Associated Staff </TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
       </BootstrapTable>

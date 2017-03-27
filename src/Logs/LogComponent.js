@@ -36,6 +36,7 @@ class LogComponent extends React.Component {
             currentUser: ""
         };
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.getRequestForLog = this.getRequestForLog.bind(this);
     }
 
     getRequestForLog(url_parameter, cb){

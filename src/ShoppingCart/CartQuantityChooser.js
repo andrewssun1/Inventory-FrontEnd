@@ -1,7 +1,7 @@
 var React = require('react');
 
 import '../DropdownTable.css';
-import {Button, FormGroup, FormControl, InputGroup, Label} from 'react-bootstrap';
+import {Button, FormGroup, FormControl, InputGroup, Label, OverlayTrigger, Tooltip} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -13,8 +13,7 @@ export default class CartQuantityChooser extends React.Component {
     this.state = {
       shouldUpdateCart: false
     }
-    //this.generateMenuItems = this.generateMenuItems.bind(this);
-    // this.updateCart = this.updateCart.bind(this);
+    this.toggleRequestType = this.toggleRequestType.bind(this);
   }
 
   componentDidMount(){
@@ -47,7 +46,7 @@ export default class CartQuantityChooser extends React.Component {
         var Quantity = parseInt(row.quantity_cartitem, 10);
         const isStaff = (localStorage.isStaff === "true");
         var updateJSON = JSON.stringify({
-            type: "disbursement",
+            type: row.status,
             quantity: Quantity
         });
         var url = "/api/request/modifyQuantityRequested/"+id+"/";
@@ -88,6 +87,7 @@ export default class CartQuantityChooser extends React.Component {
                 this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
                 row.inCart = true;
                 row.cartId = response.id;
+                row.status = "disbursement"
                 this.setState({shouldUpdateCart: true});
                 this.forceUpdate();
             }, (status, errResponse)=>{
@@ -101,9 +101,36 @@ export default class CartQuantityChooser extends React.Component {
     })
   }
 
+  toggleRequestType(){
+    checkAuthAndAdmin(()=>{
+      var row = this.props.row;
+      var id = (row.cartId ? row.cartId : row.id);
+      var url = "/api/request/convertRequestType/";
+      var changeTypeJSON = JSON.stringify({
+          current_type: row.status,
+          pk: id
+      });
+      restRequest("POST", url, "application/JSON", changeTypeJSON,
+          (responseText)=>{
+              var response = JSON.parse(responseText);
+              row.cartId = response.id;
+              row.status === "disbursement" ? row.status = "loan" : row.status = "disbursement";
+              this.forceUpdate();
+          }, (status, errResponse)=>{
+
+          }
+      );
+    });
+  }
+
   render(){
     var row = this.props.row;
-    //console.log(row);
+    // if (row.name === "Table"){
+    //   console.log(row);
+    // }
+    const tooltip = (
+      <Tooltip id="tooltip">Click to toggle between loan and disbursement.</Tooltip>
+    );
     return (
       <div>
       <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
@@ -112,6 +139,13 @@ export default class CartQuantityChooser extends React.Component {
       {row.shouldUpdate === true ? <Button bsStyle="success" onClick={() => this.updateRowQuantity(row)}>Update</Button> : null}
       {row.inCart === true ? null : <Button bsStyle="success" onClick={() => this.onAddtoCartClick(row)}>Add to Cart</Button>}
       {(this.state.showLabel && row.inCart) ? <Label style={{marginLeft: "5px", marginTop: "10px"}} bsStyle="info">In Cart</Label> : null}
+      {(row.inCart && row.status != null) ?
+        <OverlayTrigger placement="bottom" overlay={tooltip}>
+        <Button bsSize="xsmall" style={{marginLeft: "5px", marginTop: "1px", fontSize: "9.5px"}}
+                bsStyle={row.status === "disbursement" ? "primary" : "warning"}
+                onClick={this.toggleRequestType}>
+                <strong>{row.status === "disbursement" ? "Disbursement" : "Loan"}
+                </strong></Button></OverlayTrigger> : null}
       </InputGroup>
       </FormGroup>
       </div>
