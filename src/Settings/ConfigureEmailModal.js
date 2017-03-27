@@ -15,10 +15,31 @@ class ConfigureEmailModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showModal: false
+      showModal: false,
+      subjectTag: "",
+      prependedBody: ""
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.didPressSave = this.didPressSave.bind(this);
+  }
+
+  componentWillMount() {
+    //Get Subject
+    restRequest("GET", "/api/email/subjectTag/", "application/json", null,
+    (responseText)=>{
+      console.log("Successfully got the subject tag");
+      console.log(JSON.parse(responseText));
+      this.setState({subjectTag: JSON.parse(responseText).subject_tag});
+    }, ()=>{});
+
+    //Get Body
+    restRequest("GET", "/api/email/prependedBody/", "application/json", null,
+    (responseText)=>{
+      console.log("Successfully got the prepended body");
+      console.log(JSON.parse(responseText));
+      this.setState({prependedBody: JSON.parse(responseText).prepended_body});
+    }, ()=>{});
   }
 
   openModal() {
@@ -30,7 +51,31 @@ class ConfigureEmailModal extends React.Component {
   }
 
   didPressSave() {
-    //TODO: implement with request
+    //Save Subject
+    let requestBody = {
+      "subject_tag" : this._subjectElement.state.value
+    }
+    let jsonResult = JSON.stringify(requestBody);
+    restRequest("PATCH", "/api/email/subjectTag/modify/", "application/json", jsonResult,
+    (responseText)=>{
+      console.log("Successfully updated request body!");
+      console.log(JSON.parse(responseText));
+    }, ()=>{});
+
+    //Save Body
+    requestBody = {
+      "prepended_body" : this._bodyElement.state.value
+    }
+    jsonResult = JSON.stringify(requestBody);
+    restRequest("PATCH", "/api/email/prependedBody/modify/", "application/json", jsonResult,
+    (responseText)=>{
+      console.log("Successfully updated request body!");
+      console.log(JSON.parse(responseText));
+    }, ()=>{});
+
+    this.setState({subjectTag: this._subjectElement.state.value});
+    this.setState({prependedBody: this._bodyElement.state.value});
+    this.closeModal();
   }
 
   render() {
@@ -40,10 +85,10 @@ class ConfigureEmailModal extends React.Component {
       <DateRangePicker cb={this}></DateRangePicker>
       <Form horizontal>
       <TextEntryFormElement controlId="formHorizontalSubject"
-      label="Subject" type={TypeConstants.Enum.SHORT_STRING} initialValue=""
+      label="Subject" type={TypeConstants.Enum.SHORT_STRING} initialValue={this.state.subjectTag}
       ref={child => this._subjectElement = child}/>
       <TextEntryFormElement controlId="formHorizontalBody"
-      label="Body" type={TypeConstants.Enum.LONG_STRING} initialValue=""
+      label="Body" type={TypeConstants.Enum.LONG_STRING} initialValue={this.state.prependedBody}
       ref={child => this._bodyElement = child}/>
       </Form>
       </Modal.Body>

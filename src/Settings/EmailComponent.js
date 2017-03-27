@@ -75,7 +75,6 @@ export default class EmailComponent extends React.Component {
   render() {
     return(
       <div>
-      <h2> Email </h2>
       {this.renderSubscribeButton()}
       <br/> <br/>
       <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>
