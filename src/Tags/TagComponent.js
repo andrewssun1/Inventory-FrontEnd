@@ -94,7 +94,7 @@ class TagComponent extends React.Component {
 
     render(){
         return(
-          <Select.Creatable clearable={false} multi simpleValue value={this.state.includedValue} placeholder="Select tag(s)" options={this.state.tagOptions} onChange={this.handleSelectChange} />
+          <Select.Creatable disabled={localStorage.isStaff === "false"} clearable={false} multi simpleValue value={this.state.includedValue} placeholder="Select tag(s)" options={this.state.tagOptions} onChange={this.handleSelectChange} />
         )
     }
 }
