@@ -6,6 +6,7 @@ var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
 import {restRequest, checkAuthAndAdmin} from "../Utilities";
 import TypeConstants from "../TypeConstants";
+import {Tooltip, OverlayTrigger} from 'react-bootstrap'
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -68,6 +69,9 @@ class LogQuantityChangeModal extends React.Component {
   }
 
   render() {
+    const tooltip = (
+      <Tooltip id="tooltip">Enter negative quantity to log destruction, positive quantity to log addition</Tooltip>
+    );
     return (
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
@@ -75,9 +79,11 @@ class LogQuantityChangeModal extends React.Component {
       <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       <h2> {this.props.item} </h2>
       <Form horizontal>
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
       <TextEntryFormElement controlId={"formHorizontalChange"}
       label={"Change"} type={TypeConstants.Enum.INTEGER} initialValue={0}
       ref={child => this._changeField = child}/>
+      </OverlayTrigger>
       <TextEntryFormElement controlId={"formHorizontalComments"}
       label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""}
       ref={child => this._commentsField = child}/>

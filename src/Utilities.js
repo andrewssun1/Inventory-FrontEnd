@@ -3,8 +3,9 @@
 // @author Andrew
 
 import { hashHistory } from 'react-router';
+import { getServer } from "./SecretStuff.js"
 
-const BACKEND_SERVER = "https://asap-test.colab.duke.edu"
+const BACKEND_SERVER = getServer();
 
 export function isLoggedIn(){
     return !!localStorage.token

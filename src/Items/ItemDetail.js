@@ -239,8 +239,8 @@ saveItem(cb) {
   }
 
   onRowClickCart(row, isSelected, e) {
-    this.closeModal();
-    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+    // this.closeModal();
+    this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
       this._viewRequestModal.openModal();
     });
   }
@@ -281,14 +281,27 @@ saveItem(cb) {
     }
   }
 
+  generateItemStackTable(data){
+    const cartTableOptions = {
+      onRowClick: this.onRowClickCart
+    };
+    return(
+      <BootstrapTable ref="logTable"
+                      data={ data }
+                      options={ cartTableOptions }
+                      striped hover>
+                      <TableHeaderColumn dataField='cart_id' isKey hidden autoValue="true">cart_id</TableHeaderColumn>
+                      <TableHeaderColumn dataField='cart_owner'>Requesting User</TableHeaderColumn>
+                      <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
+                      <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
+      </BootstrapTable>
+    );
+  }
+
   render() {
     if(this.state.itemData == null) return null;
 
     const isStaff = (localStorage.isStaff === "true");
-
-    const cartTableOptions = {
-      onRowClick: this.onRowClickCart
-    };
 
     return (
       <div>
@@ -310,17 +323,12 @@ saveItem(cb) {
         <div>
         {this.renderDisplayFields()}
         <br />
-        <p><b>Outstanding requests containing this item: </b></p>
-        <BootstrapTable ref="logTable"
-                        data={ this.state.cartData }
-                        options={ cartTableOptions }
-                        striped hover>
-                        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-                        <TableHeaderColumn dataField='username' width="150px">Requesting User</TableHeaderColumn>
-                        <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
-                        <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
-                        <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
-        </BootstrapTable>
+        <p><b>Outstanding disbursements containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}
+        <p><b>Outstanding loans containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.outstanding_loans)}
+        <p><b>Current loans containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.current_loans)}
         {isStaff ?
         <div>
         <b> Logs involving this item: </b>
