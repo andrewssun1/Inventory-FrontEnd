@@ -30,7 +30,7 @@ class RequestTable extends React.Component {
         0: 'outstanding',
         1: 'approved',
         2: 'denied',
-        3: 'active'
+        3: 'fulfilled'
       }
     };
     this.getAllRequest = this.getAllRequests.bind(this);
