@@ -89,7 +89,6 @@ class ViewRequestModal extends React.Component {
                     }
 
                     this.setState({requestData: response}, cb);
-
                     //cb();
                   }, ()=>{console.log("Get detailed request failed!");}
                   )
