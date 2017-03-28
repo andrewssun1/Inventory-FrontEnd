@@ -8,6 +8,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 import TypeConstants from "../TypeConstants.js"
+import CustomFieldDetail from "./CustomFieldDetail.js"
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 
@@ -22,6 +23,7 @@ class CustomFieldTable extends React.Component {
     this.getFieldData = this.getFieldData.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
+    this.onRowClick = this.onRowClick.bind(this);
   }
 
   componentWillMount() {
@@ -77,8 +79,13 @@ onDeleteRow(rows) {
     restRequest("DELETE", "/api/item/field/" + rows[i], "application/json", null,
     (responseText)=>{ this.getFieldData();},
     ()=>{console.log('GET Failed!!');}
-  );
+    );
+  }
 }
+
+onRowClick(row) {
+  console.log(row);
+  this._detail.openModal(row);
 }
 
 render() {
@@ -88,7 +95,8 @@ render() {
 
   const options = {
     onAddRow: this.onAddRow,
-    onDeleteRow: this.onDeleteRow
+    onDeleteRow: this.onDeleteRow,
+    onRowClick: this.onRowClick
   };
 
   const typeList = TypeConstants.FormattedStrings;
@@ -103,6 +111,7 @@ render() {
     <TableHeaderColumn dataField='type' editable={ { type: 'select', options: { values: typeList} } }>Type</TableHeaderColumn>
     <TableHeaderColumn dataField='private' editable={ { type: 'select', options: { values: boolList} } }>Privacy</TableHeaderColumn>
     </BootstrapTable>
+    <CustomFieldDetail cb={this} ref={(child) => { this._detail = child; }} ></CustomFieldDetail>
     </div>
   )
 }

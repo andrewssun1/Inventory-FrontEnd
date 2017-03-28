@@ -18,6 +18,7 @@ import {Button, ButtonGroup} from 'react-bootstrap';
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
 import AlertComponent from '../AlertComponent';
+import TypeConstants from "../TypeConstants.js"
 
 class ItemTable extends React.Component {
 
@@ -33,6 +34,7 @@ class ItemTable extends React.Component {
         "tags": [{"tag": "first tag"}, {"tag": "second tags"}],
         "quantity_cartitem": 1
       }],
+      _fields: [],
       _loginState: true,
       currentSearchURL: null,
       currentPage: 1,
@@ -49,6 +51,7 @@ class ItemTable extends React.Component {
     this.onTagSearchClick = this.onTagSearchClick.bind(this);
     this.cartFormatter = this.cartFormatter.bind(this);
     this.resetTable = this.resetTable.bind(this);
+    this.renderColumns = this.renderColumns.bind(this);
     this.openBulkImportModal = this.openBulkImportModal.bind(this);
   }
 
@@ -90,6 +93,7 @@ class ItemTable extends React.Component {
                                       }
 
                                   }
+                                  console.log("Setting products:");
                                   this.setState({
                                       _products: response_results,
                                       totalDataSize: response.count
@@ -105,7 +109,8 @@ class ItemTable extends React.Component {
   }
 
   componentWillMount() {
-    this.getAllItem(null)
+    this.getAllItem(null);
+    this.getFieldData();
   }
 
   resetTable(){
@@ -168,17 +173,52 @@ class ItemTable extends React.Component {
                       row.id = response.id;
                       row.quantity_cartitem = 1;
                       this._alertchild.generateSuccess("Successfully added " + row.name + " to database.");
+                      this.addItemCustomFields(row);
                       this.forceUpdate();
                     }, (status, errResponse)=>{
                       var err = JSON.parse(errResponse);
                       this._alertchild.generateError("Error: " + err.name[0]);
-                    })
+                    });
       }
     );
   }
 
+  addItemCustomFields(row) {
+    //Request to get Detailed Item. This is turning into a mess
+    restRequest("GET", "/api/item/" + row.id, "application/json", null,
+    (responseText)=>{
+      var detailedResponse = JSON.parse(responseText);
+      //Now that we have the detail:
+      //Custom Fields:
+      var typesArray = TypeConstants.RequestStrings;
+      var responseDataArrays = [detailedResponse.int_fields, detailedResponse.float_fields, detailedResponse.short_text_fields, detailedResponse.long_text_fields];
+      for(var i = 0; i < typesArray.length; i++) {
+        for(var j = 0; j < responseDataArrays[i].length; j++) {
+          this.customFieldRequest(typesArray[i], responseDataArrays[i][j].id, row[responseDataArrays[i][j].field]);
+        }
+      }
+    }, ()=>{console.log('GET Detailed Failed!!');});
+  }
+
   onAddRow(row) {
     this.addOrUpdateRow(row, 'POST', '');
+  }
+
+  customFieldRequest(type, id, value) {
+    if(value == null) return;
+    var requestBody = {
+      "value": value
+    }
+    var jsonResult = JSON.stringify(requestBody);
+    restRequest("PATCH", "/api/item/field/" + type + "/" + id, "application/json", jsonResult,
+    (responseText)=>{
+      var response = JSON.parse(responseText);
+      console.log("Getting Response");
+      console.log(response);
+    },
+    ()=>{
+      console.log('PATCH Failed!!');
+    });
   }
 
   onDeleteRow(rows) {
@@ -196,6 +236,27 @@ class ItemTable extends React.Component {
       });
     });
   }
+
+  getFieldData() {
+      restRequest("GET", "/api/item/field/", "application/json", null,
+      (responseText)=>{
+        var response = JSON.parse(responseText);
+        console.log("Getting Custom Field Response iin ItemTable");
+        console.log(response);
+        var results = response.results;
+        for(var i = 0; i < results.length; i++) {
+          results[i].type = TypeConstants.RequestToFormatMap[results[i].type];
+          if(results[i].private) {
+            results[i].private = "Private";
+          } else {
+            results[i].private = "Public";
+          }
+        }
+        this.setState({_fields: response.results});
+      },
+      ()=>{console.log('GET Failed!!');}
+    );
+}
 
   // Makes sure quantity is an integer
   quantityValidator(value) {
@@ -271,9 +332,25 @@ class ItemTable extends React.Component {
     this._bulkImportChild.openModal();
   }
 
-  render() {
+  renderColumns() {
+    var cols = [];
+    cols.push(<TableHeaderColumn key="idCol" isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="nameCol" dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="quantityCol" width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="modelNumberCol" dataField='model_number'>Model Number</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="descriptionCol" dataField='description'>Description</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="tagsCol" dataField='tags'>Tags</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="buttonCol" dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="tagsDataCol" dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="cartIDCol" dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>);
+    for(var i = 0; i < this.state._fields.length; i++) {
+      let name = this.state._fields[i].name;
+      cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
+    }
+    return cols;
+  }
 
-    //TODO: Configure options to change cursor when hovering over row
+  render() {
     const isStaff = (localStorage.isStaff === "true");
     const isSuperUser = (localStorage.isSuperUser === "true");
 
@@ -307,16 +384,7 @@ class ItemTable extends React.Component {
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
       fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
-      <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
-      <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
-      <TableHeaderColumn width="150px" dataField='model_number'>Model Number</TableHeaderColumn>
-      <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
-      <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
-      <TableHeaderColumn dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>
-      <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
-      <TableHeaderColumn dataField='status' hidden hiddenOnInsert>status</TableHeaderColumn>
+      {this.renderColumns()}
       </BootstrapTable>) : null}
 
       <BulkImportModal importCb={this} ref={(child) => {this._bulkImportChild= child; }} />
