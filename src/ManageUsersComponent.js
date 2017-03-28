@@ -36,7 +36,9 @@ export default class ManageUsersComponent extends React.Component {
   }
 
   componentDidMount(){
-    this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
+    if(localStorage.isSuperUser === "true") {
+      this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
+    }
   }
 
   resetTable() {
