@@ -185,11 +185,21 @@ export default class HomePage extends React.Component {
     );
   }
 
+  onOutstandingClick(row){
+    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+      this._viewRequestModal.openModal();
+    });
+  }
+
   renderOutstandingTable(data){
+    const options = {
+      onRowClick: this.onOutstandingClick.bind(this),
+    }
     return(
     <BootstrapTable ref="loanTable"
                     data={ data }
-                    striped hover>
+                    striped hover
+                    options={options}>
                     <TableHeaderColumn dataField='id' isKey hidden autoValue="true">id</TableHeaderColumn>
                     <TableHeaderColumn dataField="owner">Requesting User</TableHeaderColumn>
                     <TableHeaderColumn dataField='status'>Status</TableHeaderColumn>
