@@ -7,8 +7,9 @@ import {Form, FormGroup, Col, Button, ControlLabel, FormControl, Alert} from 're
 import { hashHistory } from 'react-router';
 import { restRequest } from './Utilities';
 
-const SERVER = "https://asap-test.colab.duke.edu";
-const CLIENT_ID = "2yCZ6QlDjFuS7ZTOwOaWCHPX7PU7s2iwWANqRFSy";
+import { getServer, getClientId } from "./SecretStuff.js"
+const SERVER = getServer();
+const CLIENT_ID = getClientId();
 // const SERVER = "http://localhost:3000";
 
 export default class LoginPage extends React.Component {

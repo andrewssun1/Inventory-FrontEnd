@@ -66,9 +66,14 @@ class ItemTable extends React.Component {
                                   var responseCart = JSON.parse(responseText);
                                   var hash = {};
                                   var disburseRequest = responseCart.cart_disbursements;
+                                  var loanRequest = responseCart.cart_loans;
                                   for (var j = 0; j < disburseRequest.length; j++){
                                     var currItem = disburseRequest[j];
-                                    hash[currItem.item.id] = [currItem.quantity, currItem.id];
+                                    hash[currItem.item.id] = [currItem.quantity, currItem.id, "disbursement"];
+                                  }
+                                  for (var k = 0; k < loanRequest.length; k++){
+                                    var currItem = loanRequest[k];
+                                    hash[currItem.item.id] = [currItem.quantity, currItem.id, "loan"];
                                   }
                                   for (var i = 0; i < response_results.length; i++){
                                       response_results[i]["tags_data"] = response_results[i].tags;
@@ -77,6 +82,7 @@ class ItemTable extends React.Component {
                                         response_results[i].quantity_cartitem = hash[response_results[i].id][0];
                                         response_results[i].inCart = true;
                                         response_results[i].cartId = hash[response_results[i].id][1];
+                                        response_results[i].status = hash[response_results[i].id][2];
                                       }
                                       else{
                                         response_results[i].quantity_cartitem = 1;
@@ -304,12 +310,13 @@ class ItemTable extends React.Component {
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>
-      <TableHeaderColumn dataField='model_number'>Model Number</TableHeaderColumn>
+      <TableHeaderColumn width="150px" dataField='model_number'>Model Number</TableHeaderColumn>
       <TableHeaderColumn dataField='description'>Description</TableHeaderColumn>
       <TableHeaderColumn dataField='tags'>Tags</TableHeaderColumn>
       <TableHeaderColumn dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>
       <TableHeaderColumn dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>
+      <TableHeaderColumn dataField='status' hidden hiddenOnInsert>status</TableHeaderColumn>
       </BootstrapTable>) : null}
 
       <BulkImportModal ref={(child) => {this._bulkImportChild= child; }} />
