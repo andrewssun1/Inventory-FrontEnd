@@ -1,6 +1,7 @@
 import React from "react";
 import {checkAuthAndAdmin, restRequest} from "../Utilities.js";
 import {Button} from 'react-bootstrap';
+import AlertComponent from '../AlertComponent';
 
 export default class SubscribeButton extends React.Component {
 
@@ -19,18 +20,14 @@ export default class SubscribeButton extends React.Component {
   }
 
   assignSubscriptionStatus() {
-    restRequest("GET", "/api/email/subscribedManagers/", "application/json", null,
+    restRequest("GET", "/api/email/subscribedManagers/current/", "application/json", null,
                   (responseText)=>{
                     let response = JSON.parse(responseText);
-                    //TODO: is there a better way to do this?
-                    var hasUsername = false;
-                    for(var i = 0; i < response.results.length; i ++) {
-                      if(response.results[i].member.username === localStorage.username) {
-                        hasUsername = true;
-                      }
-                    }
-                    this.setState({isSubscribed: hasUsername});
-                  }, ()=>{});
+                    console.log(response);
+                    this.setState({isSubscribed: true});
+                  }, ()=>{
+                    console.log("Error!");
+                  });
   }
 
   subscribeManager() {
@@ -38,7 +35,10 @@ export default class SubscribeButton extends React.Component {
                 (responseText)=>{
                   console.log("Successfully Subscribed");
                   this.setState({isSubscribed: true});
-                }, ()=>{});
+                  this._alertchild.generateSuccess("Successfully subscribed");
+                }, ()=>{
+                  this._alertchild.generateSuccess("Failed to subscribe");
+                });
   }
 
   unsubscribeManager() {
@@ -46,15 +46,23 @@ export default class SubscribeButton extends React.Component {
                 (responseText)=>{
                   console.log("Successfully Unsubscribed");
                   this.setState({isSubscribed: false});
-                }, ()=>{});
+                  this._alertchild.generateSuccess("Successfully unsubscribed");
+                }, ()=>{
+                  this._alertchild.generateSuccess("Failed to unsubscribe");
+                });
   }
 
   render() {
-    if(this.state.isSubscribed) {
-      return (<Button onClick={this.unsubscribeManager} bsStyle="danger">Unsubscribe</Button>);
-    } else {
-      return (<Button onClick={this.subscribeManager} bsStyle="primary">Subscribe</Button>);
-    }
+    return(
+      <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+      {this.state.isSubscribed ?
+        <Button onClick={this.unsubscribeManager} bsStyle="danger">Unsubscribe</Button>
+        :
+        <Button onClick={this.subscribeManager} bsStyle="primary">Subscribe</Button>
+      }
+      </div>
+    )
   }
 
 }

@@ -55,7 +55,7 @@ export default class ApplicationTabs extends React.Component {
     else if (key === "log"){
       this.refs.logComponent.resetTable();
     }
-    else if (key === "users"){
+    else if (key === "users" && this.refs.manage != null){
       this.refs.manage.resetTable();
     }
     else if (key === "cart"){
@@ -132,7 +132,7 @@ export default class ApplicationTabs extends React.Component {
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
                    }
-                   {this.state.is_superuser ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
+                   {this.state.is_staff ? (<NavItem eventKey="users"><Glyphicon style={{marginRight: "8px"}} glyph="briefcase" />Manage Users
                    </NavItem>) : null
                    }
                    <NavItem eventKey="settings">
@@ -160,7 +160,7 @@ export default class ApplicationTabs extends React.Component {
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComponent"></LogComponent>
                  </Tab.Pane>
-                 {this.state.is_superuser ? (
+                 {this.state.is_staff ? (
                  <Tab.Pane eventKey="users">
                    <ManageUsersComponent ref="manage"></ManageUsersComponent>
                  </Tab.Pane>) : null}

@@ -36,7 +36,9 @@ export default class ManageUsersComponent extends React.Component {
   }
 
   componentDidMount(){
-    this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
+    if(localStorage.isSuperUser === "true") {
+      this.refs.managetable.refs.toolbar.refs.form[1].type = "password";
+    }
   }
 
   resetTable() {
@@ -155,11 +157,15 @@ export default class ManageUsersComponent extends React.Component {
     });
   }
 
-  render(){
+  render() {
+    let isSuperUser = (localStorage.isSuperUser === "true");
 
-    const selectRow = {
-      mode: 'checkbox' //radio or checkbox
-    };
+    var selectRow = {};
+    if(isSuperUser) {
+      selectRow = {
+        mode: 'checkbox' //radio or checkbox
+      };
+    }
 
     const options = {
       onAddRow: this.onAddRow,
@@ -178,12 +184,12 @@ export default class ManageUsersComponent extends React.Component {
     return(
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <BootstrapTable ref="managetable" options={options} insertRow={true} selectRow={selectRow} data={this.state._users} deleteRow={true} cellEdit={cellEdit} striped hover>
+      <BootstrapTable ref="managetable" options={options} insertRow={isSuperUser} selectRow={selectRow} data={this.state._users} deleteRow={isSuperUser} cellEdit={cellEdit} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>
       <TableHeaderColumn dataField='username' editable={false}>Username</TableHeaderColumn>
       <TableHeaderColumn dataField='password' editable={false} hidden>Password</TableHeaderColumn>
       <TableHeaderColumn dataField='email' editable={false}>Email</TableHeaderColumn>
-      <TableHeaderColumn dataField='permission_level' editable={ { type: 'select', options: { values: permissionTypes } } }> Permission Level</TableHeaderColumn>
+      <TableHeaderColumn dataField='permission_level' editable={ isSuperUser ? { type: 'select', options: { values: permissionTypes } } : false}> Permission Level</TableHeaderColumn>
       <TableHeaderColumn dataField='date_joined' editable={false} hiddenOnInsert>Date Joined</TableHeaderColumn>
       </BootstrapTable>
       </div>
