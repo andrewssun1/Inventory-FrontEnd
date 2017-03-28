@@ -22,7 +22,6 @@ export default class SubscribedManagerTable extends React.Component {
                       results[i]['username'] = results[i].member.username;
                       results[i]['email'] = results[i].member.email;
                     }
-                    console.log(results);
                     this.setState({dataResults: results});
                   }, ()=>{});
   }

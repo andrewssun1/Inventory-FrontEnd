@@ -22,7 +22,6 @@ export default class SubscribeButton extends React.Component {
     restRequest("GET", "/api/email/subscribedManagers/", "application/json", null,
                   (responseText)=>{
                     let response = JSON.parse(responseText);
-                    console.log(response);
                     //TODO: is there a better way to do this?
                     var hasUsername = false;
                     for(var i = 0; i < response.results.length; i ++) {
@@ -35,7 +34,6 @@ export default class SubscribeButton extends React.Component {
   }
 
   subscribeManager() {
-    console.log("Subscribe");
     restRequest("POST", "/api/email/subscribe/", "application/json", null,
                 (responseText)=>{
                   console.log("Successfully Subscribed");
@@ -44,7 +42,6 @@ export default class SubscribeButton extends React.Component {
   }
 
   unsubscribeManager() {
-    console.log("Unsubscribe");
     restRequest("POST", "/api/email/unsubscribe/", "application/json", null,
                 (responseText)=>{
                   console.log("Successfully Unsubscribed");

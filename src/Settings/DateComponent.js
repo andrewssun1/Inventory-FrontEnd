@@ -39,7 +39,6 @@ export default class DateComponent extends React.Component {
       requestBody.push({"date" : this.state.scheduledEmailDates[i].date});
     }
     requestBody.push({"date" : this._calendar.state.selectedValue.format('YYYY-MM-DD')});
-    console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", "/api/email/loanReminderDates/modify/", "application/json", jsonResult,
     (responseText)=>{
@@ -60,15 +59,12 @@ export default class DateComponent extends React.Component {
 
   onDeleteRow(rows) {
     if(this.state.scheduledEmailDates == null) return null;
-    console.log(rows);
     var requestBody = [];
     for(var i = 0; i < this.state.scheduledEmailDates.length; i ++) {
       if(!this.deletedRowsContainsIndex(rows, i)) {
         requestBody.push({"date" : this.state.scheduledEmailDates[i].date});
       }
     }
-
-    console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", "/api/email/loanReminderDates/modify/", "application/json", jsonResult,
     (responseText)=>{
