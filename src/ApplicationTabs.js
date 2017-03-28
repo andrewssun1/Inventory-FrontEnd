@@ -9,7 +9,8 @@ import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
 import SettingsComponent from './Settings/SettingsComponent'
-import DisbursementTable from './Disbursements/DisbursementTable'
+import DisbursementTable from './Disbursements/DisbursementTable';
+import HomePage from './HomePage';
 
 var React = require('react');
 var ReactBootstrap = require('react-bootstrap');
@@ -62,6 +63,9 @@ export default class ApplicationTabs extends React.Component {
       // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
       // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
+    }
+    else if (key === "home") {
+      this.refs.homePage.componentWillMount();
     }
 
   });
@@ -143,7 +147,8 @@ export default class ApplicationTabs extends React.Component {
                <Tab.Content animation>
                  <Tab.Pane eventKey="home">
                    <div>
-                   <p> You are in the user homepage. Welcome {localStorage.username}! </p>
+                   <p> Welcome {localStorage.username}! </p>
+                   <HomePage ref="homePage"></HomePage>
                     </div>
                  </Tab.Pane>
                  <Tab.Pane eventKey="items">
