@@ -1,7 +1,6 @@
 import React from "react";
 import LogTable from "./LogTable";
 import {checkAuthAndAdmin, restRequest} from "../Utilities.js";
-import DateRangePicker from './DateRangePicker';
 
 import LogDetail from './LogDetail';
 import AlertComponent from '../AlertComponent';
@@ -37,6 +36,10 @@ class LogComponent extends React.Component {
         };
         this.handleNameChange = this.handleNameChange.bind(this);
         this.getRequestForLog = this.getRequestForLog.bind(this);
+    }
+
+    didFinishChangeState(url_parameter, cb) {
+      this.getRequestForLog(url_parameter, cb);
     }
 
     getRequestForLog(url_parameter, cb){
