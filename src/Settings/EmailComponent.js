@@ -22,8 +22,8 @@ export default class EmailComponent extends React.Component {
   render() {
     return(
       <div>
-      <SubscribeButton />
-      {localStorage.isSuperUser ? <SubscribedManagerTable /> : null}
+      <SubscribeButton cb={this}/>
+      {localStorage.isSuperUser ? <SubscribedManagerTable ref={(child) => { this._subscribedManagerTable = child; }}/> : null}
       <br/>
       <h4> Configure </h4>
       <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>

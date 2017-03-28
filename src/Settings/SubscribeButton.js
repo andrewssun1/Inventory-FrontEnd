@@ -35,6 +35,7 @@ export default class SubscribeButton extends React.Component {
                 (responseText)=>{
                   console.log("Successfully Subscribed");
                   this.setState({isSubscribed: true});
+                  this.props.cb._subscribedManagerTable.getSubscribedManagers();
                   this._alertchild.generateSuccess("Successfully subscribed");
                 }, ()=>{
                   this._alertchild.generateSuccess("Failed to subscribe");
@@ -46,6 +47,7 @@ export default class SubscribeButton extends React.Component {
                 (responseText)=>{
                   console.log("Successfully Unsubscribed");
                   this.setState({isSubscribed: false});
+                  this.props.cb._subscribedManagerTable.getSubscribedManagers();
                   this._alertchild.generateSuccess("Successfully unsubscribed");
                 }, ()=>{
                   this._alertchild.generateSuccess("Failed to unsubscribe");
