@@ -1,8 +1,8 @@
 import React from "react";
-import {checkAuthAndAdmin, restRequest} from "./Utilities.js";
+import {checkAuthAndAdmin, restRequest} from "../Utilities.js";
 import {Button, Label, FormGroup, FormControl} from 'react-bootstrap';
 
-export default class SettingsComponent extends React.Component {
+export default class APIKeyComponent extends React.Component {
 
   constructor(props){
     super(props);

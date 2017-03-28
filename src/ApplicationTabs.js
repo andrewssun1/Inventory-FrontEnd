@@ -8,7 +8,7 @@ import LogComponent from './Logs/LogComponent'
 import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
-import SettingsComponent from './SettingsComponent'
+import SettingsComponent from './Settings/SettingsComponent'
 import DisbursementTable from './Disbursements/DisbursementTable'
 
 var React = require('react');
