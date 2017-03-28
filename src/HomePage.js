@@ -69,11 +69,10 @@ export default class HomePage extends React.Component {
 
   getAllLoans(){
     checkAuthAndAdmin(()=>{
-      const isStaff = (localStorage.isStaff === "true");
-      var returned = isStaff ? "" : "false";
       var url =  "/api/request/loan/" + "?item__name="+this.state.currentItem
                 + "&cart__owner__username="+this.state.selectedUser
-                + "&returned="+returned
+                + "&cart__status=fulfilled"
+                + "&returned=false"
                 + "&page="+this.state.currentPageLoan;
       restRequest("GET", url, "application/JSON", null,
                   (responseText)=>{
@@ -214,7 +213,7 @@ export default class HomePage extends React.Component {
     const isStaff = (localStorage.isStaff === "true");
     return(
       <div>
-        <p><b>Current loans: </b></p>
+        <p><b>Current unreturned loans: </b></p>
         {this.renderHomePageTable(this.state.loan_data)}
         <p><b>Current outstanding requests: </b></p>
         {this.renderOutstandingTable(this.state.outstanding_data)}
