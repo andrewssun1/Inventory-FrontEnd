@@ -69,8 +69,11 @@ export default class HomePage extends React.Component {
 
   getAllLoans(){
     checkAuthAndAdmin(()=>{
+      const isStaff = (localStorage.isStaff === "true");
+      var returned = isStaff ? "" : "false";
       var url =  "/api/request/loan/" + "?item__name="+this.state.currentItem
                 + "&cart__owner__username="+this.state.selectedUser
+                + "&returned="+returned
                 + "&page="+this.state.currentPageLoan;
       restRequest("GET", url, "application/JSON", null,
                   (responseText)=>{
@@ -185,11 +188,21 @@ export default class HomePage extends React.Component {
     );
   }
 
+  onOutstandingClick(row){
+    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+      this._viewRequestModal.openModal();
+    });
+  }
+
   renderOutstandingTable(data){
+    const options = {
+      onRowClick: this.onOutstandingClick.bind(this),
+    }
     return(
     <BootstrapTable ref="loanTable"
                     data={ data }
-                    striped hover>
+                    striped hover
+                    options={options}>
                     <TableHeaderColumn dataField='id' isKey hidden autoValue="true">id</TableHeaderColumn>
                     <TableHeaderColumn dataField="owner">Requesting User</TableHeaderColumn>
                     <TableHeaderColumn dataField='status'>Status</TableHeaderColumn>
