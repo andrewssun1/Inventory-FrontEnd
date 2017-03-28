@@ -19,18 +19,14 @@ export default class SubscribeButton extends React.Component {
   }
 
   assignSubscriptionStatus() {
-    restRequest("GET", "/api/email/subscribedManagers/", "application/json", null,
+    restRequest("GET", "/api/email/subscribedManagers/current/", "application/json", null,
                   (responseText)=>{
                     let response = JSON.parse(responseText);
-                    //TODO: is there a better way to do this?
-                    var hasUsername = false;
-                    for(var i = 0; i < response.results.length; i ++) {
-                      if(response.results[i].member.username === localStorage.username) {
-                        hasUsername = true;
-                      }
-                    }
-                    this.setState({isSubscribed: hasUsername});
-                  }, ()=>{});
+                    console.log(response);
+                    this.setState({isSubscribed: true});
+                  }, ()=>{
+                    console.log("Error!");
+                  });
   }
 
   subscribeManager() {
