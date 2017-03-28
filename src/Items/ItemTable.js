@@ -6,6 +6,7 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 import ItemDetail from './ItemDetail';
 import TagModal from '../TagModal';
+import BulkImportModal from './BulkImportModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -51,6 +52,7 @@ class ItemTable extends React.Component {
     this.cartFormatter = this.cartFormatter.bind(this);
     this.resetTable = this.resetTable.bind(this);
     this.renderColumns = this.renderColumns.bind(this);
+    this.openBulkImportModal = this.openBulkImportModal.bind(this);
   }
 
   getAllItem(url_parameter){
@@ -61,15 +63,20 @@ class ItemTable extends React.Component {
                     var response = JSON.parse(responseText);
                     var response_results = response.results;
                     const isStaff = (localStorage.isStaff === "true");
-                    var cartUrl = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+                    var cartUrl = "/api/request/active/";
                     restRequest("GET", cartUrl, "application/JSON", null,
                                 (responseText)=>{
                                   var responseCart = JSON.parse(responseText);
                                   var hash = {};
-                                  var disburseRequest = isStaff ? responseCart.disbursements : responseCart.requests;
+                                  var disburseRequest = responseCart.cart_disbursements;
+                                  var loanRequest = responseCart.cart_loans;
                                   for (var j = 0; j < disburseRequest.length; j++){
                                     var currItem = disburseRequest[j];
-                                    hash[currItem.item.id] = [currItem.quantity, currItem.id];
+                                    hash[currItem.item.id] = [currItem.quantity, currItem.id, "disbursement"];
+                                  }
+                                  for (var k = 0; k < loanRequest.length; k++){
+                                    var currItem = loanRequest[k];
+                                    hash[currItem.item.id] = [currItem.quantity, currItem.id, "loan"];
                                   }
                                   for (var i = 0; i < response_results.length; i++){
                                       response_results[i]["tags_data"] = response_results[i].tags;
@@ -78,6 +85,7 @@ class ItemTable extends React.Component {
                                         response_results[i].quantity_cartitem = hash[response_results[i].id][0];
                                         response_results[i].inCart = true;
                                         response_results[i].cartId = hash[response_results[i].id][1];
+                                        response_results[i].status = hash[response_results[i].id][2];
                                       }
                                       else{
                                         response_results[i].quantity_cartitem = 1;
@@ -101,7 +109,7 @@ class ItemTable extends React.Component {
   }
 
   componentWillMount() {
-    this.getAllItem(null)
+    this.getAllItem(null);
     this.getFieldData();
   }
 
@@ -230,7 +238,6 @@ class ItemTable extends React.Component {
   }
 
   getFieldData() {
-    checkAuthAndAdmin(()=>{
       restRequest("GET", "/api/item/field/", "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
@@ -249,7 +256,6 @@ class ItemTable extends React.Component {
       },
       ()=>{console.log('GET Failed!!');}
     );
-  });
 }
 
   // Makes sure quantity is an integer
@@ -284,7 +290,7 @@ class ItemTable extends React.Component {
   }
 
   onTagSearchClick() {
-    this._tagchild.openModal();
+    this._tagChild.openModal();
   }
 
     onSearchChange(searchText, colInfos, multiColumnSearch) {
@@ -322,6 +328,9 @@ class ItemTable extends React.Component {
     );
   }
 
+  openBulkImportModal() {
+    this._bulkImportChild.openModal();
+  }
 
   renderColumns() {
     var cols = [];
@@ -364,6 +373,7 @@ class ItemTable extends React.Component {
 
     return(
       <div>
+      <Button onClick={this.openBulkImportModal} bsStyle="primary">Import Items from CSV</Button>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
@@ -376,8 +386,10 @@ class ItemTable extends React.Component {
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
       {this.renderColumns()}
       </BootstrapTable>) : null}
+
+      <BulkImportModal importCb={this} ref={(child) => {this._bulkImportChild= child; }} />
       <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
-      <TagModal ref={(child) => {this._tagchild = child; }} updateCallback={this}/>
+      <TagModal ref={(child) => {this._tagChild = child; }} updateCallback={this}/>
       </div>
     )
   }

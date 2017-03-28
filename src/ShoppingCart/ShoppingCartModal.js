@@ -69,11 +69,11 @@ export default class ShoppingCartModal extends React.Component {
   // TODO: Change this
   getNewActiveCart(){
     const isStaff = (localStorage.isStaff === "true");
-    var url = isStaff ? "/api/disburse/active/" : "/api/shoppingCart/active/";
+    var url = "/api/request/active/";
     restRequest("GET", url, "application/JSON", null,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
-                  var disburseRequest = isStaff ? response.disbursements : response.requests;
+                  var disburseRequest = response.cart_disbursements;
                   localStorage.activecartid = response.id;
                   localStorage.setItem("cart_quantity", disburseRequest.length);
                   console.log(response);
@@ -82,14 +82,13 @@ export default class ShoppingCartModal extends React.Component {
 
   submitCart(){
     var sendJSON = JSON.stringify({
-      id: localStorage.activecartid,
       reason: this.state.reason
     });
-    restRequest("PATCH", "/api/shoppingCart/send/"+localStorage.activecartid+"/", "application/JSON", sendJSON,
+    restRequest("PATCH", "/api/request/send/"+localStorage.activecartid+"/", "application/JSON", sendJSON,
                 (responseText)=>{
                   this.getNewActiveCart();
                   this.props.updateCallback.componentDidMount();
-                  this.props.updateCallback._alertchild.generateSuccess("Shopping cart sent!");
+                  this.props.updateCallback._alertchild.generateSuccess("Request sent!");
                 }, (status, errResponse)=>{
                   console.log(JSON.parse(errResponse));
                   // this.props.updateCallback._alertchild.generateError("Shopping cart sent!");
@@ -111,16 +110,25 @@ export default class ShoppingCartModal extends React.Component {
   submitDisbursement(){
     console.log(this.state.selectedUser);
     var sendJSON = JSON.stringify({
-      receiver_id: parseInt(this.state.selectedUser, 10),
-      comment: this.state.reason
+      owner_id: parseInt(this.state.selectedUser, 10),
+      staff_comment: this.state.reason
     });
-    restRequest("PATCH", "/api/disburse/"+localStorage.activecartid, "application/JSON", sendJSON,
+    restRequest("PATCH", "/api/request/dispense/"+localStorage.activecartid+"/", "application/JSON", sendJSON,
                 (responseText)=>{
                   this.getNewActiveCart();
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Disbursement successfully sent.");
                 }, (status, errResponse)=>{
-                  this.props.updateCallback._alertchild.generateError("User field may not be empty.");
+
+                  if (JSON.parse(errResponse).owner_id != null){
+                    this.props.updateCallback._alertchild.generateError("User field may not be empty.");
+                  }
+                  else if (JSON.parse(errResponse).detail != null){
+                    this.props.updateCallback._alertchild.generateError(JSON.parse(errResponse).detail);
+                  }
+                  else{
+                    this.props.updateCallback._alertchild.generateError("Server error. Contact system admin.");
+                  }
                 });
     this.closeModal();
   }
@@ -130,7 +138,7 @@ export default class ShoppingCartModal extends React.Component {
     return(
       <Modal show={this.state.showModal}>
       <Modal.Header>
-        <Modal.Title>{this.state.isStaff ? "Disbursement Cart" : "Request Cart"}</Modal.Title>
+        <Modal.Title>{this.state.isStaff ? "Direct Dispense Cart" : "Request Cart"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form>

@@ -4,7 +4,7 @@ import { Modal, Button, Form, Col, ControlLabel, DropdownButton, MenuItem } from
 import AlertComponent from '../AlertComponent';
 import TypeConstants from '../TypeConstants';
 import TextEntryFormElement from '../TextEntryFormElement';
-import restRequest from "../Utilities.js"
+import {restRequest} from "../Utilities.js"
 
 export default class CustomFieldDetail extends React.Component {
 
@@ -61,6 +61,8 @@ export default class CustomFieldDetail extends React.Component {
     var response = JSON.parse(responseText);
     console.log("Getting Response");
     console.log(response);
+    this.props.cb.getFieldData();
+    this.closeModal();
   },
   ()=>{
     console.log('PATCH Failed!!');

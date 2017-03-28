@@ -3,8 +3,9 @@
 // @author Andrew
 
 import { hashHistory } from 'react-router';
+import { getServer } from "./SecretStuff.js"
 
-const BACKEND_SERVER = "https://asap-test.colab.duke.edu"
+const BACKEND_SERVER = getServer();
 
 export function isLoggedIn(){
     return !!localStorage.token
@@ -58,4 +59,15 @@ export function restRequest( requestType, url, contentType, requestStr, successC
   var f = function(){restCb(xhttp, successCb, errorCb)};
   xhttp.onreadystatechange = f;
   xhttp.send(requestStr);
+}
+
+export function restRequestData( requestType, url, requestData, successCb, errorCb ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open(requestType, BACKEND_SERVER + url, true);
+  if (localStorage.token){
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+  }
+  var f = function(){restCb(xhttp, successCb, errorCb)};
+  xhttp.onreadystatechange = f;
+  xhttp.send(requestData);
 }

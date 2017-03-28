@@ -97,7 +97,7 @@ export default class DateRangePicker extends React.Component {
     var max_time = value[1].endOf('day').format();
     this.props.cb.setState({minTime: min_time, maxTime: max_time},
       ()=>{
-        this.props.cb.getRequestForLog("", ()=>{
+        this.props.cb.didFinishChangeState("", ()=>{
           this.props.cb.setState({
               currentPage:1
           });
@@ -125,7 +125,7 @@ export default class DateRangePicker extends React.Component {
     });
     this.props.cb.setState({minTime: "", maxTime: ""},
       ()=>{
-        this.props.cb.getRequestForLog("", ()=>{
+        this.props.cb.didFinishChangeState("", ()=>{
           this.props.cb.setState({
               currentPage:1
           });

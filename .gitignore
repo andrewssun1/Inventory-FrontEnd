@@ -14,6 +14,9 @@ build
 .env
 npm-debug.log
 
+# secret
+/src/SecretStuff.js
+
 .DS_STORE
 node_modules
 *~

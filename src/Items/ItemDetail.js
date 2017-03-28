@@ -18,9 +18,10 @@ var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 var moment = require('moment');
 
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
-import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser'
-import AlertComponent from '../AlertComponent'
+import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
+import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
+import AlertComponent from '../AlertComponent';
+import Select from 'react-select';
 
 class ItemDetail extends React.Component {
 
@@ -161,7 +162,7 @@ saveItem(cb) {
 
   getCarts(item_name){
     // GET request to get all outstanding carts for this item by this user
-    restRequest("GET", "/api/shoppingCart/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
+    restRequest("GET", "/api/request/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log(response);
@@ -238,8 +239,8 @@ saveItem(cb) {
   }
 
   onRowClickCart(row, isSelected, e) {
-    this.closeModal();
-    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+    // this.closeModal();
+    this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
       this._viewRequestModal.openModal();
     });
   }
@@ -254,6 +255,11 @@ saveItem(cb) {
       let displayFields = this.state.fieldData.map((field) => {
         return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
       });
+      displayFields.push(
+        <div key="tagComponent">
+        <p><b>Tags: </b></p>
+        <TagComponent ref="tagComponent" cb={this} item_id={this.state.itemData.id} item_detail={this.state.itemData.tags} />
+        </div>);
       return (displayFields);
     }
   }
@@ -270,18 +276,32 @@ saveItem(cb) {
           ref={child => this.refDict[field.name] = child}/>);
         }
       });
+      // editFields.push(<>);
       return(editFields);
     }
+  }
+
+  generateItemStackTable(data){
+    const cartTableOptions = {
+      onRowClick: this.onRowClickCart
+    };
+    return(
+      <BootstrapTable ref="logTable"
+                      data={ data }
+                      options={ cartTableOptions }
+                      striped hover>
+                      <TableHeaderColumn dataField='cart_id' isKey hidden autoValue="true">cart_id</TableHeaderColumn>
+                      <TableHeaderColumn dataField='cart_owner'>Requesting User</TableHeaderColumn>
+                      <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
+                      <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
+      </BootstrapTable>
+    );
   }
 
   render() {
     if(this.state.itemData == null) return null;
 
     const isStaff = (localStorage.isStaff === "true");
-
-    const cartTableOptions = {
-      onRowClick: this.onRowClickCart
-    };
 
     return (
       <div>
@@ -302,20 +322,13 @@ saveItem(cb) {
         :
         <div>
         {this.renderDisplayFields()}
-        <p><b>Tags: </b></p>
-        <TagComponent ref="tagComponent" item_id={this.state.itemData.id} item_detail={this.state.itemData.tags}/>
         <br />
-        <p><b>Outstanding requests containing this item: </b></p>
-        <BootstrapTable ref="logTable"
-                        data={ this.state.cartData }
-                        options={ cartTableOptions }
-                        striped hover>
-                        <TableHeaderColumn dataField='id' isKey hidden autoValue="true">Id</TableHeaderColumn>
-                        <TableHeaderColumn dataField='username' width="150px">Requesting User</TableHeaderColumn>
-                        <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
-                        <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
-                        <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
-        </BootstrapTable>
+        <p><b>Outstanding disbursements containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}
+        <p><b>Outstanding loans containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.outstanding_loans)}
+        <p><b>Current loans containing this item: </b></p>
+        {this.generateItemStackTable(this.state.itemData.current_loans)}
         {isStaff ?
         <div>
         <b> Logs involving this item: </b>

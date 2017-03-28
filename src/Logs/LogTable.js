@@ -4,7 +4,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import Select from 'react-select';
 import '../DropdownTable.css';
-import DateRangePicker from './DateRangePicker';
+import DateRangePicker from '../DateRangePicker';
 
 import { Button } from 'react-bootstrap';
 
@@ -107,8 +107,7 @@ class LogTable extends React.Component {
                 <TableHeaderColumn dataField='timestamp' width="160px" className='my-class'  filter={this.props.lightMode ? null : { type: 'CustomFilter', getElement: this.getDateRangePicker }}>Timestamp</TableHeaderColumn>
                 <TableHeaderColumn dataField='comment'>Comment</TableHeaderColumn>
                 <TableHeaderColumn dataField='item_log' hidden hiddenOnInsert></TableHeaderColumn>
-                <TableHeaderColumn dataField='shopping_cart_log' hidden hiddenOnInsert></TableHeaderColumn>
-                <TableHeaderColumn dataField='disbursement_log' hidden hiddenOnInsert></TableHeaderColumn>
+                <TableHeaderColumn dataField='cart_disbursements' hidden hiddenOnInsert></TableHeaderColumn>
             </BootstrapTable>
           </div>
         )

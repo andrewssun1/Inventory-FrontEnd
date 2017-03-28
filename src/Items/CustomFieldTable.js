@@ -111,7 +111,7 @@ render() {
     <TableHeaderColumn dataField='type' editable={ { type: 'select', options: { values: typeList} } }>Type</TableHeaderColumn>
     <TableHeaderColumn dataField='private' editable={ { type: 'select', options: { values: boolList} } }>Privacy</TableHeaderColumn>
     </BootstrapTable>
-    <CustomFieldDetail ref={(child) => { this._detail = child; }} ></CustomFieldDetail>
+    <CustomFieldDetail cb={this} ref={(child) => { this._detail = child; }} ></CustomFieldDetail>
     </div>
   )
 }
