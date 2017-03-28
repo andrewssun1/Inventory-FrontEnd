@@ -11,9 +11,14 @@ export default class SubscribedManagerTable extends React.Component {
     this.state = {
       dataResults : null
     };
+    this.getSubscribedManagers = this.getSubscribedManagers.bind(this);
   }
 
   componentWillMount() {
+    this.getSubscribedManagers();
+  }
+
+  getSubscribedManagers() {
     restRequest("GET", "/api/email/subscribedManagers/", "application/json", null,
                   (responseText)=>{
                     let response = JSON.parse(responseText);
