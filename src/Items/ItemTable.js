@@ -373,7 +373,7 @@ class ItemTable extends React.Component {
 
     return(
       <div>
-      {isStaff ? <Button onClick={this.openBulkImportModal} bsStyle="primary">Import Items from CSV</Button> : null}
+      {isStaff ? <Button onClick={this.openBulkImportModal} bsStyle="primary">CSV Import/Export</Button> : null}
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>

@@ -75,21 +75,33 @@ class BulkImportModal extends React.Component {
                 });
   }
 
+  exportItems() {
+    restRequest("GET", "/api/item/csv/export", "application/json", null,
+                (responseText)=>{
+                  console.log("Successfully got items");
+                  fileDownload(responseText, 'InventoryItems.csv');
+                }, (status, errResponse)=>{
+                  console.log('Failed to get items');
+                });
+  }
+
   render() {
     return (
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <h4> Select File: </h4>
+      <h4> Import New Items: </h4>
       <input type='file' label='Choose File' accept='.csv'
        ref={(ref) => this._fileUpload = ref} />
+      <Button onClick={this.makeImport} bsStyle="primary">Import</Button>
+      <h4> Export Current Items: </h4>
+      <Button onClick={this.exportItems} bsStyle="primary">Export</Button>
       <h4> Format: </h4>
       <p> Your CSV file must be in a particular format in order to be read by the database. Click below to dowload a preformatted csv template</p>
       <Button onClick={this.downloadTemplate} bsStyle="primary">Download Template</Button>
       </Modal.Body>
       <Modal.Footer>
-      <Button onClick={this.makeImport} bsStyle="success">Import</Button>
       <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
       </Modal.Footer>
       </Bootstrap.Modal>
