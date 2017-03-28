@@ -36,6 +36,7 @@ class BulkImportModal extends React.Component {
     restRequestData("POST", "/api/item/csv/import", data,
                 (responseText)=>{
                   this.props.importCb.getAllItem(null);
+                  this.props.importCb._alertchild.generateSuccess("Successfully imported items");
                   this.closeModal();
                 }, (status, errResponse)=>{
                   let errs = JSON.parse(errResponse);
