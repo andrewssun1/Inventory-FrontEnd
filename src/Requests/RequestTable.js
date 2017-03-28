@@ -226,7 +226,7 @@ class RequestTable extends React.Component {
     <TableHeaderColumn dataField='staff' width="150px"> Associated Staff </TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp' width="170px"  editable={ false }>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='reason' >Reason</TableHeaderColumn>
-      <TableHeaderColumn dataField='type' >Type</TableHeaderColumn>
+      <TableHeaderColumn dataField='type' >Type (Disbursement/Loan/Both)</TableHeaderColumn>
       </BootstrapTable>
       </div>
     )
