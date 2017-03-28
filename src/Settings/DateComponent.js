@@ -6,6 +6,7 @@ import DatePicker from 'rc-calendar/lib/Picker';
 import Calendar from 'rc-calendar';
 import moment from 'moment';
 import enUS from 'rc-calendar/lib/locale/en_US';
+import AlertComponent from '../AlertComponent';
 
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
@@ -45,7 +46,9 @@ export default class DateComponent extends React.Component {
       console.log("Successfully updated loan reminder dates!");
       console.log(JSON.parse(responseText));
       this.getScheduledEmailDates();
-    }, ()=>{});
+    }, (status, errResponse)=>{
+      this._alertchild.generateError("There was an error adding dates. Please make sure you are not adding an date which has already been scheduled.");
+    });
   }
 
   getScheduledEmailDates() {
@@ -54,7 +57,9 @@ export default class DateComponent extends React.Component {
       console.log("Successfully obtained loan reminder dates!");
       console.log(JSON.parse(responseText));
       this.setState({scheduledEmailDates: JSON.parse(responseText).results});
-    }, ()=>{});
+    }, ()=>{
+      this._alertchild.generateError("There was an error getting the scheduled dates");
+    });
   }
 
   onDeleteRow(rows) {
@@ -71,7 +76,9 @@ export default class DateComponent extends React.Component {
       console.log("Successfully updated loan reminder dates!");
       console.log(JSON.parse(responseText));
       this.getScheduledEmailDates();
-    }, ()=>{});
+    }, ()=>{
+      this._alertchild.generateError("There was an error deleting dates");
+    });
   }
 
   deletedRowsContainsIndex(rows, index) {
@@ -108,6 +115,7 @@ export default class DateComponent extends React.Component {
 
     return(
       <div>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h4> Scheduled Email Dates </h4>
       {this.renderScheduledEmailDates()}
       <br/>
