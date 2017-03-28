@@ -319,7 +319,7 @@ class ItemTable extends React.Component {
       <TableHeaderColumn dataField='status' hidden hiddenOnInsert>status</TableHeaderColumn>
       </BootstrapTable>) : null}
 
-      <BulkImportModal ref={(child) => {this._bulkImportChild= child; }} />
+      <BulkImportModal importCb={this} ref={(child) => {this._bulkImportChild= child; }} />
       <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
       <TagModal ref={(child) => {this._tagChild = child; }} updateCallback={this}/>
       </div>
