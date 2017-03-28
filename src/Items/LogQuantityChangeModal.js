@@ -6,7 +6,8 @@ var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
 import {restRequest, checkAuthAndAdmin} from "../Utilities";
 import TypeConstants from "../TypeConstants";
-import {Tooltip, OverlayTrigger} from 'react-bootstrap'
+import {Tooltip, OverlayTrigger} from 'react-bootstrap';
+import AlertComponent from '../AlertComponent'
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -56,34 +57,27 @@ class LogQuantityChangeModal extends React.Component {
     },
     (status, responseText)=>{
       if (status === 401 || status === 500){
-        this.setState({
-          requestProblemString: 'A problem occured, please contact system administrator'
-        })
+        this._alertchild.generateError('A problem occured, please contact system administrator');
       } else {
         var response = JSON.parse(responseText);
-        this.setState({
-          requestProblemString: response.detail
-        })
+        this._alertchild.generateError(response.detail);
       }
     });
   }
 
   render() {
-    const tooltip = (
-      <Tooltip id="tooltip">Enter negative quantity to log destruction, positive quantity to log addition</Tooltip>
-    );
     return (
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
-      <p style={{color:"red"}}> {this.state.requestProblemString} </p>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h2> {this.props.item} </h2>
+        <p>Enter negative quantity to log destruction, positive quantity to log addition</p>
+
       <Form horizontal>
-      <OverlayTrigger placement="bottom" overlay={tooltip}>
       <TextEntryFormElement controlId={"formHorizontalChange"}
       label={"Change"} type={TypeConstants.Enum.INTEGER} initialValue={0}
       ref={child => this._changeField = child}/>
-      </OverlayTrigger>
       <TextEntryFormElement controlId={"formHorizontalComments"}
       label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""}
       ref={child => this._commentsField = child}/>
