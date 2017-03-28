@@ -60,3 +60,14 @@ export function restRequest( requestType, url, contentType, requestStr, successC
   xhttp.onreadystatechange = f;
   xhttp.send(requestStr);
 }
+
+export function restRequestData( requestType, url, requestData, successCb, errorCb ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open(requestType, BACKEND_SERVER + url, true);
+  if (localStorage.token){
+    xhttp.setRequestHeader("Authorization", "Bearer " + localStorage.token);
+  }
+  var f = function(){restCb(xhttp, successCb, errorCb)};
+  xhttp.onreadystatechange = f;
+  xhttp.send(requestData);
+}

@@ -4,9 +4,11 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
-import {restRequest, checkAuthAndAdmin} from "../Utilities";
+import {restRequest, restRequestData} from "../Utilities";
 import {Modal, Button, Form} from 'react-bootstrap';
 import Input from 'react-bootstrap';
+import AlertComponent from '../AlertComponent';
+var fileDownload = require('react-file-download');
 
 class BulkImportModal extends React.Component {
   constructor(props) {
@@ -17,6 +19,7 @@ class BulkImportModal extends React.Component {
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.makeImport = this.makeImport.bind(this);
+    this.downloadTemplate = this.downloadTemplate.bind(this);
   }
 
   openModal() {
@@ -27,41 +30,48 @@ class BulkImportModal extends React.Component {
     this.setState({showModal: false});
   }
 
-  uploadFileButton() {
-
-  }
-
-  makeImport() {
-    console.log(this._fileUpload.files);
+  makeImport(successCb, errorCb) {
     var data = new FormData();
-    data.append("csv_file", this._fileUpload.files[0].name);
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://localhost:8000/api/item/csv/import");
-    xhttp.setRequestHeader("authorization", "Token f4982e6a241258d467c91dfc3452c85416f6ce19");
-    xhttp.setRequestHeader("cache-control", "no-cache");
+    data.append("csv_file", this._fileUpload.files[0]);
+    restRequestData("POST", "/api/item/csv/import", data,
+                (responseText)=>{
+                  this.closeModal();
+                }, (status, errResponse)=>{
+                  let errs = JSON.parse(errResponse);
 
-    xhttp.send(data);
-        /*
-        From Siva:
-        var data = new FormData();
-data.append("csv_file", "items.csv");
-
-var xhr = new XMLHttpRequest();
-xhr.withCredentials = true;
-
-xhr.addEventListener("readystatechange", function () {
-  if (this.readyState === 4) {
-    console.log(this.responseText);
+                  if(errs.detail != null) {
+                    this._alertchild.generateError(errs.detail);
+                  } else {
+                  var errorString = "";
+                  for (var key in errs) {
+                    if (errs.hasOwnProperty(key)) {
+                      let errorArray = errs[key];
+                      for(var i = 0; i < errorArray.length; i ++) {
+                        let errorObject = errorArray[i];
+                        for(var colKey in errorObject) {
+                          if(errorObject.hasOwnProperty(colKey)) {
+                            errorString = errorString + "Column " + key + ", " +
+                            colKey + " error: " + errorObject[colKey] + "\n";
+                          }
+                        }
+                      }
+                    }
+                  }
+                  if(errorString != "") {
+                    this._alertchild.generateError(errorString);
+                  }
+                }
+                });
   }
-});
 
-xhr.open("POST", "http://localhost:8000/api/item/csv/import");
-xhr.setRequestHeader("authorization", "Token f4982e6a241258d467c91dfc3452c85416f6ce19");
-xhr.setRequestHeader("cache-control", "no-cache");
-xhr.setRequestHeader("postman-token", "a4d36444-55be-488f-81bc-b5e9e5e16769");
-
-xhr.send(data);
-        */
+  downloadTemplate() {
+    restRequest("GET", "/api/item/csv/export/example", "application/json", null,
+                (responseText)=>{
+                  console.log("Successfully got example");
+                  fileDownload(responseText, 'ItemTemplate.csv');
+                }, (status, errResponse)=>{
+                  console.log('Failed to get example');
+                });
   }
 
   render() {
@@ -69,11 +79,13 @@ xhr.send(data);
       <div>
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h4> Select File: </h4>
       <input type='file' label='Choose File' accept='.csv'
        ref={(ref) => this._fileUpload = ref} />
       <h4> Format: </h4>
-      <p> Your CSV file must be in a particular format in order to be read by the database. This format is: </p>
+      <p> Your CSV file must be in a particular format in order to be read by the database. Click below to dowload a preformatted csv template</p>
+      <Button onClick={this.downloadTemplate} bsStyle="primary">Download Template</Button>
       </Modal.Body>
       <Modal.Footer>
       <Button onClick={this.makeImport} bsStyle="success">Import</Button>
