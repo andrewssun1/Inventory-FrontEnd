@@ -25,13 +25,15 @@ class ConfigureEmailModal extends React.Component {
   }
 
   componentWillMount() {
-    //Get Subject
-    restRequest("GET", "/api/email/subjectTag/", "application/json", null,
-    (responseText)=>{
-      console.log("Successfully got the subject tag");
-      console.log(JSON.parse(responseText));
-      this.setState({subjectTag: JSON.parse(responseText).subject_tag});
-    }, ()=>{});
+    if(localStorage.isSuperUser === "true") {
+      //Get Subject
+      restRequest("GET", "/api/email/subjectTag/", "application/json", null,
+      (responseText)=>{
+        console.log("Successfully got the subject tag");
+        console.log(JSON.parse(responseText));
+        this.setState({subjectTag: JSON.parse(responseText).subject_tag});
+      }, ()=>{});
+    }
 
     //Get Body
     restRequest("GET", "/api/email/prependedBody/", "application/json", null,
@@ -51,41 +53,46 @@ class ConfigureEmailModal extends React.Component {
   }
 
   didPressSave() {
-    //Save Subject
-    let requestBody = {
-      "subject_tag" : this._subjectElement.state.value
+    if(localStorage.isSuperUser === "true") {
+      //Save Subject
+      let requestBody = {
+        "subject_tag" : this._subjectElement.state.value
+      }
+      let jsonResult = JSON.stringify(requestBody);
+      restRequest("PATCH", "/api/email/subjectTag/modify/", "application/json", jsonResult,
+      (responseText)=>{
+        console.log("Successfully updated request body!");
+        console.log(JSON.parse(responseText));
+      }, ()=>{});
+
+      this.setState({subjectTag: this._subjectElement.state.value});
     }
-    let jsonResult = JSON.stringify(requestBody);
-    restRequest("PATCH", "/api/email/subjectTag/modify/", "application/json", jsonResult,
-    (responseText)=>{
-      console.log("Successfully updated request body!");
-      console.log(JSON.parse(responseText));
-    }, ()=>{});
 
     //Save Body
-    requestBody = {
+    let requestBody = {
       "prepended_body" : this._bodyElement.state.value
     }
-    jsonResult = JSON.stringify(requestBody);
+    let jsonResult = JSON.stringify(requestBody);
     restRequest("PATCH", "/api/email/prependedBody/modify/", "application/json", jsonResult,
     (responseText)=>{
       console.log("Successfully updated request body!");
       console.log(JSON.parse(responseText));
     }, ()=>{});
 
-    this.setState({subjectTag: this._subjectElement.state.value});
     this.setState({prependedBody: this._bodyElement.state.value});
     this.closeModal();
   }
 
   render() {
+    let isSuperUser = (localStorage.isSuperUser === "true");
     return (
       <Bootstrap.Modal show={this.state.showModal}>
       <Modal.Body>
       <Form horizontal>
+      {isSuperUser ?
       <TextEntryFormElement controlId="formHorizontalSubject"
       label="Subject" type={TypeConstants.Enum.SHORT_STRING} initialValue={this.state.subjectTag}
-      ref={child => this._subjectElement = child}/>
+      ref={child => this._subjectElement = child}/> : null}
       <TextEntryFormElement controlId="formHorizontalBody"
       label="Body" type={TypeConstants.Enum.LONG_STRING} initialValue={this.state.prependedBody}
       ref={child => this._bodyElement = child}/>
