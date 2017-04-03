@@ -91,7 +91,7 @@ class MakeRequestModal extends React.Component {
   render() {
     return (
       <div>
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
         <p style={{color:"red"}}> {this.state.requestProblemString} </p>
       <Form horizontal>

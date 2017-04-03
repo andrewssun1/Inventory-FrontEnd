@@ -362,7 +362,7 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Request</Modal.Title>

@@ -70,7 +70,7 @@ export default class LogDetail extends React.Component {
       <ViewRequestModal id={this.state.selectedRequest}
         updateCallback={this}
         ref={(child) => { this._requestModal = child; }} />
-      <Modal show={this.state.showModal}>
+      <Modal show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
         <div>

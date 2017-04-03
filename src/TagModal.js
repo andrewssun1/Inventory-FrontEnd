@@ -99,7 +99,7 @@ class TagModal extends React.Component {
     //TODO: Add in image
     return (
       <div>
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
         <div className="section">
   				<h3 className="section-heading">Search Tags</h3>

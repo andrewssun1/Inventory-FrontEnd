@@ -61,7 +61,7 @@ export default class DisbursementModal extends React.Component {
 
   render(){
     return(
-    <Modal show={this.state.showModal}>
+    <Modal show={this.state.showModal} onHide={this.closeModal}>
     <Modal.Header>
       <Modal.Title>View Disbursement</Modal.Title>
     </Modal.Header>
