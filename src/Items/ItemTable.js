@@ -13,7 +13,7 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import '../DropdownTable.css';
 import CartQuantityChooser from "../ShoppingCart/CartQuantityChooser";
 
-import {Button, ButtonGroup} from 'react-bootstrap';
+import {Button, ButtonGroup, ButtonToolbar} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -374,12 +374,14 @@ class ItemTable extends React.Component {
       <div>
       {isStaff ? <Button onClick={this.openBulkImportModal} bsStyle="primary">CSV Import/Export</Button> : null}
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <div style={{marginRight: "10px"}} className="text-right">
+      <ButtonToolbar style={{marginRight: "10px"}} className="text-right">
+        <div style={{marginRight: "10px"}} className="text-right">
         <ButtonGroup>
           <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
         </ButtonGroup>
         <p>{this.state.tagSearchText}</p>
-      </div>
+        </div>
+      </ButtonToolbar>
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
       fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
