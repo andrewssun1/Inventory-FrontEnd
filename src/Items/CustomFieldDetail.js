@@ -128,7 +128,7 @@ export default class CustomFieldDetail extends React.Component {
   render(){
     return(
       <div>
-      <Modal show={this.state.showModal}>
+      <Modal show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Body>
       {this.state.isEditing ? this.renderEditFields() : this.renderDisplayFields()}

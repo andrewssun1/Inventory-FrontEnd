@@ -89,7 +89,7 @@ class BulkImportModal extends React.Component {
   render() {
     return (
       <div>
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h4> Import New Items: </h4>

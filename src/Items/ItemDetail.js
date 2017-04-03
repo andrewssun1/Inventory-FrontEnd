@@ -309,7 +309,7 @@ saveItem(cb) {
       <LogQuantityChangeModal item_id={this.state.itemData.id} item={this.state.itemData.name}
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
       <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} updateCallback={this.props.updateCallback} />
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Item</Modal.Title>
