@@ -7,10 +7,17 @@ import TextEntryFormElement from "../TextEntryFormElement";
 import {restRequest, checkAuthAndAdmin} from "../Utilities";
 import TypeConstants from "../TypeConstants";
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
-import AlertComponent from '../AlertComponent'
+import AlertComponent from '../AlertComponent';
+import TypeEnum from '../TypeEnum';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
+var FormGroup = Bootstrap.FormGroup;
+var Col = Bootstrap.Col;
+var ControlLabel = Bootstrap.ControlLabel;
+var FormControl = Bootstrap.FormControl;
+var MenuItem = Bootstrap.MenuItem;
+var DropdownButton = Bootstrap.DropdownButton;
 
 class LogQuantityChangeModal extends React.Component {
   constructor(props) {
@@ -18,16 +25,21 @@ class LogQuantityChangeModal extends React.Component {
     this.state = {
       showModal: false,
       requestProblemString: '',
-      value: 0
+      value: 0,
+      dropdownTitle: "Acquired",
+      logDisabled : true
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.handleChangeQuantity = this.handleChangeQuantity.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.logChange = this.logChange.bind(this);
+    this.onDropdownSelect = this.onDropdownSelect.bind(this);
   }
 
   openModal() {
     this.setState({showModal: true});
+    this.setState({logDisabled: true});
   }
 
   closeModal() {
@@ -35,17 +47,22 @@ class LogQuantityChangeModal extends React.Component {
     this.setState({disableRequestButton: true});
   }
 
-  handleChange(evt) {
+  handleChangeQuantity(evt) {
     this.setState({value: evt.target.value});
-    if(this.props.changeHandleCallback != null) {
-      this.props.changeHandleCallback.handleChange(evt);
-    }
+  }
+
+  handleChange(evt) {
+    this.setState({logDisabled: (this._commentsField.state.value === "")});
   }
 
   logChange() {
+    var changeToSend = this.state.value;
+    if(this.state.dropdownTitle == "Lost") {
+      changeToSend = -1*changeToSend;
+    }
     var requestBody = {
       "item_id": this.props.item_id,
-      "quantity": this._changeField.state.value,
+      "quantity": changeToSend,
       "comment": this._commentsField.state.value
     };
     var jsonResult = JSON.stringify(requestBody);
@@ -65,6 +82,15 @@ class LogQuantityChangeModal extends React.Component {
     });
   }
 
+  onDropdownSelect(eventKey: any, event: Object) {
+    this.setState({dropdownTitle: eventKey});
+  }
+  /*
+  <TextEntryFormElement controlId={"formHorizontalChange"}
+  label={"Change"} type={TypeConstants.Enum.INTEGER} initialValue={0}
+  ref={child => this._changeField = child}/>
+  */
+
   render() {
     return (
       <div>
@@ -75,17 +101,29 @@ class LogQuantityChangeModal extends React.Component {
         <p>Enter negative quantity to log destruction, positive quantity to log addition</p>
 
       <Form horizontal>
-      <TextEntryFormElement controlId={"formHorizontalChange"}
-      label={"Change"} type={TypeConstants.Enum.INTEGER} initialValue={0}
-      ref={child => this._changeField = child}/>
+
+      <FormGroup controlId={this.quantityChange}>
+      <Col sm={2}>
+      <FormControl componentClass={"input"}
+      type={"number"}
+      value={this.state.value} onChange={this.handleChangeQuantity}/>
+      </Col>
+      <Col sm={10}>
+      <DropdownButton title={this.state.dropdownTitle}  id={'Dropdown'} onSelect={this.onDropdownSelect}>
+      <MenuItem eventKey="Acquired">Acquired</MenuItem>
+      <MenuItem eventKey="Lost">Lost</MenuItem>
+      </DropdownButton>
+      </Col>
+      </FormGroup>
+
       <TextEntryFormElement controlId={"formHorizontalComments"}
-      label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""}
+      label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""} changeHandleCallback={this}
       ref={child => this._commentsField = child}/>
       </Form>
       </Modal.Body>
       <Modal.Footer>
       <div>
-      <Button onClick={this.logChange} bsStyle="success">Log Change</Button>
+      <Button onClick={this.logChange} bsStyle="success" disabled={this.state.logDisabled}>Log Change</Button>
       <Button onClick={this.closeModal} bsStyle="danger">Cancel</Button>
       </div>
       </Modal.Footer>
