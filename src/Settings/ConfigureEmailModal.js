@@ -86,7 +86,7 @@ class ConfigureEmailModal extends React.Component {
   render() {
     let isSuperUser = (localStorage.isSuperUser === "true");
     return (
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
       <Form horizontal>
       {isSuperUser ?

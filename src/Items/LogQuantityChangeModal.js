@@ -68,7 +68,7 @@ class LogQuantityChangeModal extends React.Component {
   render() {
     return (
       <div>
-      <Bootstrap.Modal show={this.state.showModal}>
+      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h2> {this.props.item} </h2>
