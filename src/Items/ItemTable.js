@@ -93,7 +93,6 @@ class ItemTable extends React.Component {
                                       }
 
                                   }
-                                  console.log("Setting products:");
                                   this.setState({
                                       _products: response_results,
                                       totalDataSize: response.count
