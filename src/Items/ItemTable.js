@@ -7,13 +7,14 @@ var ReactBsTable = require('react-bootstrap-table');
 import ItemDetail from './ItemDetail';
 import TagModal from '../TagModal';
 import BulkImportModal from './BulkImportModal';
+import MinimumStockModal from './MinimumStockModal';
 
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import '../DropdownTable.css';
 import CartQuantityChooser from "../ShoppingCart/CartQuantityChooser";
 
-import {Button, ButtonGroup, ButtonToolbar} from 'react-bootstrap';
+import {Button, ButtonGroup, ButtonToolbar, Row, Col, Glyphicon} from 'react-bootstrap';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -43,7 +44,8 @@ class ItemTable extends React.Component {
       showModal: true,
       alertState: false,
       alertType: "error",
-      alertMessage: ""
+      alertMessage: "",
+      selected_rows: []
     };
     this.onAddRow = this.onAddRow.bind(this);
     this.onDeleteRow = this.onDeleteRow.bind(this);
@@ -53,6 +55,7 @@ class ItemTable extends React.Component {
     this.resetTable = this.resetTable.bind(this);
     this.renderColumns = this.renderColumns.bind(this);
     this.openBulkImportModal = this.openBulkImportModal.bind(this);
+    this.openMinimumStockModal= this.openMinimumStockModal.bind(this)
   }
 
   getAllItem(url_parameter){
@@ -62,6 +65,11 @@ class ItemTable extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     var response_results = response.results;
+                    for (var i = 0; i < response_results.length; i++) {
+                      if (response_results[i].track_minimum_stock === false){
+                        response_results[i].minimum_stock = "N/A";
+                      }
+                    }
                     const isStaff = (localStorage.isStaff === "true");
                     var cartUrl = "/api/request/active/";
                     restRequest("GET", cartUrl, "application/JSON", null,
@@ -331,11 +339,56 @@ class ItemTable extends React.Component {
     this._bulkImportChild.openModal();
   }
 
+  openMinimumStockModal(){
+    // Check if items have been selected
+    this.setState({
+      selected_rows: this.refs.table1.state.selectedRowKeys
+    }, ()=>{
+      this._minimumStockChild.openModal();
+    })
+
+  }
+
+  removeMinimumStock(){
+    checkAuthAndAdmin(()=>{
+      var selected_rows= this.refs.table1.state.selectedRowKeys
+      var successStr = "Removed minimum stock"
+      for (var i = 0; i < selected_rows.length; i++) {
+        var requestBody = {
+            "minimum_stock": 0,
+            "track_minimum_stock": false,
+          }
+
+        var jsonResult = JSON.stringify(requestBody);
+        restRequest("PATCH", "/api/item/" + selected_rows[i], "application/json", jsonResult,
+        (responseText)=>{
+          var response = JSON.parse(responseText);
+          // this.setState({successStr: this.state.successStr + response.name + ", "
+          // });
+          console.log(response);
+        },
+        (status, errResponse)=>{
+          let errs = JSON.parse(errResponse);
+          console.log('PATCH Failed!!');
+          if(errs.quantity != null) {
+            for(var i = 0; i < this.state.errs.quantity.length; i ++) {
+              this._alertchild.generateError(errs.quantity[i]);
+            }
+          }
+        });
+      }
+      this._alertchild.generateSuccess(successStr);
+      this.refs.table1.cleanSelected();
+      this.resetTable();
+      });
+  }
+
   renderColumns() {
     var cols = [];
     cols.push(<TableHeaderColumn key="idCol" isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>);
     cols.push(<TableHeaderColumn key="nameCol" dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>);
-    cols.push(<TableHeaderColumn key="quantityCol" width="120px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="quantityCol" width="100px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="minStockCol" width="100px" dataField='minimum_stock' editable={ { validator: this.quantityValidator} }>Min Quantity</TableHeaderColumn>);
     cols.push(<TableHeaderColumn key="modelNumberCol" dataField='model_number'>Model Number</TableHeaderColumn>);
     cols.push(<TableHeaderColumn key="descriptionCol" dataField='description'>Description</TableHeaderColumn>);
     cols.push(<TableHeaderColumn key="tagsCol" dataField='tags'>Tags</TableHeaderColumn>);
@@ -348,6 +401,8 @@ class ItemTable extends React.Component {
     }
     return cols;
   }
+
+
 
   render() {
     const isStaff = (localStorage.isStaff === "true");
@@ -372,22 +427,29 @@ class ItemTable extends React.Component {
 
     return(
       <div>
-      {isStaff ? <Button onClick={this.openBulkImportModal} bsStyle="primary">CSV Import/Export</Button> : null}
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
-      <ButtonToolbar style={{marginRight: "10px"}} className="text-right">
-        <div style={{marginRight: "10px"}} className="text-right">
-        <ButtonGroup>
-          <Button onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
-        </ButtonGroup>
-        <p>{this.state.tagSearchText}</p>
+        <div className="container-fluid">
+          <Row style={{marginBottom: "-10px"}}>
+          	<Col md={6} style={{marginLeft: "-5px"}}>
+        		   {isStaff ? <Button bsSize="small" onClick={this.openBulkImportModal} bsStyle="primary"><Glyphicon style={{marginRight: "4px"}} glyph="import" />CSV Import/Export</Button> : null}
+               {isStaff ? <Button bsSize="small" onClick={this.openMinimumStockModal} bsStyle="success"><Glyphicon style={{marginRight: "4px"}} glyph="object-align-left" />Set Minimum Stock</Button> : null}
+               {isStaff ? <Button bsSize="small" onClick={this.removeMinimumStock.bind(this)} bsStyle="danger"><Glyphicon style={{marginRight: "4px"}} glyph="remove" />Untrack Minimum Stock</Button> : null}
+            </Col>
+            <Col className="text-right" style={{marginRight: "10px"}}>
+              <div>
+              <Button bsSize="small" onClick={this.onTagSearchClick} bsStyle="primary">Search Tags</Button>
+              <p>{this.state.tagSearchText}</p>
+              </div>
+            </Col>
+          </Row>
         </div>
-      </ButtonToolbar>
       {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
       fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
       data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
       {this.renderColumns()}
       </BootstrapTable>) : null}
 
+      <MinimumStockModal cb={this} item_ids={this.state.selected_rows} ref={(child) => {this._minimumStockChild= child; }} />
       <BulkImportModal importCb={this} ref={(child) => {this._bulkImportChild= child; }} />
       <ItemDetail  ref={(child) => { this._child = child; }} updateCallback={this} />
       <TagModal ref={(child) => {this._tagChild = child; }} updateCallback={this}/>
