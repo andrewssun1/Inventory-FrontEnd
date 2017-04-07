@@ -219,7 +219,7 @@ saveItem(cb) {
   saveEdits() {
     var r = confirm("Are you sure you want to save?");
     if (r) {
-      this.saveItem(()=>{s
+      this.saveItem(()=>{
         this.clearAlert();
         this.toggleEditing();
       });

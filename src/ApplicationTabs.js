@@ -48,6 +48,7 @@ export default class ApplicationTabs extends React.Component {
     else if (key === "requests"){
       this.refs.requestComponent.refs.requestTable._alertchild.closeAlert();
       this.refs.requestComponent.refs.requestTable.resetTable();
+      this.refs.requestComponent.refs.requestTable.refs.logTable.refs.toolbar.refs.seachInput.value = "";
     }
     // else if (key === "disbursements"){
     //   this.refs.disbursementComponent.resetTable();
