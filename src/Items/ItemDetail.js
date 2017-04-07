@@ -198,7 +198,6 @@ saveItem(cb) {
   }
 
   openModal() {
-    //this.state.showModal = true;
     this.setState({showModal: true}, ()=>{});
   }
 
@@ -206,7 +205,7 @@ saveItem(cb) {
     if(this.state.isEditing) {
       this.toggleEditing();
     }
-    // this.props.updateCallback.componentWillMount();
+    this.props.updateCallback.componentWillMount();
     this.setState({showModal: false});
   }
 
@@ -220,8 +219,7 @@ saveItem(cb) {
   saveEdits() {
     var r = confirm("Are you sure you want to save?");
     if (r) {
-      this.saveItem(()=>{
-        this.props.updateCallback.componentWillMount();
+      this.saveItem(()=>{s
         this.clearAlert();
         this.toggleEditing();
       });
@@ -229,7 +227,6 @@ saveItem(cb) {
   }
 
   requestItem() {
-    // this.closeModal();
     this._requestModal.openModal();
   }
 
@@ -239,7 +236,6 @@ saveItem(cb) {
   }
 
   onRowClickCart(row, isSelected, e) {
-    // this.closeModal();
     this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
       this._viewRequestModal.openModal();
     });
@@ -276,7 +272,6 @@ saveItem(cb) {
           ref={child => this.refDict[field.name] = child}/>);
         }
       });
-      // editFields.push(<>);
       return(editFields);
     }
   }
