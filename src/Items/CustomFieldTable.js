@@ -32,7 +32,7 @@ class CustomFieldTable extends React.Component {
 
   getFieldData() {
     checkAuthAndAdmin(()=>{
-      restRequest("GET", "/api/item/field/", "application/json", null,
+      restRequest("GET", this.props.apiSource, "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
         console.log("Getting Custom Field Response");
@@ -62,7 +62,7 @@ onAddRow(row) {
     }
     console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
-    restRequest("POST", "/api/item/field/", "application/json", jsonResult,
+    restRequest("POST", this.props.apiSource, "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log("Getting Add Custom Field Response");
@@ -76,7 +76,7 @@ onAddRow(row) {
 
 onDeleteRow(rows) {
   for (var i = 0; i < rows.length; i++) {
-    restRequest("DELETE", "/api/item/field/" + rows[i], "application/json", null,
+    restRequest("DELETE", this.props.apiSource + rows[i], "application/json", null,
     (responseText)=>{ this.getFieldData();},
     ()=>{console.log('GET Failed!!');}
     );
@@ -111,7 +111,7 @@ render() {
     <TableHeaderColumn dataField='type' editable={ { type: 'select', options: { values: typeList} } }>Type</TableHeaderColumn>
     <TableHeaderColumn dataField='private' editable={ { type: 'select', options: { values: boolList} } }>Privacy</TableHeaderColumn>
     </BootstrapTable>
-    <CustomFieldDetail cb={this} ref={(child) => { this._detail = child; }} ></CustomFieldDetail>
+    <CustomFieldDetail apiSource={this.props.apiSource} cb={this} ref={(child) => { this._detail = child; }} ></CustomFieldDetail>
     </div>
   )
 }

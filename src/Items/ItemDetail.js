@@ -7,10 +7,11 @@ var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
 import MakeRequestModal from '../Requests/MakeRequestModal';
 import ViewRequestModal from '../Requests/ViewRequestModal';
-import TagComponent from '../Tags/TagComponent'
+import TagComponent from '../Tags/TagComponent';
 import TypeConstants from '../TypeConstants';
 import LogQuantityChangeModal from './LogQuantityChangeModal';
-import LogComponent from '../Logs/LogComponent'
+import LogComponent from '../Logs/LogComponent';
+import AssetDetail from './AssetDetail';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
@@ -36,7 +37,9 @@ class ItemDetail extends React.Component {
       fieldData: null,
       cartData: [],
       row: [],
-      showCartChange: true
+      showCartChange: true,
+      isAsset: false,
+      assetData: null
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -53,6 +56,8 @@ class ItemDetail extends React.Component {
     this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
     this.onRowClickCart = this.onRowClickCart.bind(this);
     this.clearAlert = this.clearAlert.bind(this);
+    this.requestAssets = this.requestAssets.bind(this);
+    this.onAssetRowClick = this.onAssetRowClick.bind(this);
   }
 
   getDetailedItem(id, cb) {
@@ -62,6 +67,11 @@ class ItemDetail extends React.Component {
         var response = JSON.parse(responseText);
         console.log("Getting Detailed Item Response");
         console.log(response);
+        //Handle assets:
+        this.setState({isAsset: response.is_asset});
+        if(localStorage.isStaff === "true" && response.is_asset){
+          this.requestAssets(response.id);
+        }
         this.setState({itemData: response}, ()=>{
           if (cb != null){
             cb();
@@ -74,6 +84,19 @@ class ItemDetail extends React.Component {
       ()=>{console.log('GET Failed!!');}
     );
   });
+}
+
+requestAssets(id) {
+  console.log("requesting assets");
+  restRequest("GET", "/api/item/asset?item__id=" + id + "&search&available=True", "application/json", null,
+  (responseText)=>{
+    var response = JSON.parse(responseText);
+    console.log("Getting Asset Response");
+    console.log(response);
+    this.setState({assetData: response.results});
+    //TODO: add Error/success messages
+  },
+  ()=>{console.log('GET Failed!!');});
 }
 
 populateFieldData(response) {
@@ -103,12 +126,18 @@ populateFieldData(response) {
 saveItem(cb) {
   checkAuthAndAdmin(()=>{
     var requestBody;
+    var isAssetString = "true";
+    if(this._isAssetSelect != null) {
+      isAssetString = this._isAssetSelect.state.value;
+    }
+    console.log(isAssetString);
     if(localStorage.isSuperUser === "true") {
       requestBody = {
         "name": this.refDict["Name"].state.value,
         "quantity": this.refDict["Quantity"].state.value,
         "model_number": this.refDict["Model Number"].state.value,
-        "description": this.refDict["Description"].state.value
+        "description": this.refDict["Description"].state.value,
+        "is_asset": isAssetString
       }
     } else {
       requestBody = {
@@ -246,6 +275,29 @@ saveItem(cb) {
     this._alertchild.setState({alertMessage: ""});
   }
 
+  onAssetRowClick(row, isSelected, e) {
+    console.log("Asset Row Click");
+    console.log(row);
+    this._assetDetail.getDetailedAsset(row.id);
+    this._assetDetail.openModal();
+  }
+
+  generateAssetTable() {
+    const options = {
+      onRowClick: this.onAssetRowClick
+    }
+      if((localStorage.isStaff === "true") && this.state.isAsset && this.state.assetData != null) {
+        return(<BootstrapTable ref="assetTable"
+                        data={ this.state.assetData }
+                        options={ options }
+                        striped hover>
+        <TableHeaderColumn dataField='asset_tag' isKey>Asset Tag</TableHeaderColumn>
+        </BootstrapTable>);
+      } else {
+        return(null);
+      }
+    }
+
   renderDisplayFields() {
     if(this.state.fieldData != null) {
       let displayFields = this.state.fieldData.map((field) => {
@@ -256,6 +308,9 @@ saveItem(cb) {
         <p><b>Tags: </b></p>
         <TagComponent ref="tagComponent" cb={this} item_id={this.state.itemData.id} item_detail={this.state.itemData.tags} />
         </div>);
+      if(localStorage.isStaff === "true"){
+        displayFields.push(<p key="isAsset"> <b> Is Asset: </b> {this.state.isAsset ? "True" : "False"} </p>);
+      }
       return (displayFields);
     }
   }
@@ -272,6 +327,13 @@ saveItem(cb) {
           ref={child => this.refDict[field.name] = child}/>);
         }
       });
+      //TODO: Fix placeholder bug
+    if(localStorage.isStaff === "true" && !this.state.isAsset) {
+      editFields.push(<TextEntryFormElement key="isAsset"  label="Is Asset"
+      type={TypeConstants.Enum.SELECT} selectOptions={["true", "false"]} placeholder="false"
+      initialValue="false" ref={child => this._isAssetSelect = child}/>);
+    }
+
       return(editFields);
     }
   }
@@ -304,6 +366,7 @@ saveItem(cb) {
       <LogQuantityChangeModal item_id={this.state.itemData.id} item={this.state.itemData.name}
       updateCallback={this.props.updateCallback} ref={(child) => { this._lqcModal = child; }} />
       <ViewRequestModal id={this.state.selectedRequest} ref={(child) => { this._viewRequestModal = child; }} updateCallback={this.props.updateCallback} />
+      <AssetDetail ref={(child) => { this._assetDetail = child; }} />
       <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
@@ -317,6 +380,8 @@ saveItem(cb) {
         :
         <div>
         {this.renderDisplayFields()}
+        {isStaff ? <p> <b> Instances of this Asset: </b> </p> : null}
+        {this.generateAssetTable()}
         <br />
         <p><b>Outstanding disbursements containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}

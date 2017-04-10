@@ -56,7 +56,7 @@ export default class CustomFieldDetail extends React.Component {
   console.log(requestBody);
 
   var jsonResult = JSON.stringify(requestBody);
-  restRequest("PATCH", "/api/item/field/" + this.state.row.id, "application/json", jsonResult,
+  restRequest("PATCH", this.props.apiSource + this.state.row.id, "application/json", jsonResult,
   (responseText)=>{
     var response = JSON.parse(responseText);
     console.log("Getting Response");
