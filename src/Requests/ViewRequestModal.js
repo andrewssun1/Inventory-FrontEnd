@@ -315,15 +315,19 @@ class ViewRequestModal extends React.Component {
   }
 
   renderOutstandingButton(row){
+    const tooltip = (
+      <Tooltip id="tooltip">{"Change specified quantity to " + (row.status === "disbursement" ? "loan" : "disbursement")}</Tooltip>
+    );
     return (
       <div>
       {this.generateHighQuantityTextBox(row)}
-      <Button bsSize="small"
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <Button bsSize="xsmall" style={{marginLeft: "5px", marginTop: "1px", fontSize: "9.5px"}}
               bsStyle="primary"
-              style={{marginTop: "3px"}}
               onClick={()=>{this.changeRequestType(row)}}>
-              {"Change to " + (row.status === "disbursement" ? "loan" : "disbursement")}</Button>
-            </div>
+              <strong>{"Swap"}
+              </strong></Button>
+          </OverlayTrigger></div>
     );
   }
 
@@ -362,7 +366,7 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
-      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
+      <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Request</Modal.Title>

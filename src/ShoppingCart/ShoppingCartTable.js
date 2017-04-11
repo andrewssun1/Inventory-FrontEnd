@@ -12,7 +12,8 @@ import '../DropdownTable.css';
 import {Button} from 'react-bootstrap';
 import ShoppingCartModal from './ShoppingCartModal';
 import CartQuantityChooser from './CartQuantityChooser';
-import AlertComponent from '../AlertComponent'
+import AlertComponent from '../AlertComponent';
+import BackfillModal from '../Backfill/BackfillModal';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -36,6 +37,8 @@ export default class ShoppingCartTable extends React.Component {
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.openCartModal = this.openCartModal.bind(this);
     this.createChooserAndButton = this.createChooserAndButton.bind(this);
+    this.createBackfillButton = this.createBackfillButton.bind(this);
+    this.openBackfillModal = this.openBackfillModal.bind(this);
   }
 
 
@@ -122,6 +125,15 @@ export default class ShoppingCartTable extends React.Component {
     );
   }
 
+  openBackfillModal(){
+    this._backfillchild.openModal();
+  }
+  createBackfillButton(cell, row){
+    return(
+      <Button bsStyle="primary" onClick={this.openBackfillModal}>Backfill</Button>
+    );
+  }
+
   render(){
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
@@ -133,9 +145,11 @@ export default class ShoppingCartTable extends React.Component {
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ShoppingCartModal ref={(child) => {this._cartchild = child; }} updateCallback={this}/>
+      <BackfillModal ref={(child) => {this._backfillchild = child; }} cb={this}/>
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
+      <TableHeaderColumn ref="backfill" dataField='button' dataFormat={this.createBackfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Backfill</TableHeaderColumn>
       <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
     </BootstrapTable>
       <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
