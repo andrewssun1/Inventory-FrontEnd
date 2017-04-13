@@ -167,6 +167,7 @@ openModal() {
 }
 
 closeModal() {
+  console.log("closeModal called");
   if(this.state.isEditing) {
     this.toggleEditing();
   }
@@ -265,10 +266,16 @@ renderDisplayFields() {
     );
   }
 
+  testOnHide() {
+    console.log("TEST ON HIDE");
+  }
+
   render() {
     if(this.state.itemData == null) return null;
 
     const isStaff = (localStorage.isStaff === "true");
+
+    //TODO: Fix weird close modal bug when adding asset, fix scrolling problem
 
     return (
       <div>
@@ -296,7 +303,7 @@ renderDisplayFields() {
         null
         :
         <div>
-        {(isStaff && this.state.id != null) ? <AssetTable id={this.state.id} /> : null}
+        {(isStaff && this.state.id != null && this.state.isAsset) ? <AssetTable id={this.state.id} updateCallback={this}/> : null}
         <br />
         <p><b>Outstanding disbursements containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}

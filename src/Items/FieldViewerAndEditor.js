@@ -63,7 +63,7 @@ class FieldViewerAndEditor extends React.Component {
     this.setState({fieldData: data});
   }
 
-  saveCustomFields() {
+  saveCustomFields(cb) {
     //Save Custom Fields
     var itemDataArrays = this.state.responseData;
       var types = TypeConstants.RequestStrings;
@@ -74,6 +74,9 @@ class FieldViewerAndEditor extends React.Component {
           var newValue = this.refDict[oldFields[j].field].state.value;
           if(oldFields[j].value !== newValue && this.typeCheck(newValue, types[i])) {
             this.customFieldRequest(types[i], oldFields[j].id, newValue);
+          }
+          if(cb != null) {
+            cb();
           }
         }
       }

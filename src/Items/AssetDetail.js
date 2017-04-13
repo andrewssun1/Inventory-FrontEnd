@@ -48,9 +48,10 @@ class AssetDetail extends React.Component {
   }
 
   saveEdits() {
-    this._fieldViewerAndEditor.saveCustomFields();
+    this._fieldViewerAndEditor.saveCustomFields(()=> {
+        this.getDetailedAsset(this.state.tag);
+    });
     this.toggleEditing();
-    this.getDetailedAsset(this.state.tag);
   }
 
   toggleEditing() {
