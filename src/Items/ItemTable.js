@@ -253,6 +253,7 @@ class ItemTable extends React.Component {
         var results = response.results;
         for(var i = 0; i < results.length; i++) {
           results[i].type = TypeConstants.RequestToFormatMap[results[i].type];
+          //TODO: Don't think we need this
           if(results[i].private) {
             results[i].private = "Private";
           } else {
