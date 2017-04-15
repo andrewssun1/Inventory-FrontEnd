@@ -28,7 +28,10 @@ class ItemComponent extends React.Component {
                 {this.state.isSuperUser ?
                     <div>
                       <h2> Custom Fields </h2>
-                      <CustomFieldTable />
+                      <CustomFieldTable apiSource="/api/item/field/"/>
+                      <br />
+                      <h2> Asset Fields </h2>
+                      <CustomFieldTable apiSource="/api/item/asset/field/"/>
                     </div>
                     : null}
             </div>

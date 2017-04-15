@@ -71,3 +71,24 @@ export function restRequestData( requestType, url, requestData, successCb, error
   xhttp.onreadystatechange = f;
   xhttp.send(requestData);
 }
+
+export function handleErrors(errResponse, alertchild) {
+  let errs = JSON.parse(errResponse);
+  var errorString = "";
+  for (var key in errs) {
+    if (errs.hasOwnProperty(key)) {
+      let errorArray = errs[key];
+      for(var i = 0; i < errorArray.length; i ++) {
+        let errorObject = errorArray[i];
+        errorString = errorString + errorObject;
+      }
+    }
+  }
+  if(errorString != "") {
+    alertchild.generateError(errorString);
+  }
+}
+
+export function handleServerError(alertchild) {
+  alertchild.generateError("An internal server error has occurred. Please contact the system administrator.");
+}
