@@ -4,10 +4,11 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
-import {restRequest, checkAuthAndAdmin} from "../Utilities";
+import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities";
 import DateRangePicker from '../DateRangePicker.js';
 import TypeConstants from '../TypeConstants.js';
 import FieldViewerAndEditor from './FieldViewerAndEditor.js';
+import AlertComponent from '../AlertComponent';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -42,9 +43,8 @@ class AssetDetail extends React.Component {
       console.log("Getting Asset Response");
       console.log(response);
       this._fieldViewerAndEditor.populateFieldData(response);
-      //TODO: add Error/success messages
     },
-    ()=>{console.log('GET Failed!!');});
+    ()=>{handleServerError(this._alertchild)});
   }
 
   saveEdits() {
@@ -62,7 +62,9 @@ class AssetDetail extends React.Component {
     return (
       <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
-      <FieldViewerAndEditor apiSource="/api/item/asset/field/" isEditing={this.state.isEditing} ref={(child) => { this._fieldViewerAndEditor = child; }}/>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+      <FieldViewerAndEditor apiSource="/api/item/asset/field/" isEditing={this.state.isEditing}
+      alertchild={this._alertchild} ref={(child) => { this._fieldViewerAndEditor = child; }}/>
       </Modal.Body>
       <Modal.Footer>
       {this.state.isEditing ?

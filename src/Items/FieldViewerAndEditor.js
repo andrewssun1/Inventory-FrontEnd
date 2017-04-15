@@ -19,7 +19,7 @@ var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 var moment = require('moment');
 
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
+import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities.js";
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import AlertComponent from '../AlertComponent';
 import Select from 'react-select';
@@ -98,8 +98,8 @@ class FieldViewerAndEditor extends React.Component {
       console.log("Getting Response");
       console.log(response);
     },
-    ()=>{
-      console.log('PATCH Failed!!');
+    (status, errResponse)=>{
+      handleErrors(errResponse, this.props.alertchild);
     });
   }
 

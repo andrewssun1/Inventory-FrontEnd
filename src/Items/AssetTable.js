@@ -4,12 +4,13 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 var ReactBsTable = require('react-bootstrap-table');
-import {restRequest} from "../Utilities";
+import {restRequest, handleErrors, handleServerError} from "../Utilities";
 import AssetDetail from './AssetDetail';
 import TypeConstants from '../TypeConstants';
 import Select from 'react-select';
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import InstaButtons from './InstaButtons';
+import AlertComponent from '../AlertComponent';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn
 var Button = Bootstrap.Button;
@@ -23,7 +24,8 @@ class AssetTable extends React.Component {
       fields: null,
       users: [],
       selectValues: [],
-      userMap: []
+      userMap: [],
+      shouldOpenModal: true
     }
     this.requestAssets = this.requestAssets.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
@@ -42,16 +44,14 @@ class AssetTable extends React.Component {
   }
 
   requestAssets() {
-    console.log("requesting assets");
     restRequest("GET", "/api/item/asset?item__id=" + this.props.id + "&search", "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log("Getting Asset Response");
       console.log(response);
       this.setState({assetData: response.results});
-      //TODO: add Error/success messages
     },
-    ()=>{console.log('GET Failed!!');});
+    ()=>{handleServerError(this._alertchild)});
   }
 
   getFieldData() {
@@ -63,7 +63,7 @@ class AssetTable extends React.Component {
       var results = response.results;
       this.setState({_fields: response.results});
     },
-    ()=>{console.log('GET Failed!!');}
+    ()=>{handleServerError(this._alertchild)}
   );
 }
 
@@ -79,12 +79,12 @@ getUsers() {
       usernameIDMap[username] = response.results[i].id;
     }
     this.setState({userMap: usernameIDMap});
-  }, ()=>{});
+  }, ()=>{handleServerError(this._alertchild)});
 }
 
 userSelectFormatter(cell, row) {
   return(
-    <div>
+    <div onClick={()=>{this.state.shouldOpenModal=false;}}>
     <Select simpleValue
     placeholder="Select"
     value={this.state.selectValues[row.asset_tag]}
@@ -101,7 +101,6 @@ handleSelectChange(value, row) {
 }
 
 assetButtonFormatter(cell, row) {
-  console.log(row);
   if(row.disbursement != null) {
     return(<b> Disbursed to {row.disbursement.cart_owner}</b>);
   } else if(row.loan != null) {
@@ -111,13 +110,15 @@ assetButtonFormatter(cell, row) {
     //this asset using selectValues, then using that to find the appropriate user ID
     //using userMap
     return (
-      <InstaButtons row={row} id={this.state.userMap[this.state.selectValues[row.asset_tag]]} updateCallback={this}/>
+      <div onClick={()=>{this.state.shouldOpenModal=false;}} >
+      <InstaButtons row={row} id={this.state.userMap[this.state.selectValues[row.asset_tag]]}
+      alertchild={this._alertchild} updateCallback={this}/>
+      </div>
     );
   }
 }
 
 onAddRow(row) {
-  console.log(row);
   var requestBody = {
     "item_id" : this.props.id
   }
@@ -130,8 +131,11 @@ onAddRow(row) {
     row.id = response.id;
     this.addAssetFields(row);
     this.requestAssets();
+    this._alertchild.generateSuccess("Successfully added asset");
   },
-  ()=>{console.log('GET Failed!!');}
+  (status, errResponse)=>{
+    handleErrors(errResponse, this._alertchild);
+  }
 );
 }
 
@@ -149,7 +153,7 @@ addAssetFields(row) {
         this.customFieldRequest(typesArray[i], responseDataArrays[i][j].id, row[responseDataArrays[i][j].field]);
       }
     }
-  }, ()=>{console.log('GET Detailed Failed!!');});
+  }, ()=>{handleServerError(this._alertchild)});
 }
 
 customFieldRequest(type, id, value) {
@@ -164,21 +168,29 @@ customFieldRequest(type, id, value) {
     console.log("Getting Response");
     console.log(response);
   },
-  ()=>{
-    console.log('PATCH Failed!!');
+  (status, errResponse)=>{
+    handleErrors(errResponse, this._alertchild);
   });
 }
 
 onDeleteRow(rows) {
-  for(var i = 0; i < this.state.assetData.length; i ++) {
-    for(var j = 0; j < rows.length; j ++) {
+  console.log(rows);
+  var k = 1;
+  for(var j = 0; j < rows.length; j ++) {
+    for(var i = 0; i < this.state.assetData.length; i ++) {
       if(this.state.assetData[i].asset_tag === rows[j]) {
         restRequest("DELETE", "/api/item/asset/"+this.state.assetData[i].id, "application/json", null,
         ()=>{
-          this.requestAssets();
-          this.props.updateCallback.getDetailedItem(this.props.id);
+          console.log("Successfully deleted rows")
+          console.log(j);
+          if(k == rows.length) {
+            this.requestAssets();
+            this.props.updateCallback.getDetailedItem(this.props.id);
+            this._alertchild.generateSuccess("Successfully deleted rows");
+          }
+          k ++;
         }, (status, errResponse)=>{
-          console.log('GET Failed!!');
+          this.handleErrors(errResponse, this._alertchild);
         });
       }
     }
@@ -187,17 +199,20 @@ onDeleteRow(rows) {
 
 onAssetRowClick(row, isSelected, e) {
   //TODO: Uncomment when you figure out how to copy Andrew's funky logic
-  /*console.log("Asset Row Click");
+  console.log("Asset Row Click");
   console.log(row);
-  this._assetDetail.getDetailedAsset(row.id);
-  this._assetDetail.openModal();*/
+  if(this.state.shouldOpenModal) {
+    this._assetDetail.openModal();
+    this._assetDetail.getDetailedAsset(row.id);
+  } else {
+    this.state.shouldOpenModal = true;
+  }
 }
 
 
 renderColumns() {
-  //TODO: ask about asset_tag bug
   var cols = [];
-  cols.push(<TableHeaderColumn key="asset_tag" dataField='asset_tag' hiddenOnInsert isKey>Asset Tag</TableHeaderColumn>);
+  cols.push(<TableHeaderColumn key="asset_tag" dataField='asset_tag' autoValue={true} hiddenOnInsert isKey>Asset Tag</TableHeaderColumn>);
   for(var i = 0; i < this.state._fields.length; i++) {
     let name = this.state._fields[i].name;
     cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
@@ -222,6 +237,7 @@ render() {
     return(
       <div>
       <p> <b> Instances of this Asset: </b> </p>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <AssetDetail ref={(child) => { this._assetDetail = child; }} />
       <BootstrapTable ref="assetTable"
       data={ this.state.assetData }

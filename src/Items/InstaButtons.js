@@ -3,7 +3,7 @@ var React = require('react');
 import '../DropdownTable.css';
 import {Button, FormGroup, FormControl, InputGroup, Label, OverlayTrigger, Tooltip} from 'react-bootstrap';
 // import { hashHistory } from 'react-router';
-import { checkAuthAndAdmin, restRequest } from '../Utilities';
+import { checkAuthAndAdmin, restRequest, handleErrors } from '../Utilities';
 
 export default class InstaButtons extends React.Component {
 
@@ -38,8 +38,11 @@ export default class InstaButtons extends React.Component {
       console.log("Getting insta response");
       console.log(response);
       this.props.updateCallback.requestAssets();
+      this.props.updateCallback._alertchild.generateSuccess("Successfully made dispensement");
     },
-    ()=>{console.log('GET Failed!!');}
+    (status, errResponse)=>{
+      handleErrors(errResponse, this.props.alertchild);
+    }
   );
   }
 
