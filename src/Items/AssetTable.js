@@ -24,7 +24,9 @@ class AssetTable extends React.Component {
       users: [],
       selectValues: [],
       userMap: [],
-      shouldOpenModal: true
+      shouldOpenModal: true,
+      currentPage: 1,
+      dataTotalSize: 0
     }
     this.requestAssets = this.requestAssets.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
@@ -34,6 +36,7 @@ class AssetTable extends React.Component {
     this.userSelectFormatter = this.userSelectFormatter.bind(this);
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.assetButtonFormatter = this.assetButtonFormatter.bind(this);
+    this.onPageChange = this.onPageChange.bind(this);
   }
 
   componentWillMount() {
@@ -42,13 +45,18 @@ class AssetTable extends React.Component {
     this.getUsers();
   }
 
-  requestAssets() {
-    restRequest("GET", "/api/item/asset?item__id=" + this.props.id + "&search", "application/json", null,
+  requestAssets(pageNumber) {
+    var pageParam = pageNumber
+    if(pageParam == null) {
+      pageParam = this.state.currentPage
+    }
+    restRequest("GET", "/api/item/asset?item__id=" + this.props.id + "&page=" + pageParam + "&search", "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log("Getting Asset Response");
       console.log(response);
       this.setState({assetData: response.results});
+      this.setState({dataTotalSize: response.count});
     },
     ()=>{handleServerError(this._alertchild)});
   }
@@ -204,6 +212,12 @@ onAssetRowClick(row, isSelected, e) {
   }
 }
 
+onPageChange(page, sizePerPage) {
+    this.requestAssets(page);
+    this.setState({
+        currentPage: page
+    })
+}
 
 renderColumns() {
   var cols = [];
@@ -225,7 +239,11 @@ render() {
   const options = {
     onAddRow: this.onAddRow,
     onDeleteRow: this.onDeleteRow,
-    onRowClick: this.onAssetRowClick
+    onRowClick: this.onAssetRowClick,
+    onPageChange: this.onPageChange.bind(this),
+    sizePerPageList: [ 30 ],
+    sizePerPage: 30,
+    page: this.state.currentPage
   };
 
   if((localStorage.isStaff === "true") && this.state.assetData != null) {
@@ -237,6 +255,9 @@ render() {
       <BootstrapTable ref="assetTable"
       data={ this.state.assetData }
       options={ options }
+      pagination={true}
+      fetchInfo={ { dataTotalSize: this.state.dataTotalSize } }
+      remote={true}
       selectRow = { selectRow }
       deleteRow={true} insertRow={true}
       striped hover>
