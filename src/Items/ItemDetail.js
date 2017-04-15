@@ -7,10 +7,12 @@ var ReactBsTable = require('react-bootstrap-table');
 import TextEntryFormElement from '../TextEntryFormElement';
 import MakeRequestModal from '../Requests/MakeRequestModal';
 import ViewRequestModal from '../Requests/ViewRequestModal';
-import TagComponent from '../Tags/TagComponent'
+import TagComponent from '../Tags/TagComponent';
 import TypeConstants from '../TypeConstants';
 import LogQuantityChangeModal from './LogQuantityChangeModal';
-import LogComponent from '../Logs/LogComponent'
+import LogComponent from '../Logs/LogComponent';
+import AssetTable from './AssetTable';
+import FieldViewerAndEditor from './FieldViewerAndEditor';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 var Modal = Bootstrap.Modal;
@@ -36,7 +38,9 @@ class ItemDetail extends React.Component {
       fieldData: null,
       cartData: [],
       row: [],
-      showCartChange: true
+      showCartChange: true,
+      isAsset: false,
+      id: null,
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -48,8 +52,6 @@ class ItemDetail extends React.Component {
     this.populateFieldData = this.populateFieldData.bind(this);
     this.renderDisplayFields = this.renderDisplayFields.bind(this);
     this.renderEditFields = this.renderEditFields.bind(this);
-    this.customFieldRequest = this.customFieldRequest.bind(this);
-    this.typeCheck = this.typeCheck.bind(this);
     this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
     this.onRowClickCart = this.onRowClickCart.bind(this);
     this.clearAlert = this.clearAlert.bind(this);
@@ -62,6 +64,9 @@ class ItemDetail extends React.Component {
         var response = JSON.parse(responseText);
         console.log("Getting Detailed Item Response");
         console.log(response);
+        //Handle assets:
+        this.setState({isAsset: response.is_asset});
+        this.setState({id: response.id});
         this.setState({itemData: response}, ()=>{
           if (cb != null){
             cb();
@@ -80,35 +85,29 @@ populateFieldData(response) {
   //Default Fields:
   var data = [
     {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
-    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true")},
+    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true" || this.state.isAsset)},
     {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
     {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
   ];
-  //Custom Fields:
-  var typesArray = TypeConstants.Array;
-  console.log("printing response arrays");
-  var responseDataArrays = [response.int_fields, response.float_fields, response.short_text_fields, response.long_text_fields];
-  for(var i = 0; i < typesArray.length; i++) {
-    console.log(responseDataArrays[i]);
-    for(var j = 0; j < responseDataArrays[i].length; j++) {
-      var field = responseDataArrays[i][j];
-      if((localStorage.isStaff === "true") || !field.private) {
-        data.push({name: field.field, type: typesArray[i], value: field.value});
-      }
-    }
-  }
+  this._fieldViewerAndEditor.populateFieldData(response);
   this.setState({fieldData: data});
 }
 
-saveItem(cb) {
+saveItem() {
   checkAuthAndAdmin(()=>{
     var requestBody;
+    var isAssetString = "true";
+    if(this._isAssetSelect != null) {
+      isAssetString = this._isAssetSelect.state.value;
+    }
+    console.log(isAssetString);
     if(localStorage.isSuperUser === "true") {
       requestBody = {
         "name": this.refDict["Name"].state.value,
         "quantity": this.refDict["Quantity"].state.value,
         "model_number": this.refDict["Model Number"].state.value,
-        "description": this.refDict["Description"].state.value
+        "description": this.refDict["Description"].state.value,
+        "is_asset": isAssetString
       }
     } else {
       requestBody = {
@@ -124,7 +123,8 @@ saveItem(cb) {
       var response = JSON.parse(responseText);
       console.log("Getting Response");
       console.log(response);
-      cb();
+      this.toggleEditing();
+      this.clearAlert();
     },
     (status, errResponse)=>{
       let errs = JSON.parse(errResponse);
@@ -135,127 +135,93 @@ saveItem(cb) {
         }
       }
     });
+    this._fieldViewerAndEditor.saveCustomFields();
+    //Update detailed item data:
+    this.getDetailedItem(this.state.itemData.id);
+  });
+}
 
-    //Save Custom Fields
-    var itemDataArrays = [this.state.itemData.int_fields,
-      this.state.itemData.float_fields,
-      this.state.itemData.short_text_fields,
-      this.state.itemData.long_text_fields];
-      var types = TypeConstants.RequestStrings;
-      for(var i = 0; i < itemDataArrays.length; i++) {
-        var oldFields = itemDataArrays[i];
-        for(var j = 0; j < oldFields.length; j++) {
-          var newValue = this.refDict[oldFields[j].field].state.value;
-          if(oldFields[j].value !== newValue && this.typeCheck(newValue, types[i])) {
-            this.customFieldRequest(types[i], oldFields[j].id, newValue);
-          }
-        }
+getCarts(item_name){
+  // GET request to get all outstanding carts for this item by this user
+  restRequest("GET", "/api/request/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
+  (responseText)=>{
+    var response = JSON.parse(responseText);
+    console.log(response);
+    var results = ItemDetail.editGetResponse(response.results);
+    this.setState({
+      cartData: results
+    });
+  }, ()=>{console.log('GET Failed!!');});
+}
+
+static editGetResponse(data) {
+  for(var index=0; index< data.length; index++){
+    data[index]['username'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
+    data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
+  }
+  return data;
+}
+
+openModal() {
+  this.setState({showModal: true}, ()=>{});
+}
+
+closeModal() {
+  console.log("closeModal called");
+  if(this.state.isEditing) {
+    this.toggleEditing();
+  }
+  this.props.updateCallback.componentWillMount();
+  this.setState({showModal: false});
+}
+
+toggleEditing() {
+  if(!this.state.isEditing) {
+    this.renderEditFields();
+  }
+  this.setState({isEditing: !this.state.isEditing});
+}
+
+saveEdits() {
+  var r = confirm("Are you sure you want to save?");
+  if (r) {
+    this.saveItem();
+  }
+}
+
+requestItem() {
+  this._requestModal.openModal();
+}
+
+logItemQuantityChange() {
+  this.closeModal();
+  this._lqcModal.openModal();
+}
+
+onRowClickCart(row, isSelected, e) {
+  this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
+    this._viewRequestModal.openModal();
+  });
+}
+
+clearAlert() {
+  this._alertchild.setState({showAlert: false});
+  this._alertchild.setState({alertMessage: ""});
+}
+
+renderDisplayFields() {
+  if(this.state.fieldData != null) {
+    let displayFields = this.state.fieldData.map((field) => {
+      return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
+    });
+    displayFields.push(
+      <div key="tagComponent">
+      <p><b>Tags: </b></p>
+      <TagComponent ref="tagComponent" cb={this} item_id={this.state.itemData.id} item_detail={this.state.itemData.tags} />
+      </div>);
+      if(localStorage.isStaff === "true"){
+        displayFields.push(<p key="isAsset"> <b> Is Asset: </b> {this.state.isAsset ? "True" : "False"} </p>);
       }
-      //Update detailed item data:
-      this.getDetailedItem(this.state.itemData.id);
-    });
-  }
-
-  typeCheck(value, type) {
-    return (type === 'short_text' || type === 'long_text' || value !== "");
-  }
-
-  getCarts(item_name){
-    // GET request to get all outstanding carts for this item by this user
-    restRequest("GET", "/api/request/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
-    (responseText)=>{
-      var response = JSON.parse(responseText);
-      console.log(response);
-      var results = ItemDetail.editGetResponse(response.results);
-      this.setState({
-        cartData: results
-      });
-    }, ()=>{console.log('GET Failed!!');});
-  }
-
-  static editGetResponse(data) {
-    for(var index=0; index< data.length; index++){
-      data[index]['username'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
-      data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
-    }
-    return data;
-  }
-
-  customFieldRequest(type, id, value) {
-    var requestBody = {
-      "value": value
-    }
-    var jsonResult = JSON.stringify(requestBody);
-    restRequest("PATCH", "/api/item/field/" + type + "/" + id, "application/json", jsonResult,
-    (responseText)=>{
-      var response = JSON.parse(responseText);
-      console.log("Getting Response");
-      console.log(response);
-    },
-    ()=>{
-      console.log('PATCH Failed!!');
-    });
-  }
-
-  openModal() {
-    this.setState({showModal: true}, ()=>{});
-  }
-
-  closeModal() {
-    if(this.state.isEditing) {
-      this.toggleEditing();
-    }
-    this.props.updateCallback.componentWillMount();
-    this.setState({showModal: false});
-  }
-
-  toggleEditing() {
-    if(!this.state.isEditing) {
-      this.renderEditFields();
-    }
-    this.setState({isEditing: !this.state.isEditing});
-  }
-
-  saveEdits() {
-    var r = confirm("Are you sure you want to save?");
-    if (r) {
-      this.saveItem(()=>{
-        this.clearAlert();
-        this.toggleEditing();
-      });
-    }
-  }
-
-  requestItem() {
-    this._requestModal.openModal();
-  }
-
-  logItemQuantityChange() {
-    this.closeModal();
-    this._lqcModal.openModal();
-  }
-
-  onRowClickCart(row, isSelected, e) {
-    this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
-      this._viewRequestModal.openModal();
-    });
-  }
-
-  clearAlert() {
-    this._alertchild.setState({showAlert: false});
-    this._alertchild.setState({alertMessage: ""});
-  }
-
-  renderDisplayFields() {
-    if(this.state.fieldData != null) {
-      let displayFields = this.state.fieldData.map((field) => {
-        return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
-      });
-      displayFields.push(
-        <div key="tagComponent">
-        <p><b>Tags: </b></p>
-        <TagComponent ref="tagComponent" cb={this} item_id={this.state.itemData.id} item_detail={this.state.itemData.tags} />
-        </div>);
       return (displayFields);
     }
   }
@@ -272,6 +238,13 @@ saveItem(cb) {
           ref={child => this.refDict[field.name] = child}/>);
         }
       });
+      //TODO: Fix placeholder bug
+      if(localStorage.isStaff === "true" && !this.state.isAsset) {
+        editFields.push(<TextEntryFormElement key="isAsset"  label="Is Asset"
+        type={TypeConstants.Enum.SELECT} selectOptions={["true", "false"]} placeholder="false"
+        initialValue="false" ref={child => this._isAssetSelect = child}/>);
+      }
+
       return(editFields);
     }
   }
@@ -282,21 +255,27 @@ saveItem(cb) {
     };
     return(
       <BootstrapTable ref="logTable"
-                      data={ data }
-                      options={ cartTableOptions }
-                      striped hover>
-                      <TableHeaderColumn dataField='cart_id' isKey hidden autoValue="true">cart_id</TableHeaderColumn>
-                      <TableHeaderColumn dataField='cart_owner'>Requesting User</TableHeaderColumn>
-                      <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
-                      <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
+      data={ data }
+      options={ cartTableOptions }
+      striped hover>
+      <TableHeaderColumn dataField='cart_id' isKey hidden autoValue="true">cart_id</TableHeaderColumn>
+      <TableHeaderColumn dataField='cart_owner'>Requesting User</TableHeaderColumn>
+      <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
+      <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
       </BootstrapTable>
     );
+  }
+
+  testOnHide() {
+    console.log("TEST ON HIDE");
   }
 
   render() {
     if(this.state.itemData == null) return null;
 
     const isStaff = (localStorage.isStaff === "true");
+
+    //TODO: Fix weird close modal bug when adding asset, fix scrolling problem
 
     return (
       <div>
@@ -315,8 +294,16 @@ saveItem(cb) {
         {this.renderEditFields()}
         </Form>
         :
+        this.renderDisplayFields()
+      }
+
+      <FieldViewerAndEditor apiSource="/api/item/field/" isEditing={this.state.isEditing} ref={(child) => { this._fieldViewerAndEditor = child; }}/>
+
+      {this.state.isEditing ?
+        null
+        :
         <div>
-        {this.renderDisplayFields()}
+        {(isStaff && this.state.id != null && this.state.isAsset) ? <AssetTable id={this.state.id} updateCallback={this}/> : null}
         <br />
         <p><b>Outstanding disbursements containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}
@@ -325,47 +312,47 @@ saveItem(cb) {
         <p><b>Current loans containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.current_loans)}
         {isStaff ?
-        <div>
-        <b> Logs involving this item: </b>
-        <LogComponent lightMode={true} itemFilter={this.state.itemData.name}> </LogComponent>
-        </div>
-        : null}
-        </div>
-      }
-      </Modal.Body>
-      <Modal.Footer>
-      {isStaff ?
-        this.state.isEditing ?
-        //Buttons for an admin in editing mode
-        <div>
-        <Button onClick={this.saveEdits} bsStyle="primary">Save</Button>
-        <Button onClick={this.toggleEditing} bsStyle="danger">Cancel</Button>
-        </div>
-        :
-        //Buttons for an admin in viewing mode
-        <div>
-        {this.state.showCartChange ?
-        <CartQuantityChooser showLabel={true} disburse={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
-        : null}
-        <Button onClick={this.logItemQuantityChange} bsStyle="info">Log</Button>
-        <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
-        <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
-        </div>
-        :
-        //Buttons for a user
-        <div>
+          <div>
+          <b> Logs involving this item: </b>
+          <LogComponent lightMode={true} itemFilter={this.state.itemData.name}> </LogComponent>
+          </div>
+          : null}
+          </div>
+        }
+        </Modal.Body>
+        <Modal.Footer>
+        {isStaff ?
+          this.state.isEditing ?
+          //Buttons for an admin in editing mode
+          <div>
+          <Button onClick={this.saveEdits} bsStyle="primary">Save</Button>
+          <Button onClick={this.toggleEditing} bsStyle="danger">Cancel</Button>
+          </div>
+          :
+          //Buttons for an admin in viewing mode
+          <div>
           {this.state.showCartChange ?
-          <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser> :
-          null
+            <CartQuantityChooser showLabel={true} disburse={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser>
+            : null}
+            <Button onClick={this.logItemQuantityChange} bsStyle="info">Log</Button>
+            <Button onClick={this.toggleEditing} bsStyle="primary">Edit</Button>
+            <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
+            </div>
+            :
+            //Buttons for a user
+            <div>
+            {this.state.showCartChange ?
+              <CartQuantityChooser showLabel={true} cb={this} row={this.state.row} shouldUpdateCart={this.state.row.inCart}></CartQuantityChooser> :
+              null
+            }
+            <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
+            </div>
           }
-        <Button onClick={this.closeModal} bsStyle="danger">Close</Button>
-        </div>
+          </Modal.Footer>
+          </Bootstrap.Modal>
+          </div>
+        )
       }
-      </Modal.Footer>
-      </Bootstrap.Modal>
-      </div>
-    )
-  }
-}
+    }
 
-export default ItemDetail
+    export default ItemDetail

@@ -16,12 +16,23 @@ class TextEntryFormElement extends React.Component {
       value: (this.props.initialValue == null) ? "" : this.props.initialValue
     }
     this.handleChange = this.handleChange.bind(this);
+    this.renderSelectOptions = this.renderSelectOptions.bind(this);
   }
 
   handleChange(evt) {
     this.setState({value: evt.target.value});
     if(this.props.changeHandleCallback != null) {
       this.props.changeHandleCallback.handleChange(evt);
+    }
+  }
+
+  renderSelectOptions() {
+    console.log(this.props.selectOptions);
+    if(this.props.selectOptions != null) {
+      let selectOptions = this.props.selectOptions.map((optionString) => {
+        return(<option key={optionString} value={optionString}>{optionString}</option>);
+      });
+      return (selectOptions);
     }
   }
 
@@ -32,9 +43,15 @@ class TextEntryFormElement extends React.Component {
       {this.props.label}
       </Col>
       <Col sm={10}>
+      {this.props.type === TypeEnum.SELECT ?
+      <FormControl componentClass="select" placeholder={this.props.placeholder}
+      onChange={this.handleChange} ref={(child) => { this._selectFormControl = child; }}>
+      {this.renderSelectOptions()}
+      </FormControl>
+      :
       <FormControl componentClass={(this.props.type === TypeEnum.LONG_STRING) ? "textarea" : "input"}
       type={(this.props.type === TypeEnum.INTEGER || this.props.type === TypeEnum.FLOAT) ? "number" : "text"}
-      value={this.state.value} onChange={this.handleChange}/>
+      value={this.state.value} onChange={this.handleChange}/>}
       </Col>
       </FormGroup>
     )
