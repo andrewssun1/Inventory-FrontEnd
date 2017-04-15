@@ -8,7 +8,6 @@ import {restRequest, handleErrors, handleServerError} from "../Utilities";
 import AssetDetail from './AssetDetail';
 import TypeConstants from '../TypeConstants';
 import Select from 'react-select';
-import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import InstaButtons from './InstaButtons';
 import AlertComponent from '../AlertComponent';
 var BootstrapTable = ReactBsTable.BootstrapTable;
@@ -198,9 +197,6 @@ onDeleteRow(rows) {
 }
 
 onAssetRowClick(row, isSelected, e) {
-  //TODO: Uncomment when you figure out how to copy Andrew's funky logic
-  console.log("Asset Row Click");
-  console.log(row);
   if(this.state.shouldOpenModal) {
     this._assetDetail.openModal();
     this._assetDetail.getDetailedAsset(row.id);
@@ -224,7 +220,7 @@ renderColumns() {
 
 render() {
   const selectRow = {
-    mode: 'checkbox' //radio or checkbox
+    mode: 'checkbox'
   };
 
   const options = {

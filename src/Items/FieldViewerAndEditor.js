@@ -3,26 +3,12 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-var ReactBsTable = require('react-bootstrap-table');
+import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities.js";
+import AlertComponent from '../AlertComponent';
 import TextEntryFormElement from '../TextEntryFormElement';
-import MakeRequestModal from '../Requests/MakeRequestModal';
-import ViewRequestModal from '../Requests/ViewRequestModal';
-import TagComponent from '../Tags/TagComponent';
 import TypeConstants from '../TypeConstants';
-import LogQuantityChangeModal from './LogQuantityChangeModal';
-import LogComponent from '../Logs/LogComponent';
-import AssetDetail from './AssetDetail';
-var BootstrapTable = ReactBsTable.BootstrapTable;
-var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
-var moment = require('moment');
-
-import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities.js";
-import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
-import AlertComponent from '../AlertComponent';
-import Select from 'react-select';
 
 class FieldViewerAndEditor extends React.Component {
 

@@ -3,15 +3,11 @@
 
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
-import TextEntryFormElement from "../TextEntryFormElement";
 import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities";
-import DateRangePicker from '../DateRangePicker.js';
-import TypeConstants from '../TypeConstants.js';
 import FieldViewerAndEditor from './FieldViewerAndEditor.js';
 import AlertComponent from '../AlertComponent';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
-var Form = Bootstrap.Form;
 
 class AssetDetail extends React.Component {
   constructor(props) {

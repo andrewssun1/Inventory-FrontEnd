@@ -1,9 +1,7 @@
 var React = require('react');
 
-import '../DropdownTable.css';
-import {Button, FormGroup, FormControl, InputGroup, Label, OverlayTrigger, Tooltip} from 'react-bootstrap';
-// import { hashHistory } from 'react-router';
-import { checkAuthAndAdmin, restRequest, handleErrors } from '../Utilities';
+import {Button} from 'react-bootstrap';
+import { checkAuthAndAdmin, restRequest, handleErrors} from '../Utilities';
 
 export default class InstaButtons extends React.Component {
 
