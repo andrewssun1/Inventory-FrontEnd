@@ -173,7 +173,6 @@ customFieldRequest(type, id, value) {
 }
 
 onDeleteRow(rows) {
-  console.log(rows);
   var k = 1;
   for(var j = 0; j < rows.length; j ++) {
     for(var i = 0; i < this.state.assetData.length; i ++) {

@@ -33,12 +33,9 @@ class FieldViewerAndEditor extends React.Component {
     var data = [];
     //Custom Fields:
     var typesArray = TypeConstants.Array;
-    console.log("printing response arrays");
-    console.log(response);
     var responseDataArrays = [response.int_fields, response.float_fields, response.short_text_fields, response.long_text_fields];
     this.setState({responseData: responseDataArrays});
     for(var i = 0; i < typesArray.length; i++) {
-      console.log(responseDataArrays[i]);
       for(var j = 0; j < responseDataArrays[i].length; j++) {
         var field = responseDataArrays[i][j];
         if((localStorage.isStaff === "true") || !field.private) {
@@ -55,7 +52,6 @@ class FieldViewerAndEditor extends React.Component {
       var types = TypeConstants.RequestStrings;
       for(var i = 0; i < itemDataArrays.length; i++) {
         var oldFields = itemDataArrays[i];
-        console.log(itemDataArrays);
         for(var j = 0; j < oldFields.length; j++) {
           var newValue = this.refDict[oldFields[j].field].state.value;
           if(oldFields[j].value !== newValue && this.typeCheck(newValue, types[i])) {
@@ -90,7 +86,6 @@ class FieldViewerAndEditor extends React.Component {
   }
 
   renderDisplayFields() {
-    console.log(this.state.fieldData);
     if(this.state.fieldData != null) {
       let displayFields = this.state.fieldData.map((field) => {
         return(<p key={field.name}> <b>{field.name}:</b> {field.value} </p>);
@@ -101,7 +96,6 @@ class FieldViewerAndEditor extends React.Component {
 
   renderEditFields() {
     if(this.state.fieldData != null) {
-      console.log(this.state.fieldData);
       let editFields = this.state.fieldData.map((field) => {
         if(field.isImmutable) {
           return null;
@@ -117,9 +111,7 @@ class FieldViewerAndEditor extends React.Component {
 
   render() {
     if(this.state.fieldData == null) return null;
-
     const isStaff = (localStorage.isStaff === "true");
-
     return (
       <div>
       {this.props.isEditing ?
