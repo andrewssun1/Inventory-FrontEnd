@@ -125,12 +125,13 @@ export default class ShoppingCartTable extends React.Component {
     );
   }
 
-  openBackfillModal(){
-    this._backfillchild.openModal();
+  openBackfillModal(row){
+    this._backfillchild.openModal(row);
   }
+
   createBackfillButton(cell, row){
     return(
-      <Button bsStyle="primary" onClick={this.openBackfillModal}>Backfill</Button>
+      row.status === "loan" ? <Button bsStyle="primary" style={{backgroundColor: "#333399"}} onClick={()=>{this.openBackfillModal(row)}}>Backfill</Button> : null
     );
   }
 
