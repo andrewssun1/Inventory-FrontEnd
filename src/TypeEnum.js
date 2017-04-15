@@ -6,6 +6,7 @@ const TypeEnum = {
   FLOAT: 2,
   SHORT_STRING: 3,
   LONG_STRING: 4,
+  SELECT: 5
 };
 
 export default TypeEnum;
