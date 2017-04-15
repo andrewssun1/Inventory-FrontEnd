@@ -60,10 +60,10 @@ export default class ApplicationTabs extends React.Component {
       this.refs.manage.resetTable();
     }
     else if (key === "cart"){
-      this.refs.shoppingCartTable.resetTable();
       // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
       // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
+      this.refs.shoppingCartTable.resetTable();
     }
     else if (key === "home") {
       this.refs.homePage.componentWillMount();
@@ -175,7 +175,7 @@ export default class ApplicationTabs extends React.Component {
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="about_us">
-                   <AboutPage ref="shoppingCartTable"></AboutPage>
+                   <AboutPage ref="aboutUs"></AboutPage>
                  </Tab.Pane>
                </Tab.Content>
              </Col>
