@@ -25,7 +25,7 @@ import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import AlertComponent from '../AlertComponent';
 import Select from 'react-select';
-// import BackfillTable from '../BackfillTable';
+import BackfillDetailTable from '../Backfill/BackfillDetailTable';
 
 class ItemDetail extends React.Component {
 
@@ -68,6 +68,12 @@ class ItemDetail extends React.Component {
         console.log("Getting Detailed Item Response");
         console.log(response);
         //Handle assets:
+        for (var i = 0; i < response.backfill_requested.length; i++) {
+          response.backfill_requested[i].timestamp = moment(response.backfill_requested[i].timestamp).format('lll');
+        }
+        for (var j = 0; j < response.backfill_transit.length; j++) {
+          response.backfill_transit[j].timestamp = moment(response.backfill_transit[j].timestamp).format('lll');
+        }
         this.setState({isAsset: response.is_asset});
         this.setState({id: response.id});
         this.setState({itemData: response}, ()=>{
@@ -330,6 +336,7 @@ renderDisplayFields() {
         <p><b>Current loans containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.current_loans)}
         <p><b>Backfills involving this item: </b></p>
+        <BackfillDetailTable cb={this} data={this.state.itemData.backfill_requested.concat(this.state.itemData.backfill_transit)} />
         {isStaff ?
           <div>
           <b> Logs involving this item: </b>
