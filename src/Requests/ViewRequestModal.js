@@ -364,8 +364,7 @@ class ViewRequestModal extends React.Component {
       <Button bsSize="xsmall" style={{marginLeft: "5px", marginTop: "1px", fontSize: "9.5px"}}
               bsStyle="primary"
               onClick={()=>{this.changeRequestType(row)}}>
-              {"To " + (row.status === "disbursement" ? "loan" : "disbursement")}
-              <strong>{"Swap"} </strong>
+              <strong> Swap </strong>
               </Button>
           </OverlayTrigger></div>
     );
