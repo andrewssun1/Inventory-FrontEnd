@@ -231,7 +231,6 @@ class ViewRequestModal extends React.Component {
   }
 
   changeRequestType(row){
-    console.log(row);
     if(row.assetSelect == AssetSelectStatus.NOT_ASSET ||
       row.assetSelect == AssetSelectStatus.SELECT_ASSETS) {
         checkAuthAndAdmin(()=>{
@@ -368,7 +367,6 @@ class ViewRequestModal extends React.Component {
   }
 
   selectAssetsButton(cell, row) {
-    console.log(row);
     switch (row.assetSelect) {
       case AssetSelectStatus.SELECT_ASSETS:
         return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}

@@ -62,7 +62,6 @@ class SelectAssetsModal extends React.Component {
         "current_type" : this.state.type,
         "id" : this.state.dispensementID
       };
-      console.log(requestBody);
       let jsonResult = JSON.stringify(requestBody);
 
       restRequest("POST", "/api/item/asset/clear", "application/json", jsonResult,
@@ -75,29 +74,9 @@ class SelectAssetsModal extends React.Component {
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);
       });
-      /*for(var i = 0; i < assetData.length; i ++) {
-        var requestBody = { "id" : assetData[i].id };
-        console.log(requestBody);
-        let jsonResult = JSON.stringify(requestBody);
-
-        restRequest("POST", "/api/item/asset/clear", "application/json", jsonResult,
-        (responseText)=>{
-          var response = JSON.parse(responseText);
-          console.log("Getting clear selection response");
-          console.log(response);
-          k = k + 1;
-          if(k == assetData.length) {
-            cb();
-          }
-        },
-        (status, errResponse)=>{
-          handleErrors(errResponse, this._alertchild);
-        });
-      }*/
   }
 
   makeRegularSelection(selectedAssets) {
-    console.log(selectedAssets);
     for(var i = 0; i < selectedAssets.length; i ++) {
       var requestBody;
       if(this.state.type === "disbursement") {
@@ -105,7 +84,6 @@ class SelectAssetsModal extends React.Component {
       } else {
         requestBody = { "loan_id" : this.state.dispensementID };
       }
-      console.log(requestBody);
       let jsonResult = JSON.stringify(requestBody);
       restRequest("PATCH", "/api/item/asset/" + selectedAssets[i], "application/json", jsonResult,
       (responseText)=>{
@@ -123,8 +101,6 @@ class SelectAssetsModal extends React.Component {
   }
 
   makeChangeSelection(selectedAssets) {
-    console.log(selectedAssets);
-    console.log(this.state.dispensementID);
     for(var i = 0; i < selectedAssets.length; i ++) {
       var requestBody = {
         "current_type": this.state.type,
@@ -156,8 +132,6 @@ class SelectAssetsModal extends React.Component {
   }
 
   updateNumRowsSelected(numRows) {
-    console.log(numRows);
-    console.log(this.state.numAssetsNeeded);
     this.setState({enoughAssetsSelected: (numRows == this.state.numAssetsNeeded)});
   }
 

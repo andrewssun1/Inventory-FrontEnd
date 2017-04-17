@@ -77,17 +77,6 @@ class AssetTable extends React.Component {
       console.log("Getting Asset Response");
       console.log(response);
       let results = response.results;
-      /*
-      //If we're selecting, preselect any already selected assets
-      let selectedRows = this.state.selectedRows;
-      if(this.props.lightMode) {
-        for(var i = 0; i < results.length; i ++) {
-          if(results[i][this.props.filterType] != null &&
-            results[i][this.props.filterType].id == this.props.dispensementID) {
-            selectedRows.push(results[i].id);
-          }
-        }
-      }*/
 
       this.setState({assetData: results});
       this.setState({dataTotalSize: response.count});
@@ -270,18 +259,12 @@ renderColumns() {
 }
 
 onSelectRow(row, isSelected, e) {
-  console.log(isSelected);
-  //selectedRowKeys.length is out of date, need to add or subtract 1 depending
-  //on if a row was just selected or deselected.
   let newSelected = this.state.selectedRows;
-  console.log(row);
-  console.log(newSelected);
   if(isSelected) {
     newSelected.push(row.id);
   } else {
     newSelected.splice(newSelected.indexOf(row.id), 1);
   }
-  console.log(newSelected);
 
   if(this.props.selectRowCallback != null) {
     this.props.selectRowCallback.updateNumRowsSelected(newSelected.length);
