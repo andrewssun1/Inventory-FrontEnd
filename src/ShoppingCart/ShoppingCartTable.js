@@ -12,7 +12,8 @@ import '../DropdownTable.css';
 import {Button} from 'react-bootstrap';
 import ShoppingCartModal from './ShoppingCartModal';
 import CartQuantityChooser from './CartQuantityChooser';
-import AlertComponent from '../AlertComponent'
+import AlertComponent from '../AlertComponent';
+import BackfillModal from '../Backfill/BackfillModal';
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
@@ -36,6 +37,9 @@ export default class ShoppingCartTable extends React.Component {
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.openCartModal = this.openCartModal.bind(this);
     this.createChooserAndButton = this.createChooserAndButton.bind(this);
+    this.createBackfillButton = this.createBackfillButton.bind(this);
+    this.openBackfillModal = this.openBackfillModal.bind(this);
+    this.deleteBackfill = this.deleteBackfill.bind(this);
   }
 
 
@@ -74,6 +78,7 @@ export default class ShoppingCartTable extends React.Component {
                   var allRequest = disburseRequest.concat(loanRequest);
                   localStorage.setItem("cart_quantity", allRequest.length);
                   this.setState({_cart: allRequest});
+                  this.refs.shoppingCart.forceUpdate();
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
   }
 
@@ -116,13 +121,48 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   createChooserAndButton(cell, row){
-    //console.log(row);
     return(
       <CartQuantityChooser ref="cartChooser" row={row} shouldUpdateCart={true} cb={this}></CartQuantityChooser>
     );
   }
 
+  openBackfillModal(row){
+    if (row.name === "Trash Cans 6") {
+      console.log(row);
+    }
+    this._backfillchild.openModal(row);
+  }
+
+  deleteBackfill(row){
+    checkAuthAndAdmin(()=>{
+      restRequest("GET", "/api/request/backfill/active/" + row.id + "/", "application/json", null,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    // console.log(response);
+                    restRequest("DELETE", "/api/request/backfill/delete/"+response.id+"/", "application/json", null,
+                                ()=>{
+                                  this.resetTable();
+                                  this._alertchild.generateSuccess("Successfully deleted item from cart.");
+                                }, (status, errResponse)=>{
+                                  this._alertchild.generateError(JSON.parse(errResponse).detail);
+                                });
+                  }, ()=>{
+                  });
+    });
+  }
+
+  createBackfillButton(cell, row){
+    // console.log(row);
+    return(
+      <div>
+      {row.status === "loan" ? <Button bsStyle={row.has_active_backfill ? "warning" : "primary"} onClick={()=>{this.openBackfillModal(row)}}>{row.has_active_backfill ? "View Backfill" : "Create Backfill"}</Button> : null}
+      {(row.status === "loan" && row.has_active_backfill) ? <Button bsStyle="danger" onClick={()=>{this.deleteBackfill(row)}}>&times;</Button> : null}
+      </div>
+    );
+  }
+
   render(){
+    const isStaff = (localStorage.isStaff === "true");
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
     };
@@ -133,10 +173,12 @@ export default class ShoppingCartTable extends React.Component {
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ShoppingCartModal ref={(child) => {this._cartchild = child; }} updateCallback={this}/>
+      <BackfillModal ref={(child) => {this._backfillchild = child; }} cb={this}/>
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn ref="chooser" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
+      <TableHeaderColumn ref="backfill" width="150px" hidden={isStaff} dataField='button' dataFormat={this.createBackfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
+      <TableHeaderColumn ref="chooser" width="300px" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
     </BootstrapTable>
       <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
       </div>

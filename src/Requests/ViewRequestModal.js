@@ -7,7 +7,8 @@ import TextEntryFormElement from '../TextEntryFormElement'
 import {checkAuthAndAdmin} from "../Utilities";
 import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
-import AlertComponent from "../AlertComponent.js"
+import AlertComponent from "../AlertComponent.js";
+import BackfillDetailModal from "../Backfill/BackfillDetailModal";
 import SelectAssetsModal from "./SelectAssetsModal.js"
 import SelectAssetsButton from "./SelectAssetsButton.js"
 var ReactBsTable = require('react-bootstrap-table');
@@ -45,6 +46,7 @@ class ViewRequestModal extends React.Component {
     this.renderButtons = this.renderButtons.bind(this);
     this.changeRequestType = this.changeRequestType.bind(this);
     this.changeButton = this.changeButton.bind(this);
+    this.backfillButton = this.backfillButton.bind(this);
     this.selectAssetsButton = this.selectAssetsButton.bind(this);
   }
 
@@ -337,15 +339,19 @@ class ViewRequestModal extends React.Component {
   }
 
   renderOutstandingButton(row){
+    const tooltip = (
+      <Tooltip id="tooltip">{"Change specified quantity to " + (row.status === "disbursement" ? "loan" : "disbursement")}</Tooltip>
+    );
     return (
       <div>
       {this.generateHighQuantityTextBox(row)}
-      <Button bsSize="small"
+      <OverlayTrigger placement="bottom" overlay={tooltip}>
+      <Button bsSize="xsmall" style={{marginLeft: "5px", marginTop: "1px", fontSize: "9.5px"}}
               bsStyle="primary"
-              style={{marginTop: "3px"}}
               onClick={()=>{this.changeRequestType(row)}}>
-              {"Change to " + (row.status === "disbursement" ? "loan" : "disbursement")}</Button>
-            </div>
+              <strong>{"Swap"}
+              </strong></Button>
+          </OverlayTrigger></div>
     );
   }
 
@@ -364,6 +370,11 @@ class ViewRequestModal extends React.Component {
       </div>);
     }
     return null;
+  }
+
+  backfillButton(cell, row){
+    // open modal to show backfill table
+    return((row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View Backfill</Button> : null);
   }
 
   selectAssetsButton(cell, row) {
@@ -389,7 +400,10 @@ class ViewRequestModal extends React.Component {
       <TableHeaderColumn dataField='name' width="120px">Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' width="75px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+      <TableHeaderColumn dataField='total_backfill_quantity' hidden={!(this.state.requestData.status === "outstanding" && type === "loan")} width="120px" dataAlign="center">Backfills Requested</TableHeaderColumn>
+      <TableHeaderColumn dataField='button1' width="120px" dataFormat={this.backfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+                            hidden={type !== "loan"}></TableHeaderColumn>
+                          <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                         hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
       <TableHeaderColumn dataField='assetSelect' width="130px" dataFormat={this.selectAssetsButton}></TableHeaderColumn>
       </BootstrapTable>
@@ -400,9 +414,10 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
+      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }} requestState={this.state.requestData.status}></BackfillDetailModal>=
       <SelectAssetsModal cartID={this.state.requestData.id} updateCallback={this}
       ref={(child) => { this._selectAssetsModal = child; }}/>
-      <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
+    <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Request</Modal.Title>
