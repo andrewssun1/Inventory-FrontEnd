@@ -6,6 +6,7 @@ var Bootstrap = require('react-bootstrap');
 import {restRequest, checkAuthAndAdmin, handleErrors, handleServerError} from "../Utilities";
 import AlertComponent from '../AlertComponent';
 import AssetTable from '../Items/AssetTable';
+import SelectionType from './SelectionEnum.js'
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 
@@ -19,7 +20,7 @@ class SelectAssetsModal extends React.Component {
       dispensementID: 0,
       numAssetsNeeded: 0,
       enoughAssetsSelected:false,
-      isChangingCartType: false,
+      selectionType: SelectionType.DEFAULT,
       assets: null
     };
     this.openModal = this.openModal.bind(this);
@@ -38,7 +39,6 @@ class SelectAssetsModal extends React.Component {
 
   closeModal() {
     this.setState({enoughAssetsSelected: false});
-    this.setState({isChangingCartType: false});
     this.setState({showModal: false});
     console.log("Clearing asset table selected rows");
     if(this._assetTable != null) {
@@ -47,14 +47,21 @@ class SelectAssetsModal extends React.Component {
   }
 
   makeSelection() {
-    this.clearSelection(()=> {
-      let selectedAssets = this._assetTable.getSelectedAssets();
-      if(this.state.isChangingCartType) {
+    let selectedAssets = this._assetTable.getSelectedAssets();
+    console.log("Making Selection");
+    console.log(this.state.selectionType);
+    switch (this.state.selectionType) {
+      case SelectionType.DISPENSEMENT_TYPE_CHANGE:
         this.makeChangeSelection(selectedAssets);
-      } else {
-        this.makeRegularSelection(selectedAssets);
-      }
-    });
+        break;
+      case SelectionType.RETURN:
+        console.log("Return!");
+        break;
+      default:
+        this.clearSelection(()=> {
+          this.makeRegularSelection(selectedAssets);
+        });
+    }
   }
 
   clearSelection(cb) {
@@ -136,17 +143,13 @@ class SelectAssetsModal extends React.Component {
   }
 
   render() {
-    var filterID = 0;
-    if(this.state.isChangingCartType) {
-      filterID = this.state.dispensementID;
-    }
     return (
       <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <AssetTable lightMode={true} id={this.state.itemID} updateCallback={this}
       selectRowCallback={this} dispensementID={this.state.dispensementID}
-      filterType={this.state.type} isChangingCartType={this.state.isChangingCartType}
+      filterType={this.state.type} selectionType={this.state.selectionType}
       preselectedAssets={this.state.assets} ref={(child) => { this._assetTable = child; }}/>
       </Modal.Body>
       <Modal.Footer>

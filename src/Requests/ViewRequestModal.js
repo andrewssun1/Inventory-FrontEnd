@@ -9,6 +9,7 @@ import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
 import AlertComponent from "../AlertComponent.js"
 import SelectAssetsModal from "./SelectAssetsModal.js"
+import SelectionType from './SelectionEnum.js'
 import SelectAssetsButton from "./SelectAssetsButton.js"
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
@@ -256,7 +257,7 @@ class ViewRequestModal extends React.Component {
       this._selectAssetsModal.setState({type: row.status});
       this._selectAssetsModal.setState({dispensementID: row.id});
       this._selectAssetsModal.setState({numAssetsNeeded: row.changeQuantity});
-      this._selectAssetsModal.setState({isChangingCartType: true});
+      this._selectAssetsModal.setState({selectionType: SelectionType.DISPENSEMENT_TYPE_CHANGE});
       this._selectAssetsModal.openModal();
     }
   }
@@ -344,7 +345,7 @@ class ViewRequestModal extends React.Component {
               bsStyle="primary"
               style={{marginTop: "3px"}}
               onClick={()=>{this.changeRequestType(row)}}>
-              {"Change to " + (row.status === "disbursement" ? "loan" : "disbursement")}</Button>
+              {"To " + (row.status === "disbursement" ? "loan" : "disbursement")}</Button>
             </div>
     );
   }
@@ -391,7 +392,8 @@ class ViewRequestModal extends React.Component {
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
       <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                         hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
-      <TableHeaderColumn dataField='assetSelect' width="130px" dataFormat={this.selectAssetsButton}></TableHeaderColumn>
+      <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
+      hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
       </BootstrapTable>
     )
   }
