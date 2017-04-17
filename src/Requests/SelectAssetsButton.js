@@ -21,12 +21,13 @@ class SelectAssetsButton extends React.Component {
     this.props.cb._selectAssetsModal.setState({type: this.props.type});
     this.props.cb._selectAssetsModal.setState({dispensementID: this.props.dispensementID});
     this.props.cb._selectAssetsModal.setState({numAssetsNeeded: this.props.numAssetsNeeded});
+    this.props.cb._selectAssetsModal.setState({assets: this.props.assets});
     this.props.cb._selectAssetsModal.openModal();
   }
 
   render() {
     return (
-        <Button onClick={this.onButtonClick} bsStyle="primary">{this.props.name}</Button>
+        <Button onClick={this.onButtonClick} bsStyle={this.props.style}>{this.props.name}</Button>
     )
   }
 }

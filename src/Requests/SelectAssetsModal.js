@@ -19,7 +19,8 @@ class SelectAssetsModal extends React.Component {
       dispensementID: 0,
       numAssetsNeeded: 0,
       enoughAssetsSelected:false,
-      isChangingCartType: false
+      isChangingCartType: false,
+      assets: null
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -28,6 +29,7 @@ class SelectAssetsModal extends React.Component {
     this.makeChangeSelection = this.makeChangeSelection.bind(this);
     this.disableMakeSelection = this.disableMakeSelection.bind(this);
     this.updateNumRowsSelected = this.updateNumRowsSelected.bind(this);
+    this.clearSelection = this.clearSelection.bind(this);
   }
 
   openModal() {
@@ -38,15 +40,60 @@ class SelectAssetsModal extends React.Component {
     this.setState({enoughAssetsSelected: false});
     this.setState({isChangingCartType: false});
     this.setState({showModal: false});
+    console.log("Clearing asset table selected rows");
+    if(this._assetTable != null) {
+      this._assetTable.setState({selectedRows: []});
+    }
   }
 
   makeSelection() {
-    let selectedAssets = this._assetTable.getSelectedAssets();
-    if(this.state.isChangingCartType) {
-      this.makeChangeSelection(selectedAssets);
-    } else {
-      this.makeRegularSelection(selectedAssets);
-    }
+    this.clearSelection(()=> {
+      let selectedAssets = this._assetTable.getSelectedAssets();
+      if(this.state.isChangingCartType) {
+        this.makeChangeSelection(selectedAssets);
+      } else {
+        this.makeRegularSelection(selectedAssets);
+      }
+    });
+  }
+
+  clearSelection(cb) {
+      var requestBody = {
+        "current_type" : this.state.type,
+        "id" : this.state.dispensementID
+      };
+      console.log(requestBody);
+      let jsonResult = JSON.stringify(requestBody);
+
+      restRequest("POST", "/api/item/asset/clear", "application/json", jsonResult,
+      (responseText)=>{
+        var response = JSON.parse(responseText);
+        console.log("Getting clear selection response");
+        console.log(response);
+        cb();
+      },
+      (status, errResponse)=>{
+        handleErrors(errResponse, this._alertchild);
+      });
+      /*for(var i = 0; i < assetData.length; i ++) {
+        var requestBody = { "id" : assetData[i].id };
+        console.log(requestBody);
+        let jsonResult = JSON.stringify(requestBody);
+
+        restRequest("POST", "/api/item/asset/clear", "application/json", jsonResult,
+        (responseText)=>{
+          var response = JSON.parse(responseText);
+          console.log("Getting clear selection response");
+          console.log(response);
+          k = k + 1;
+          if(k == assetData.length) {
+            cb();
+          }
+        },
+        (status, errResponse)=>{
+          handleErrors(errResponse, this._alertchild);
+        });
+      }*/
   }
 
   makeRegularSelection(selectedAssets) {
@@ -126,7 +173,7 @@ class SelectAssetsModal extends React.Component {
       <AssetTable lightMode={true} id={this.state.itemID} updateCallback={this}
       selectRowCallback={this} dispensementID={this.state.dispensementID}
       filterType={this.state.type} isChangingCartType={this.state.isChangingCartType}
-      ref={(child) => { this._assetTable = child; }}/>
+      preselectedAssets={this.state.assets} ref={(child) => { this._assetTable = child; }}/>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={this.makeSelection}

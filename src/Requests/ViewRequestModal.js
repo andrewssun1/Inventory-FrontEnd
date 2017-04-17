@@ -93,7 +93,7 @@ class ViewRequestModal extends React.Component {
       cart[i].changeQuantity = cart[i].quantity;
       cart[i].shouldUpdate = false;
 
-      if(cart[i].item.is_asset && cart[i].assets.length == 0) {
+      if(cart[i].item.is_asset && cart[i].assets.length < cart[i].quantity) {
         cart[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
         this.setState({hasUnselectedAsset: true});
       } else if (cart[i].item.is_asset && cart[i].assets.length > 0) {
@@ -368,14 +368,15 @@ class ViewRequestModal extends React.Component {
   }
 
   selectAssetsButton(cell, row) {
+    console.log(row);
     switch (row.assetSelect) {
       case AssetSelectStatus.SELECT_ASSETS:
-        return(<SelectAssetsButton itemID={row.item.id} type={row.status}
-          dispensementID={row.id} numAssetsNeeded={row.quantity} cb={this} name="Select Assets"/>);
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="primary" name="Select Assets"/>);
         break;
       case AssetSelectStatus.CHANGE_ASSETS:
-        return(<SelectAssetsButton itemID={row.item.id} type={row.status}
-          dispensementID={row.id} numAssetsNeeded={row.quantity} cb={this} name="Change Assets"/>);
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="warning" name="Change Assets"/>);
       break
       default:
         return null;

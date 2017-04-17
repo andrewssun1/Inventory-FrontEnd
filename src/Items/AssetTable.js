@@ -49,10 +49,14 @@ class AssetTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.state.selectedRows);
-    /*for(var i = 0; i < this.state.selectedRows.length; i ++) {
-      this._table.state.selectedRowKeys =
-    }*/
+    if(this.props.preselectedAssets != null && !this.props.isChangingCartType) {
+      let array = [];
+      for(var i = 0; i < this.props.preselectedAssets.length; i ++) {
+        array.push(this.props.preselectedAssets[i].id);
+      }
+      console.log("Adding preselected assets");
+      this.setState({selectedRows: array});
+    }
   }
 
   requestAssets(pageNumber) {
@@ -62,7 +66,7 @@ class AssetTable extends React.Component {
     }
     var url = "/api/item/asset?item__id=" + this.props.id + "&page=" + pageParam + "&search"
     if(this.props.lightMode) {
-      url = url + "&available=True";
+      url = url + "&available=True" + "&" + this.props.filterType + "_available_id=" + this.props.dispensementID;
     }
     if(this.props.isChangingCartType && this.props.filterType != null) {
       url = url + "&" + this.props.filterType + "__id=" + this.props.dispensementID;
@@ -73,19 +77,17 @@ class AssetTable extends React.Component {
       console.log("Getting Asset Response");
       console.log(response);
       let results = response.results;
+      /*
       //If we're selecting, preselect any already selected assets
-      let selectedRows = [];
+      let selectedRows = this.state.selectedRows;
       if(this.props.lightMode) {
         for(var i = 0; i < results.length; i ++) {
-          console.log(this.props);
           if(results[i][this.props.filterType] != null &&
             results[i][this.props.filterType].id == this.props.dispensementID) {
             selectedRows.push(results[i].id);
           }
         }
-      }
-      console.log(selectedRows);
-      this.setState({selectedRows: selectedRows});
+      }*/
 
       this.setState({assetData: results});
       this.setState({dataTotalSize: response.count});
@@ -248,18 +250,19 @@ onPageChange(page, sizePerPage) {
 }
 
 getSelectedAssets() {
-  return(this._table.state.selectedRowKeys);
+  return(this.state.selectedRows);
 }
 
 renderColumns() {
   var cols = [];
   cols.push(<TableHeaderColumn key="id" dataField='id' autoValue={true} hiddenOnInsert hidden isKey></TableHeaderColumn>);
   cols.push(<TableHeaderColumn key="asset_tag" dataField='asset_tag' autoValue={true} hiddenOnInsert>Asset Tag</TableHeaderColumn>);
-  for(var i = 0; i < this.state._fields.length; i++) {
-    let name = this.state._fields[i].name;
-    cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
-  }
+
   if(!this.props.lightMode) {
+    for(var i = 0; i < this.state._fields.length; i++) {
+      let name = this.state._fields[i].name;
+      cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
+    }
     cols.push(<TableHeaderColumn key="userCol" dataField='users' dataFormat={this.userSelectFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
     cols.push(<TableHeaderColumn key="buttonCol" dataField='button' dataFormat={this.assetButtonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
   }
