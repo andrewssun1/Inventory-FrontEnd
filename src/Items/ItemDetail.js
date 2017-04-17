@@ -19,12 +19,12 @@ var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
 var moment = require('moment');
-var fileDownload = require('react-file-download');
 
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import AlertComponent from '../AlertComponent';
 import Select from 'react-select';
+// import BackfillTable from '../BackfillTable';
 
 class ItemDetail extends React.Component {
 
@@ -56,7 +56,6 @@ class ItemDetail extends React.Component {
     this.logItemQuantityChange = this.logItemQuantityChange.bind(this);
     this.onRowClickCart = this.onRowClickCart.bind(this);
     this.clearAlert = this.clearAlert.bind(this);
-    this.exportAssets = this.exportAssets.bind(this);
   }
 
   getDetailedItem(id, cb) {
@@ -164,16 +163,6 @@ static editGetResponse(data) {
   return data;
 }
 
-exportAssets() {
-  restRequest("GET","/api/item/asset/csv/export?item_id=" + this.state.itemData.id, "application/json", null,
-              (responseText)=>{
-                console.log("Successfully got assets");
-                fileDownload(responseText, this.state.itemData.name + 'Assets.csv');
-              }, (status, errResponse)=>{
-                console.log('Failed to get assets');
-              });
-}
-
 openModal() {
   this.setState({showModal: true}, ()=>{});
 }
@@ -278,6 +267,10 @@ renderDisplayFields() {
     );
   }
 
+  testOnHide() {
+    console.log("TEST ON HIDE");
+  }
+
   render() {
     if(this.state.itemData == null) return null;
 
@@ -311,12 +304,7 @@ renderDisplayFields() {
         null
         :
         <div>
-        {(isStaff && this.state.id != null && this.state.isAsset) ?
-          <div>
-          <AssetTable id={this.state.id} updateCallback={this}/>
-          <Button onClick={this.exportAssets} bsStyle="primary">Export Assets</Button>
-          </div>
-          : null}
+        {(isStaff && this.state.id != null && this.state.isAsset) ? <AssetTable id={this.state.id} updateCallback={this}/> : null}
         <br />
         <p><b>Outstanding disbursements containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}
@@ -324,6 +312,7 @@ renderDisplayFields() {
         {this.generateItemStackTable(this.state.itemData.outstanding_loans)}
         <p><b>Current loans containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.current_loans)}
+        <p><b>Backfills involving this item: </b></p>
         {isStaff ?
           <div>
           <b> Logs involving this item: </b>

@@ -162,6 +162,7 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   render(){
+    const isStaff = (localStorage.isStaff === "true");
     const selectRow = {
       mode: 'checkbox' //radio or checkbox
     };
@@ -176,7 +177,7 @@ export default class ShoppingCartTable extends React.Component {
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
-      <TableHeaderColumn ref="backfill" width="150px" dataField='button' dataFormat={this.createBackfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
+      <TableHeaderColumn ref="backfill" width="150px" hidden={isStaff} dataField='button' dataFormat={this.createBackfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn ref="chooser" width="300px" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
     </BootstrapTable>
       <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>

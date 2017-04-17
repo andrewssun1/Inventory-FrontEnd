@@ -9,6 +9,7 @@ import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
 import SettingsComponent from './Settings/SettingsComponent'
+import BackfillTable from './Backfill/BackfillTable'
 import AboutPage from './AboutUs';
 import HomePage from './HomePage';
 
@@ -129,6 +130,9 @@ export default class ApplicationTabs extends React.Component {
                  <NavItem eventKey="requests">
                    <Glyphicon style={{marginRight: "8px"}} glyph="question-sign" />Requests
                  </NavItem>
+                 {this.state.is_staff ? (<NavItem eventKey="backfills">
+                   <Glyphicon style={{marginRight: "8px"}} glyph="copy" />Backfills
+                 </NavItem>) : null}
                    {this.state.is_staff ? (<NavItem eventKey="logs">
                      <Glyphicon style={{marginRight: "8px"}} glyph="pencil" />Logs
                    </NavItem>) : null
@@ -160,6 +164,9 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="requests">
                    <RequestComponent ref="requestComponent"></RequestComponent>
+                 </Tab.Pane>
+                 <Tab.Pane eventKey="backfills">
+                   <BackfillTable />
                  </Tab.Pane>
                  <Tab.Pane eventKey="logs">
                    <LogComponent ref="logComponent"></LogComponent>

@@ -414,7 +414,7 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
-      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }}></BackfillDetailModal>=
+      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }} requestState={this.state.requestData.status}></BackfillDetailModal>=
       <SelectAssetsModal cartID={this.state.requestData.id} updateCallback={this}
       ref={(child) => { this._selectAssetsModal = child; }}/>
     <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
