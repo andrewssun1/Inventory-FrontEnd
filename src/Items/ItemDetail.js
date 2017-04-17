@@ -25,6 +25,7 @@ import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
 import CartQuantityChooser from '../ShoppingCart/CartQuantityChooser';
 import AlertComponent from '../AlertComponent';
 import Select from 'react-select';
+import BackfillDetailTable from '../Backfill/BackfillDetailTable';
 
 class ItemDetail extends React.Component {
 
@@ -67,6 +68,12 @@ class ItemDetail extends React.Component {
         console.log("Getting Detailed Item Response");
         console.log(response);
         //Handle assets:
+        for (var i = 0; i < response.backfill_requested.length; i++) {
+          response.backfill_requested[i].timestamp = moment(response.backfill_requested[i].timestamp).format('lll');
+        }
+        for (var j = 0; j < response.backfill_transit.length; j++) {
+          response.backfill_transit[j].timestamp = moment(response.backfill_transit[j].timestamp).format('lll');
+        }
         this.setState({isAsset: response.is_asset});
         this.setState({id: response.id});
         this.setState({itemData: response}, ()=>{
@@ -278,6 +285,10 @@ renderDisplayFields() {
     );
   }
 
+  testOnHide() {
+    console.log("TEST ON HIDE");
+  }
+
   render() {
     if(this.state.itemData == null) return null;
 
@@ -312,11 +323,11 @@ renderDisplayFields() {
         :
         <div>
         {(isStaff && this.state.id != null && this.state.isAsset) ?
-          <div>
-          <AssetTable id={this.state.id} updateCallback={this}/>
-          <Button onClick={this.exportAssets} bsStyle="primary">Export Assets</Button>
-          </div>
-          : null}
+        <div>
+        <AssetTable id={this.state.id} updateCallback={this}/>
+        <Button onClick={this.exportAssets} bsStyle="primary">Export Assets</Button>
+        </div>
+        : null}
         <br />
         <p><b>Outstanding disbursements containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.outstanding_disbursements)}
@@ -324,6 +335,8 @@ renderDisplayFields() {
         {this.generateItemStackTable(this.state.itemData.outstanding_loans)}
         <p><b>Current loans containing this item: </b></p>
         {this.generateItemStackTable(this.state.itemData.current_loans)}
+        <p><b>Backfills involving this item: </b></p>
+        <BackfillDetailTable cb={this} data={this.state.itemData.backfill_requested.concat(this.state.itemData.backfill_transit)} />
         {isStaff ?
           <div>
           <b> Logs involving this item: </b>

@@ -169,7 +169,7 @@ export default class HomePage extends React.Component {
     const isStaff = (localStorage.isStaff === "true");
     return(
       <div>
-      <ViewRequestModal ref={(child) => { this._viewRequestModal = child; }} updateCallback={this.props.updateCallback} />
+      <ViewRequestModal ref={(child) => { this._viewRequestModal = child; }} updateCallback={this} />
       <BootstrapTable ref="loanTable"
                       data={ data }
                       options={options}
@@ -213,6 +213,7 @@ export default class HomePage extends React.Component {
     const isStaff = (localStorage.isStaff === "true");
     return(
       <div>
+        <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
         <p><b>Current unreturned loans: </b></p>
         {this.renderHomePageTable(this.state.loan_data)}
         <p><b>Current outstanding requests: </b></p>

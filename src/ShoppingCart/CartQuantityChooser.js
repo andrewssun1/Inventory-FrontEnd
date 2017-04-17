@@ -41,7 +41,7 @@ export default class CartQuantityChooser extends React.Component {
   updateRowQuantity(row){
     checkAuthAndAdmin(()=>{
         row.shouldUpdate = false;
-        console.log(row);
+        // console.log(row);
         var id = (row.cartId ? row.cartId : row.id);
         var Quantity = parseInt(row.quantity_cartitem, 10);
         const isStaff = (localStorage.isStaff === "true");
@@ -49,10 +49,13 @@ export default class CartQuantityChooser extends React.Component {
             type: row.status,
             quantity: Quantity
         });
+
         var url = "/api/request/modifyQuantityRequested/"+id+"/";
         restRequest("PATCH", url, "application/JSON", updateJSON,
             (responseText)=>{
+                console.log(JSON.parse(responseText));
                 this.forceUpdate();
+                // this.props.cb.forceUpdate();
                 this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
                 row.original_quantity = row.quantity_cartitem;
             }, (status, errResponse)=>{
@@ -115,7 +118,12 @@ export default class CartQuantityChooser extends React.Component {
               var response = JSON.parse(responseText);
               row.cartId = response.id;
               row.status === "disbursement" ? row.status = "loan" : row.status = "disbursement";
+              row.id = response.id;
               this.forceUpdate();
+              this.props.cb.forceUpdate();
+              if (typeof this.props.cb.resetTable === "function") {
+                this.props.cb.resetTable();
+              }
           }, (status, errResponse)=>{
 
           }
