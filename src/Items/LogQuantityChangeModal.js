@@ -27,19 +27,18 @@ class LogQuantityChangeModal extends React.Component {
       requestProblemString: '',
       value: 0,
       dropdownTitle: "Acquired",
-      logDisabled : true
+      logDisabled : false
     };
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.handleChangeQuantity = this.handleChangeQuantity.bind(this);
-    this.handleChange = this.handleChange.bind(this);
     this.logChange = this.logChange.bind(this);
     this.onDropdownSelect = this.onDropdownSelect.bind(this);
   }
 
   openModal() {
     this.setState({showModal: true});
-    this.setState({logDisabled: true});
+    this.setState({logDisabled: false});
   }
 
   closeModal() {
@@ -49,10 +48,7 @@ class LogQuantityChangeModal extends React.Component {
 
   handleChangeQuantity(evt) {
     this.setState({value: evt.target.value});
-  }
-
-  handleChange(evt) {
-    this.setState({logDisabled: (this._commentsField.state.value === "")});
+    this.setState({logDisabled: (evt.target.value < 0)})
   }
 
   logChange() {
@@ -98,7 +94,7 @@ class LogQuantityChangeModal extends React.Component {
       <Modal.Body>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <h2> {this.props.item} </h2>
-        <p>Enter negative quantity to log destruction, positive quantity to log addition</p>
+        <p>Enter a positive quantity and select Acquired or Lost. Comments are optional</p>
 
       <Form horizontal>
 
@@ -106,7 +102,7 @@ class LogQuantityChangeModal extends React.Component {
       <Col sm={2}>
       <FormControl componentClass={"input"}
       type={"number"}
-      value={this.state.value} onChange={this.handleChangeQuantity}/>
+      value={this.state.value} onChange={this.handleChangeQuantity} min={1}/>
       </Col>
       <Col sm={10}>
       <DropdownButton title={this.state.dropdownTitle}  id={'Dropdown'} onSelect={this.onDropdownSelect}>
@@ -117,7 +113,7 @@ class LogQuantityChangeModal extends React.Component {
       </FormGroup>
 
       <TextEntryFormElement controlId={"formHorizontalComments"}
-      label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""} changeHandleCallback={this}
+      label={"Comments"} type={TypeConstants.Enum.LONG_STRING} initialValue={""}
       ref={child => this._commentsField = child}/>
       </Form>
       </Modal.Body>
