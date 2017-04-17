@@ -55,7 +55,6 @@ class AssetTable extends React.Component {
       for(var i = 0; i < this.props.preselectedAssets.length; i ++) {
         array.push(this.props.preselectedAssets[i].id);
       }
-      console.log("Adding preselected assets");
       this.setState({selectedRows: array});
     }
   }
@@ -69,8 +68,6 @@ class AssetTable extends React.Component {
     if(this.props.lightMode) {
       url = url + "&available=True" + "&" + this.props.filterType + "_available_id=" + this.props.dispensementID;
     }
-    console.log(this.props.lightMode);
-    console.log(this.props.selectionType);
     if(this.props.selectionType != SelectionType.DEFAULT && this.props.filterType != null) {
       url = url + "&" + this.props.filterType + "__id=" + this.props.dispensementID;
     }
@@ -211,8 +208,6 @@ onDeleteRow(rows) {
   for(var j = 0; j < rows.length; j ++) {
     restRequest("DELETE", "/api/item/asset/"+rows[j], "application/json", null,
         ()=>{
-          console.log("Successfully deleted rows")
-          console.log(j);
           if(k == rows.length) {
             this.requestAssets();
             this.props.updateCallback.getDetailedItem(this.props.id);

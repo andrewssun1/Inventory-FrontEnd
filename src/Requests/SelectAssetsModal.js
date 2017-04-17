@@ -48,19 +48,38 @@ class SelectAssetsModal extends React.Component {
 
   makeSelection() {
     let selectedAssets = this._assetTable.getSelectedAssets();
-    console.log("Making Selection");
-    console.log(this.state.selectionType);
     switch (this.state.selectionType) {
       case SelectionType.DISPENSEMENT_TYPE_CHANGE:
         this.makeChangeSelection(selectedAssets);
         break;
       case SelectionType.RETURN:
-        console.log("Return!");
+        this.makeReturn(selectedAssets);
         break;
       default:
         this.clearSelection(()=> {
           this.makeRegularSelection(selectedAssets);
         });
+    }
+  }
+
+  makeReturn(selectedAssets) {
+    for(var i = 0; i < selectedAssets.length; i ++) {
+      var requestBody = {
+	      "asset_id": selectedAssets[i]
+      };
+      let jsonResult = JSON.stringify(requestBody);
+      restRequest("PATCH", "/api/request/loan/returnAsset/" + this.state.dispensementID + "/", "application/json", jsonResult,
+      (responseText)=>{
+        var response = JSON.parse(responseText);
+        console.log("Getting return loan response");
+        console.log(response);
+        this.closeModal();
+        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+      },
+      (status, errResponse)=>{
+        handleErrors(errResponse, this._alertchild);
+      }
+      );
     }
   }
 

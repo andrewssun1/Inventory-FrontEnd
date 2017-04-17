@@ -93,6 +93,7 @@ class ViewRequestModal extends React.Component {
       cart[i].status = status;
       cart[i].changeQuantity = cart[i].quantity;
       cart[i].shouldUpdate = false;
+      cart[i].is_asset = cart[i].item.is_asset;
 
       if(cart[i].item.is_asset && cart[i].assets.length < cart[i].quantity) {
         cart[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
@@ -285,24 +286,35 @@ class ViewRequestModal extends React.Component {
   }
 
   returnItem(row){
-        console.log(row);
-    checkAuthAndAdmin(()=>{
-      var id = row.id;
-      var url = "/api/request/loan/returnItem/" + id + "/";
-      var returnJSON = JSON.stringify({
-          quantity: row.changeQuantity
+    console.log(row);
+    if(row.assetSelect == AssetSelectStatus.NOT_ASSET) {
+      //Return non-asset item
+      checkAuthAndAdmin(()=>{
+        var id = row.id;
+        var url = "/api/request/loan/returnItem/" + id + "/";
+        var returnJSON = JSON.stringify({
+            quantity: row.changeQuantity
+        });
+        restRequest("PATCH", url, "application/JSON", returnJSON,
+            (responseText)=>{
+                var response = JSON.parse(responseText);
+                console.log(response);
+                // this.forceUpdate();
+                this.getDetailedRequest(this.state.requestData.id, ()=>{});
+            }, (status, errResponse)=>{
+              this._alertchild.generateError("Invalid quantity!");
+            }
+        );
       });
-      restRequest("PATCH", url, "application/JSON", returnJSON,
-          (responseText)=>{
-              var response = JSON.parse(responseText);
-              console.log(response);
-              // this.forceUpdate();
-              this.getDetailedRequest(this.state.requestData.id, ()=>{});
-          }, (status, errResponse)=>{
-            this._alertchild.generateError("Invalid quantity!");
-          }
-      );
-    });
+    } else {
+      //Return Assets
+      this._selectAssetsModal.setState({itemID: row.item.id});
+      this._selectAssetsModal.setState({type: row.status});
+      this._selectAssetsModal.setState({dispensementID: row.id});
+      this._selectAssetsModal.setState({numAssetsNeeded: row.changeQuantity});
+      this._selectAssetsModal.setState({selectionType: SelectionType.RETURN});
+      this._selectAssetsModal.openModal();
+    }
   }
 
   renderReturnButton(row){
@@ -321,11 +333,13 @@ class ViewRequestModal extends React.Component {
       return(
         <div>
         {this.generateHighQuantityTextBox(row)}
+          {this.state.requestData.status === "fulfilled" ?
             <Button bsSize="small"
                             bsStyle="warning"
                             style={{marginTop: "3px"}}
                             onClick={()=>{this.returnItem(row)}}>
                             Return</Button>
+          : null}
           <OverlayTrigger placement="top" overlay={tooltip}>
           <Button bsSize="small"
                     bsStyle="primary"
@@ -351,10 +365,7 @@ class ViewRequestModal extends React.Component {
   }
 
   changeButton(cell, row){
-    var isFulfilled = this.state.requestData.status === "fulfilled";
-
-    if (this.isOutstanding() || (isFulfilled && row.status === "loan")){
-      return (
+    return (
         <div>
         <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
         <InputGroup>
@@ -363,8 +374,6 @@ class ViewRequestModal extends React.Component {
         </InputGroup>
         </FormGroup>
       </div>);
-    }
-    return null;
   }
 
   selectAssetsButton(cell, row) {
@@ -383,7 +392,12 @@ class ViewRequestModal extends React.Component {
   }
 
   renderRequestTable(data, type){
+    console.log(data);
     const isStaff = (localStorage.isStaff === "true");
+    let canConvert = (this.state.requestData.status === "active") ||
+      (isStaff && (this.isOutstanding() ||
+      ((this.state.requestData.status === "approved" || this.state.requestData.status === "fulfilled") && type=="loan")));
+    let showAssetSelect = isStaff && this.isOutstanding();
     return (
       <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
@@ -391,9 +405,10 @@ class ViewRequestModal extends React.Component {
       <TableHeaderColumn dataField='quantity' width="75px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
       <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
-                        hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
+                        hidden={!canConvert}></TableHeaderColumn>
       <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
-      hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
+      hidden={!showAssetSelect}></TableHeaderColumn>
+      <TableHeaderColumn dataField='is_asset' width="80px" hidden={showAssetSelect || !isStaff}>Asset</TableHeaderColumn>
       </BootstrapTable>
     )
   }
