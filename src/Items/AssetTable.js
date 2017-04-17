@@ -20,13 +20,14 @@ class AssetTable extends React.Component {
     super(props);
     this.state = {
       assetData: null,
-      fields: null,
+      _fields: null,
       users: [],
       selectValues: [],
       userMap: [],
       shouldOpenModal: true,
       currentPage: 1,
-      dataTotalSize: 0
+      dataTotalSize: 0,
+      selectedRows: []
     }
     this.requestAssets = this.requestAssets.bind(this);
     this.onAddRow = this.onAddRow.bind(this);
@@ -37,6 +38,8 @@ class AssetTable extends React.Component {
     this.handleSelectChange = this.handleSelectChange.bind(this);
     this.assetButtonFormatter = this.assetButtonFormatter.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
+    this.getSelectedAssets = this.getSelectedAssets.bind(this);
+    this.onSelectRow = this.onSelectRow.bind(this);
   }
 
   componentWillMount() {
@@ -45,17 +48,37 @@ class AssetTable extends React.Component {
     this.getUsers();
   }
 
+  componentDidMount() {
+    if(this.props.preselectedAssets != null && !this.props.isChangingCartType) {
+      let array = [];
+      for(var i = 0; i < this.props.preselectedAssets.length; i ++) {
+        array.push(this.props.preselectedAssets[i].id);
+      }
+      console.log("Adding preselected assets");
+      this.setState({selectedRows: array});
+    }
+  }
+
   requestAssets(pageNumber) {
     var pageParam = pageNumber
     if(pageParam == null) {
       pageParam = this.state.currentPage
     }
-    restRequest("GET", "/api/item/asset?item__id=" + this.props.id + "&page=" + pageParam + "&search", "application/json", null,
+    var url = "/api/item/asset?item__id=" + this.props.id + "&page=" + pageParam + "&search"
+    if(this.props.lightMode) {
+      url = url + "&available=True" + "&" + this.props.filterType + "_available_id=" + this.props.dispensementID;
+    }
+    if(this.props.isChangingCartType && this.props.filterType != null) {
+      url = url + "&" + this.props.filterType + "__id=" + this.props.dispensementID;
+    }
+    restRequest("GET", url, "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
       console.log("Getting Asset Response");
       console.log(response);
-      this.setState({assetData: response.results});
+      let results = response.results;
+
+      this.setState({assetData: results});
       this.setState({dataTotalSize: response.count});
     },
     ()=>{handleServerError(this._alertchild)});
@@ -65,7 +88,7 @@ class AssetTable extends React.Component {
     restRequest("GET", "/api/item/asset/field/", "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Custom Field Response iin ItemTable");
+      console.log("Getting Custom Field Response in ItemTable");
       console.log(response);
       var results = response.results;
       this.setState({_fields: response.results});
@@ -183,9 +206,7 @@ customFieldRequest(type, id, value) {
 onDeleteRow(rows) {
   var k = 1;
   for(var j = 0; j < rows.length; j ++) {
-    for(var i = 0; i < this.state.assetData.length; i ++) {
-      if(this.state.assetData[i].asset_tag === rows[j]) {
-        restRequest("DELETE", "/api/item/asset/"+this.state.assetData[i].id, "application/json", null,
+    restRequest("DELETE", "/api/item/asset/"+rows[j], "application/json", null,
         ()=>{
           console.log("Successfully deleted rows")
           console.log(j);
@@ -198,8 +219,6 @@ onDeleteRow(rows) {
         }, (status, errResponse)=>{
           this.handleErrors(errResponse, this._alertchild);
         });
-      }
-    }
   }
 }
 
@@ -219,21 +238,46 @@ onPageChange(page, sizePerPage) {
     })
 }
 
+getSelectedAssets() {
+  return(this.state.selectedRows);
+}
+
 renderColumns() {
   var cols = [];
-  cols.push(<TableHeaderColumn key="asset_tag" dataField='asset_tag' autoValue={true} hiddenOnInsert isKey>Asset Tag</TableHeaderColumn>);
-  for(var i = 0; i < this.state._fields.length; i++) {
-    let name = this.state._fields[i].name;
-    cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
+  cols.push(<TableHeaderColumn key="id" dataField='id' autoValue={true} hiddenOnInsert hidden isKey></TableHeaderColumn>);
+  cols.push(<TableHeaderColumn key="asset_tag" dataField='asset_tag' autoValue={true} hiddenOnInsert>Asset Tag</TableHeaderColumn>);
+
+  if(!this.props.lightMode) {
+    for(var i = 0; i < this.state._fields.length; i++) {
+      let name = this.state._fields[i].name;
+      cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
+    }
+    cols.push(<TableHeaderColumn key="userCol" dataField='users' dataFormat={this.userSelectFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
+    cols.push(<TableHeaderColumn key="buttonCol" dataField='button' dataFormat={this.assetButtonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
   }
-  cols.push(<TableHeaderColumn key="userCol" dataField='users' dataFormat={this.userSelectFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
-  cols.push(<TableHeaderColumn key="buttonCol" dataField='button' dataFormat={this.assetButtonFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
   return cols;
+}
+
+onSelectRow(row, isSelected, e) {
+  let newSelected = this.state.selectedRows;
+  if(isSelected) {
+    newSelected.push(row.id);
+  } else {
+    newSelected.splice(newSelected.indexOf(row.id), 1);
+  }
+
+  if(this.props.selectRowCallback != null) {
+    this.props.selectRowCallback.updateNumRowsSelected(newSelected.length);
+  }
+
+  this.setState({selectedRows: newSelected});
 }
 
 render() {
   const selectRow = {
-    mode: 'checkbox'
+    mode: 'checkbox',
+    onSelect: this.onSelectRow,
+    selected: this.state.selectedRows
   };
 
   const options = {
@@ -252,14 +296,14 @@ render() {
       <p> <b> Instances of this Asset: </b> </p>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <AssetDetail ref={(child) => { this._assetDetail = child; }} />
-      <BootstrapTable ref="assetTable"
+      <BootstrapTable ref={(child) => { this._table = child; }}
       data={ this.state.assetData }
       options={ options }
       pagination={true}
       fetchInfo={ { dataTotalSize: this.state.dataTotalSize } }
       remote={true}
       selectRow = { selectRow }
-      deleteRow={true} insertRow={true}
+      deleteRow={!this.props.lightMode} insertRow={!this.props.lightMode}
       striped hover>
       {this.renderColumns()}
       </BootstrapTable>
