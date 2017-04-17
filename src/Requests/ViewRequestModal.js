@@ -7,7 +7,8 @@ import TextEntryFormElement from '../TextEntryFormElement'
 import {checkAuthAndAdmin} from "../Utilities";
 import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
-import AlertComponent from "../AlertComponent.js"
+import AlertComponent from "../AlertComponent.js";
+import BackfillDetailModal from "../Backfill/BackfillDetailModal";
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
@@ -36,6 +37,7 @@ class ViewRequestModal extends React.Component {
     this.renderButtons = this.renderButtons.bind(this);
     this.changeRequestType = this.changeRequestType.bind(this);
     this.changeButton = this.changeButton.bind(this);
+    this.backfillButton = this.backfillButton.bind(this);
   }
 
   componentWillMount(){
@@ -348,6 +350,11 @@ class ViewRequestModal extends React.Component {
     return null;
   }
 
+  backfillButton(cell, row){
+    // open modal to show backfill table
+    return((row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View Backfill</Button> : null);
+  }
+
   renderRequestTable(data, type){
     const isStaff = (localStorage.isStaff === "true");
     return (
@@ -356,7 +363,10 @@ class ViewRequestModal extends React.Component {
       <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' width="80px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
-      <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+      <TableHeaderColumn dataField='total_backfill_quantity' hidden={!(type === "loan")} width="120px" dataAlign="center">Total Backfilled</TableHeaderColumn>
+      <TableHeaderColumn dataField='button1' width="120px" dataFormat={this.backfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+                            hidden={type !== "loan"}></TableHeaderColumn>
+                          <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                         hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
       </BootstrapTable>
     )
@@ -366,6 +376,7 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
+      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }}></BackfillDetailModal>
       <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>

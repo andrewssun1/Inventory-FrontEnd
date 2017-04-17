@@ -4,10 +4,11 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 import { Button } from 'react-bootstrap';
+var moment = require('moment');
+
 
 
 export default class BackfillTable extends React.Component {
-
   constructor(props){
     super(props);
     this.state = {
@@ -16,32 +17,32 @@ export default class BackfillTable extends React.Component {
     // this.onRowClick = this.onRowClick.bind(this);
   }
 
-  componentWillMount(){
-    this.resetTable();
-  }
-
-  resetTable(){
-    this.getAllBackfills();
-  }
-
-  getAllBackfills() {
-    checkAuthAndAdmin(()=>{
-      restRequest("GET", "/api/request/backfill/", "application/json", null,
-                  (responseText)=>{
-                    var response = JSON.parse(responseText);
-                    for (var i = 0; i < response.results.length; i++) {
-                      response.results[i].timestamp = moment(response.results[i].timestamp).format('lll');
-                    }
-                    this.setState({
-                      data: response.results
-                    });
-                  }, ()=>{});
-    });
-  }
+  // componentWillMount(){
+  //   this.resetTable();
+  // }
+  //
+  // resetTable(){
+  //   this.getAllBackfills();
+  // }
+  //
+  // getAllBackfills() {
+  //   checkAuthAndAdmin(()=>{
+  //     restRequest("GET", "/api/request/backfill/", "application/json", null,
+  //                 (responseText)=>{
+  //                   var response = JSON.parse(responseText);
+  //                   for (var i = 0; i < response.results.length; i++) {
+  //                     response.results[i].timestamp = moment(response.results[i].timestamp).format('lll');
+  //                   }
+  //                   this.setState({
+  //                     data: response.results
+  //                   });
+  //                 }, ()=>{});
+  //   });
+  // }
 
   formatPDF(cell, row){
     return (
-      <Button href={row.pdf_url}>Download PDF</Button>
+      <Button bsStyle="link" href={row.pdf_url}>Download PDF</Button>
     );
   }
 
@@ -52,7 +53,7 @@ export default class BackfillTable extends React.Component {
 
     return(
       <div>
-      <BootstrapTable ref="backfillTable" data={this.state.data} striped hover>
+      <BootstrapTable ref="backfillTable" data={this.props.data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='status'>Status</TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp'>Timestamp</TableHeaderColumn>

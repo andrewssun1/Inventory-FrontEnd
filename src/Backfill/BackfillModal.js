@@ -1,7 +1,7 @@
 var React = require('react');
 
 import { Modal, Button, Label, FormControl} from 'react-bootstrap';
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js";
+import {restRequest, restRequestData, checkAuthAndAdmin} from "../Utilities.js";
 import AlertComponent from '../AlertComponent';
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
@@ -19,7 +19,9 @@ export default class BackfillModal extends React.Component {
       modal_data: [],
       import_text: DEFAULT_IMPORT_TEXT,
       backfill_quantity: 0,
-      curr_file: ""
+      curr_file: "",
+      new_backfill: false,
+      backfill_data: {},
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -30,21 +32,31 @@ export default class BackfillModal extends React.Component {
 
   openModal(row){
     this.setState({modal_data: row}, ()=>{
-      // check if pdf and quantity is already setState
-      console.log(row);
-      row.send_data != null ?
-        this.setState({
-          backfill_quantity: row.send_data.quantity,
-          curr_file: row.send_data.receipt_pdf,
-          showModal: true,
-          import_text: "Uploaded file: " + row.send_data.receipt_pdf.name
-        }) :
-        this.setState({
-          backfill_quantity: 0,
-          curr_file: "",
-          showModal: true,
-          import_text: DEFAULT_IMPORT_TEXT
-        })
+      // Check whether or not there is already an active backfill
+      console.log(this.state.modal_data);
+      checkAuthAndAdmin(()=>{
+        restRequest("GET", "/api/request/backfill/active/" + row.id + "/", "application/json", null,
+                    (responseText)=>{
+                      var response = JSON.parse(responseText);
+                      console.log(response);
+                      row.backfill_quantity = parseInt(response.quantity, 10);
+                      this.setState({
+                        backfill_quantity: response.quantity,
+                        import_text: "Uploaded file: " + response.file_name,
+                        backfill_data: response,
+                        new_backfill: false
+                      });
+                    }, ()=>{
+                      this.setState({
+                        backfill_quantity: 0,
+                        import_text: DEFAULT_IMPORT_TEXT,
+                        backfill_data: {},
+                        curr_file: "",
+                        new_backfill: true
+                      });
+                    });
+      });
+      this.setState({showModal: true});
     });
   }
 
@@ -85,12 +97,43 @@ export default class BackfillModal extends React.Component {
   }
 
   saveBackfill(){
-    console.log(this.state.modal_data);
-    var currJSON = {};
-    currJSON.receipt_pdf = this.state.curr_file;
-    currJSON.loan_id = this.state.modal_data.id;
-    currJSON.quantity = this.state.backfill_quantity;
-    this.state.modal_data.send_data = currJSON;
+    // console.log(this.state.modal_data);
+
+    var data = new FormData();
+    // console.log(this.state.curr_file);
+    data.append("receipt_pdf", this.state.curr_file);
+    this.state.new_backfill ? data.append("loan_id", this.state.modal_data.id) : data.append("backfill_id", this.state.backfill_data.id);
+    data.append("quantity", this.state.backfill_quantity);
+    console.log(this.state.new_backfill);
+    this.state.new_backfill ? console.log("new backfill: ", data.get("loan_id")) :  console.log("updating backfill: ", data.get("backfill_id"))
+
+    // this.state.modal_data.send_data = currJSON;
+    if (this.state.new_backfill){
+      checkAuthAndAdmin(()=>{
+        restRequestData("POST", "/api/request/backfill/create/", data,
+                    (responseText)=>{
+                      var response = JSON.parse(responseText);
+                      if (typeof this.props.cb.resetTable === "function") {
+                        this.props.cb.resetTable();
+                      }
+                      console.log(response);
+                    }, ()=>{});
+      });
+    }
+    else{
+      checkAuthAndAdmin(()=>{
+        restRequestData("POST", "/api/request/backfill/update/", data,
+                    (responseText)=>{
+                      var response = JSON.parse(responseText);
+                      if (typeof this.props.cb.resetTable === "function") {
+                        this.props.cb.resetTable();
+                      }
+                      console.log(response);
+                    }, ()=>{});
+      });
+    }
+
+
     this.closeModal();
   }
 
