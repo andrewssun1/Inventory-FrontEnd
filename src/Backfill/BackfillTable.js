@@ -14,31 +14,7 @@ export default class BackfillTable extends React.Component {
     this.state = {
       data: []
     }
-    // this.onRowClick = this.onRowClick.bind(this);
   }
-
-  // componentWillMount(){
-  //   this.resetTable();
-  // }
-  //
-  // resetTable(){
-  //   this.getAllBackfills();
-  // }
-  //
-  // getAllBackfills() {
-  //   checkAuthAndAdmin(()=>{
-  //     restRequest("GET", "/api/request/backfill/", "application/json", null,
-  //                 (responseText)=>{
-  //                   var response = JSON.parse(responseText);
-  //                   for (var i = 0; i < response.results.length; i++) {
-  //                     response.results[i].timestamp = moment(response.results[i].timestamp).format('lll');
-  //                   }
-  //                   this.setState({
-  //                     data: response.results
-  //                   });
-  //                 }, ()=>{});
-  //   });
-  // }
 
   formatPDF(cell, row){
     return (
@@ -46,11 +22,11 @@ export default class BackfillTable extends React.Component {
     );
   }
 
-  render(){
-    // const options = {
-    //   onRowClick: this.onRowClick
-    // };
+  approveBackfill(id){
+    
+  }
 
+  render(){
     return(
       <div>
       <BootstrapTable ref="backfillTable" data={this.props.data} striped hover>

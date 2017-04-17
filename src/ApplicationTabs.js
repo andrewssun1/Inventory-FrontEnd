@@ -9,7 +9,7 @@ import RequestComponent from './Requests/RequestComponent'
 import ManageUsersComponent from './ManageUsersComponent'
 import ShoppingCartTable from './ShoppingCart/ShoppingCartTable'
 import SettingsComponent from './Settings/SettingsComponent'
-import DisbursementTable from './Disbursements/DisbursementTable';
+import AboutPage from './AboutUs';
 import HomePage from './HomePage';
 
 var React = require('react');
@@ -60,10 +60,10 @@ export default class ApplicationTabs extends React.Component {
       this.refs.manage.resetTable();
     }
     else if (key === "cart"){
-      this.refs.shoppingCartTable.resetTable();
       // this.refs.shoppingCartTable.refs.shoppingCart.refs.body.refs.cartChooser.forceUpdate();
       // this.refs.shoppingCartTable.refs.chooser.forceUpdate();
       this.refs.shoppingCartTable._alertchild.closeAlert();
+      this.refs.shoppingCartTable.resetTable();
     }
     else if (key === "home") {
       this.refs.homePage.componentWillMount();
@@ -142,6 +142,9 @@ export default class ApplicationTabs extends React.Component {
                    <NavItem eventKey="cart">
                      <Glyphicon style={{marginRight: "8px"}} glyph="shopping-cart" />{"Cart ("+this.state.cart_quantity+")"}
                    </NavItem>
+                   <NavItem eventKey="about_us">
+                     <Glyphicon style={{marginRight: "8px"}} glyph="fire" />About Us
+                   </NavItem>
                </Nav>
              </Col>
              <Col sm={9}>
@@ -170,6 +173,9 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
+                 </Tab.Pane>
+                 <Tab.Pane eventKey="about_us">
+                   <AboutPage ref="aboutUs"></AboutPage>
                  </Tab.Pane>
                </Tab.Content>
              </Col>

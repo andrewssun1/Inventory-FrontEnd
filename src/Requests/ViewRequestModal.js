@@ -9,11 +9,19 @@ import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
 import AlertComponent from "../AlertComponent.js";
 import BackfillDetailModal from "../Backfill/BackfillDetailModal";
+import SelectAssetsModal from "./SelectAssetsModal.js"
+import SelectAssetsButton from "./SelectAssetsButton.js"
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {Modal, Button, Label, FormControl, FormGroup, InputGroup, Tooltip, OverlayTrigger} from 'react-bootstrap';
 var moment = require('moment');
+
+const AssetSelectStatus = {
+  NOT_ASSET: 0,
+  SELECT_ASSETS: 1,
+  CHANGE_ASSETS: 2
+}
 
 class ViewRequestModal extends React.Component {
   constructor(props) {
@@ -22,7 +30,8 @@ class ViewRequestModal extends React.Component {
       showModal: false,
       requestData: [],
       requestProblemString: "",
-      isStaff: false
+      isStaff: false,
+      hasUnselectedAsset: false
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -38,6 +47,7 @@ class ViewRequestModal extends React.Component {
     this.changeRequestType = this.changeRequestType.bind(this);
     this.changeButton = this.changeButton.bind(this);
     this.backfillButton = this.backfillButton.bind(this);
+    this.selectAssetsButton = this.selectAssetsButton.bind(this);
   }
 
   componentWillMount(){
@@ -48,34 +58,15 @@ class ViewRequestModal extends React.Component {
 
   getDetailedRequest(id, cb) {
     checkAuthAndAdmin(()=>{
+      this.setState({hasUnselectedAsset: false});
       restRequest("GET", "/api/request/"+id, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     console.log("Getting Response");
                     console.log(response);
                     var errorItems = [];
-                    var cartDisbursements = response.cart_disbursements;
-                    var cartLoans = response.cart_loans;
-
-                    // TODO: refactor?
-                    for (var i = 0; i < cartDisbursements.length; i++){
-                      cartDisbursements[i].name = cartDisbursements[i].item.name;
-                      cartDisbursements[i].status = "disbursement";
-                      cartDisbursements[i].changeQuantity = cartDisbursements[i].quantity;
-                      cartDisbursements[i].shouldUpdate = false;
-                      if(cartDisbursements[i].quantity > cartDisbursements[i].item.quantity) {
-                        errorItems.push(cartDisbursements[i].name);
-                      }
-                    }
-                    for (var j = 0; j < cartLoans.length; j++){
-                      cartLoans[j].name = cartLoans[j].item.name;
-                      cartLoans[j].status = "loan";
-                      cartLoans[j].changeQuantity = cartLoans[j].quantity;
-                      cartLoans[j].shouldUpdate = false;
-                      if(cartLoans[j].quantity > cartLoans[j].item.quantity) {
-                        errorItems.push(cartLoans[j].name);
-                      }
-                    }
+                    this.assignCartVariables(response.cart_disbursements, "disbursement", errorItems);
+                    this.assignCartVariables(response.cart_loans, "loan", errorItems);
 
                     if (errorItems.length === 0 || response.status !== "outstanding"){
                       this.setState({requestProblemString: ""});
@@ -92,10 +83,31 @@ class ViewRequestModal extends React.Component {
                     }
 
                     this.setState({requestData: response}, cb);
-                    //cb();
                   }, ()=>{console.log("Get detailed request failed!");}
                   )
       });
+  }
+
+  assignCartVariables(cart, status, errorItems) {
+    for (var i = 0; i < cart.length; i++) {
+      cart[i].name = cart[i].item.name;
+      cart[i].status = status;
+      cart[i].changeQuantity = cart[i].quantity;
+      cart[i].shouldUpdate = false;
+
+      if(cart[i].item.is_asset && cart[i].assets.length < cart[i].quantity) {
+        cart[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
+        this.setState({hasUnselectedAsset: true});
+      } else if (cart[i].item.is_asset && cart[i].assets.length > 0) {
+        cart[i].assetSelect = AssetSelectStatus.CHANGE_ASSETS;
+      } else {
+        cart[i].assetSelect = AssetSelectStatus.NOT_ASSET;
+      }
+
+      if(cart[i].quantity > cart[i].item.quantity) {
+        errorItems.push(cart[i].name);
+      }
+    }
   }
 
   openModal() {
@@ -205,7 +217,8 @@ class ViewRequestModal extends React.Component {
         type={TypeConstants.Enum.LONG_STRING} initialValue="" ref={(child) => {this._commentsField = child;}}/>
         <br /> <br /> <br /> <br /> </div>);
         if(this.state.requestProblemString === "") {
-          buttons.push(<Button key="approve" onClick={this.approve} bsStyle="success">Approve Cart</Button>);
+          buttons.push(<Button key="approve" onClick={this.approve}
+          disabled={this.state.hasUnselectedAsset} bsStyle="success">Approve Cart</Button>);
         }
         buttons.push(<Button key="deny" onClick={this.deny} bsStyle="danger">Deny Cart</Button>);
       } else {
@@ -220,25 +233,34 @@ class ViewRequestModal extends React.Component {
   }
 
   changeRequestType(row){
-    console.log(row);
-    checkAuthAndAdmin(()=>{
-      var id = row.id;
-      var url = "/api/request/convertRequestType/";
-      var changeTypeJSON = JSON.stringify({
-          current_type: row.status,
-          pk: id,
-          quantity: row.changeQuantity
-      });
-      restRequest("POST", url, "application/JSON", changeTypeJSON,
-          (responseText)=>{
-              var response = JSON.parse(responseText);
-              // this.forceUpdate();
-              this.getDetailedRequest(this.state.requestData.id, ()=>{});
-          }, (status, errResponse)=>{
-            this._alertchild.generateError("Invalid quantity!");
-          }
-      );
-    });
+    if(row.assetSelect == AssetSelectStatus.NOT_ASSET ||
+      row.assetSelect == AssetSelectStatus.SELECT_ASSETS) {
+        checkAuthAndAdmin(()=>{
+          var id = row.id;
+          var url = "/api/request/convertRequestType/";
+          var changeTypeJSON = JSON.stringify({
+              current_type: row.status,
+              pk: id,
+              quantity: row.changeQuantity
+          });
+          restRequest("POST", url, "application/JSON", changeTypeJSON,
+              (responseText)=>{
+                  var response = JSON.parse(responseText);
+                  // this.forceUpdate();
+                  this.getDetailedRequest(this.state.requestData.id, ()=>{});
+              }, (status, errResponse)=>{
+                this._alertchild.generateError("Invalid quantity!");
+              }
+          );
+        });
+    } else {
+      this._selectAssetsModal.setState({itemID: row.item.id});
+      this._selectAssetsModal.setState({type: row.status});
+      this._selectAssetsModal.setState({dispensementID: row.id});
+      this._selectAssetsModal.setState({numAssetsNeeded: row.changeQuantity});
+      this._selectAssetsModal.setState({isChangingCartType: true});
+      this._selectAssetsModal.openModal();
+    }
   }
 
   generateHighQuantityTextBox(row){
@@ -355,19 +377,35 @@ class ViewRequestModal extends React.Component {
     return((row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View Backfill</Button> : null);
   }
 
+  selectAssetsButton(cell, row) {
+    switch (row.assetSelect) {
+      case AssetSelectStatus.SELECT_ASSETS:
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="primary" name="Select Assets"/>);
+        break;
+      case AssetSelectStatus.CHANGE_ASSETS:
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="warning" name="Change Assets"/>);
+      break
+      default:
+        return null;
+    }
+  }
+
   renderRequestTable(data, type){
     const isStaff = (localStorage.isStaff === "true");
     return (
       <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
-      <TableHeaderColumn dataField='name'>Name</TableHeaderColumn>
-      <TableHeaderColumn dataField='quantity' width="80px" dataAlign="center">Quantity</TableHeaderColumn>
+      <TableHeaderColumn dataField='name' width="120px">Name</TableHeaderColumn>
+      <TableHeaderColumn dataField='quantity' width="75px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
-      <TableHeaderColumn dataField='total_backfill_quantity' hidden={!(type === "loan")} width="120px" dataAlign="center">Total Backfilled</TableHeaderColumn>
+      <TableHeaderColumn dataField='total_backfill_quantity' hidden={!(this.state.requestData.status === "outstanding" && type === "loan")} width="120px" dataAlign="center">Backfills Requested</TableHeaderColumn>
       <TableHeaderColumn dataField='button1' width="120px" dataFormat={this.backfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                             hidden={type !== "loan"}></TableHeaderColumn>
                           <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                         hidden={!isStaff || (!this.isOutstanding() && !(this.state.requestData.status === "fulfilled" && type === "loan"))}></TableHeaderColumn>
+      <TableHeaderColumn dataField='assetSelect' width="130px" dataFormat={this.selectAssetsButton}></TableHeaderColumn>
       </BootstrapTable>
     )
   }
@@ -376,8 +414,10 @@ class ViewRequestModal extends React.Component {
     return (
       (this.state.requestData.length !== 0) ?
       <div>
-      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }}></BackfillDetailModal>
-      <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
+      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }}></BackfillDetailModal>=
+      <SelectAssetsModal cartID={this.state.requestData.id} updateCallback={this}
+      ref={(child) => { this._selectAssetsModal = child; }}/>
+    <Bootstrap.Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Modal.Header>
       <Modal.Title>View Request</Modal.Title>
