@@ -34,8 +34,6 @@ class RequestButton extends React.Component {
         restRequest("PATCH", url, "application/json", JSON.stringify(requestBody),
                     (responseText)=>{
                       var response = JSON.parse(responseText);
-                      console.log("about to print response!!");
-                      console.log(response);
                       this.props.cb._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                       this.props.cb.resetTable();
                     },
@@ -49,7 +47,6 @@ class RequestButton extends React.Component {
     approveClick() {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
-            console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "approve", "admin_comment", "");
             //this.approveRequest(requestIDs[i]);
         }
@@ -57,7 +54,6 @@ class RequestButton extends React.Component {
     denyClick() {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
-            console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "deny", "admin_comment", "");
             //this.denyRequest(requestIDs[i]);
         }
@@ -65,7 +61,6 @@ class RequestButton extends React.Component {
     cancelClick() {
         var requestIDs = this.props.selected;
         for (let i = 0; i < requestIDs.length; i++) {
-            console.log(requestIDs[i])
             this.patchRequest(requestIDs[i], "cancel", "reason", "");
             //this.cancelRequest(requestIDs[i]);
         }

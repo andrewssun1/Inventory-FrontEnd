@@ -77,13 +77,11 @@ export default class HomePage extends React.Component {
       restRequest("GET", url, "application/JSON", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    console.log(response);
                     for (var i = 0; i < response.results.length; i++) {
                       response.results[i].item_name = response.results[i].item.name;
                     }
                     this.setState({loan_data: response.results, totalLoanSize: response.count});
-                    console.log(response.count)
-                  }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                  }, (status, responseText)=>{});
     });
   }
 
@@ -94,12 +92,11 @@ export default class HomePage extends React.Component {
       restRequest("GET", url, "application/JSON", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    console.log(response);
                     for (var i = 0; i < response.results.length; i++) {
                       response.results[i]['timestamp'] = moment(response.results[i].timestamp).format('lll');
                     }
                     this.setState({outstanding_data: response.results});
-                  }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                  }, (status, responseText)=>{});
     })
   }
 
@@ -112,7 +109,6 @@ export default class HomePage extends React.Component {
   onPageChangeLoan(page, sizePerPage){
     var page_argument = "page=" + page;
     var url_param = "?" + page_argument;
-    console.log(url_param);
     this.getAllLoans();
     this.setState({
         currentPageLoan: page

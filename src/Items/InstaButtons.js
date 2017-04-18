@@ -33,8 +33,6 @@ export default class InstaButtons extends React.Component {
     restRequest("POST", "/api/request/instantRequest/", "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting insta response");
-      console.log(response);
       this.props.updateCallback.requestAssets();
       this.props.updateCallback._alertchild.generateSuccess("Successfully made dispensement");
     },

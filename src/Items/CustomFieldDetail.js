@@ -46,26 +46,19 @@ export default class CustomFieldDetail extends React.Component {
   }
 
   saveEdits() {
-  console.log(this.state.row);
-
   let requestBody = {
     "name": this._nameEntryFormElement.state.value,
     "private": (this.state.currentPrivacy == "Private")
   }
 
-  console.log(requestBody);
-
   var jsonResult = JSON.stringify(requestBody);
   restRequest("PATCH", this.props.apiSource + this.state.row.id, "application/json", jsonResult,
   (responseText)=>{
     var response = JSON.parse(responseText);
-    console.log("Getting Response");
-    console.log(response);
     this.props.cb.getFieldData();
     this.closeModal();
   },
   ()=>{
-    console.log('PATCH Failed!!');
   });
   }
 
@@ -83,7 +76,6 @@ export default class CustomFieldDetail extends React.Component {
 
   renderDisplayFields() {
     if(this.state.row == null) return null;
-    console.log(this.state.row);
     return (
       <div>
       <p><b>Name: </b>{this.state.row.name}</p>

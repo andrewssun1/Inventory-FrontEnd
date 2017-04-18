@@ -46,7 +46,6 @@ export default class BackfillTable extends React.Component {
   }
   cleanFilter() {
     if(this._statusFilter != null) {
-      console.log("Cleaning filter");
       this._statusFilter.cleanFiltered();
     }
   }
@@ -116,9 +115,8 @@ export default class BackfillTable extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     row.request_status = response.status;
-                    // console.log(row);
                     this.forceUpdate();
-                  }, ()=>{console.log("Get detailed request failed!");}
+                  }, ()=>{}
                   )
       });
   }
@@ -164,7 +162,6 @@ export default class BackfillTable extends React.Component {
 
 
   onRowClick(row){
-    console.log(this.state.showModal);
     if (this.state.showModal){
       this._requestModal.setState({id: row.cart_id});
       this._requestModal.openModal();

@@ -69,7 +69,6 @@ export default class ManageUsersComponent extends React.Component {
                     },
                     (status, errResponse)=>{
                       this._alertchild.generateError("Error retrieving user data. Please contact the system administrator." + " (Error Code: " + status + ")");
-                      console.log('GET Failed!!');
                       this.setState({
                           _loginState: false
                       });
@@ -94,7 +93,6 @@ export default class ManageUsersComponent extends React.Component {
       restRequest("POST", "/api/user/", "application/json", jsonResult,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    console.log(response);
                     row.id = response.id;
                     this.state._users.push(row);
                     this._alertchild.generateSuccess("Successfully added " + sendJSON.username);
@@ -102,7 +100,6 @@ export default class ManageUsersComponent extends React.Component {
                     var errs = JSON.parse(errResponse);
                     for (var key in errs){
                       if (errs.hasOwnProperty(key)){
-                        console.log(key);
                         this._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
                       }
                     }
@@ -110,7 +107,6 @@ export default class ManageUsersComponent extends React.Component {
                       this._alertchild.generateError("Error: Please fill out all fields when adding a user");
                     }
                     let response = JSON.parse(errResponse);
-                    console.log(response);
                     this.forceUpdate();
                   });
     });
@@ -146,13 +142,10 @@ export default class ManageUsersComponent extends React.Component {
       restRequest("PATCH", "/api/user/" + row.id, "application/json", jsonResult,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting Response");
-        console.log(response);
         this._alertchild.generateSuccess("Successfully changed user permission level");
       },
       (status, errResponse)=>{
         this._alertchild.generateError("There was an error changing user permission level. Please contact the system administrator." + " (Error Code: " + status + ")");
-        console.log('PATCH Failed!!');
       });
     });
   }

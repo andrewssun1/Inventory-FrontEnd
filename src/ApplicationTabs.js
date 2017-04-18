@@ -98,8 +98,7 @@ export default class ApplicationTabs extends React.Component {
                   var disburseRequest = response.cart_disbursements;
                   var loanRequest = response.cart_loans;
                   localStorage.setItem("cart_quantity", disburseRequest.length + loanRequest.length);
-                  console.log(response);
-                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                }, (status, responseText)=>{});
 
     // 10TH GRADE MAGICS
     localStorage.setItem = function(){

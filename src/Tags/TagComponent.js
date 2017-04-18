@@ -25,7 +25,6 @@ class TagComponent extends React.Component {
           this.setState({
               isStaff: (localStorage.isStaff === 'true')
           })
-          console.log(this.props.item_detail);
           for (var i = 0; i < this.props.item_detail.length; i++){
             var currTag = this.props.item_detail[i];
             this.state.tagDict[currTag.tag] = currTag.id;
@@ -40,7 +39,7 @@ class TagComponent extends React.Component {
                           allTags.push({label: tagList[i].tag, value: tagList[i].tag});
                         }
                         this.setState({tagOptions: allTags});
-                      }, ()=>{console.log('GET Failed!!');});
+                      }, ()=>{});
         });
     }
 
@@ -55,7 +54,6 @@ class TagComponent extends React.Component {
                     var temp_data = this.state.data;
                     this.state.tagDict[response.tag] = response.id;
                     this.props.cb._alertchild.generateSuccess("Successfully added tag: " + response.tag);
-                    console.log("Successfully added: ", tag);
                   },
                 ()=>{
                   this.props.cb._alertchild.generateError("Tag creation error! Please contact system admin.");
@@ -73,21 +71,18 @@ class TagComponent extends React.Component {
 
     handleSelectChange (value) {
       var newList = value.split(",");
-      console.log(newList);
       var oldList = this.state.includedValue;
       // added new tag
       if (newList.length > oldList.length || oldList[0] === "") {
         // find added tag
         var diff = newList.filter(x => oldList.indexOf(x) === -1);
         this.addTag(diff[0]);
-        console.log("New tag: ", diff);
       }
       // deleted a tag
       else if (newList.length < oldList.length || newList[0] === "") {
         // find deleted tag
         var diff = oldList.filter(x => newList.indexOf(x) === -1);
         this.deleteTag(diff[0]);
-        console.log("Removed tag: ", diff);
       }
       this.setState({ includedValue: newList });
       this.props.cb.props.updateCallback.componentWillMount();

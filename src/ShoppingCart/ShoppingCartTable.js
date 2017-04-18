@@ -90,10 +90,9 @@ export default class ShoppingCartTable extends React.Component {
                   var loanRequest = this.iterateRequests(response.cart_loans, "loan");
                   var allRequest = disburseRequest.concat(loanRequest);
                   localStorage.setItem("cart_quantity", allRequest.length);
-                  console.log(allRequest);
                   this.setState({_cart: allRequest});
                   this.refs.shoppingCart.forceUpdate();
-                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                }, (status, responseText)=>{});
   }
 
   iterateRequests(requestArray, type){
@@ -221,7 +220,7 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
       hidden={!isStaff}></TableHeaderColumn>
     </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || (this.isStaff && this.state.hasUnselectedAsset)} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || (isStaff && this.state.hasUnselectedAsset)} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
       </div>
     );
   }

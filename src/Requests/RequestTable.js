@@ -65,22 +65,18 @@ class RequestTable extends React.Component {
 
   cleanFilter() {
     if(this._statusFilter != null) {
-      console.log("Cleaning filter");
       this._statusFilter.cleanFiltered();
     }
   }
 
   getAllRequests(){
-    // var url = url_parameter === null ? "/api/request/" : "/api/request/" + url_parameter;
-    // console.log(url);
     checkAuthAndAdmin(()=>{
       restRequest("GET", "/api/request/?status=" + this.state.filterStatus + "&page=" + this.state.currentPage + "&search="+this.state.searchStatus + "&cart_loans__backfill_loan__status=" + this.state.currentBackfillStatus, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    // console.log(response);
+
                     var unselectable_ids = [];
                     var response_results = RequestTable.editGetResponse(response.results, unselectable_ids);
-                    // console.log(response_results);
                     for (var i = 0; i < response_results.length; i++){
                       var currRequest = response_results[i];
                       if (currRequest.cart_disbursements.length !== 0 && currRequest.cart_loans.length !== 0) {
@@ -104,7 +100,6 @@ class RequestTable extends React.Component {
   }
 
   static editGetResponse(data,unselectable_arr) {
-    // console.log(data);
     for(var index=0; index< data.length; index++){
       data[index]['owner'] = data[index].owner === null ? 'UNKNOWN USER' : data[index].owner;
       data[index]['timestamp'] = moment(data[index].timestamp).format('lll');
@@ -188,14 +183,12 @@ class RequestTable extends React.Component {
   }
 
   handleBackfillStatusChange(value){
-    console.log(value);
     this.setState({currentBackfillStatus: (value === null) ? "" : value, currentPage: 1}, ()=>{
       this.getAllRequests()
     })
   }
 
   onRowClick(row, isSelected, e) {
-    // console.log(row.id);
     this._requestModal.setState({id: row.id})
     this._requestModal.openModal();
   }

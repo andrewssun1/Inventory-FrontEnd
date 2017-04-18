@@ -78,8 +78,6 @@ class AssetTable extends React.Component {
     restRequest("GET", url, "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Asset Response");
-      console.log(response);
       let results = response.results;
 
       this.setState({assetData: results});
@@ -92,8 +90,6 @@ class AssetTable extends React.Component {
     restRequest("GET", "/api/item/asset/field/", "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Custom Field Response in ItemTable");
-      console.log(response);
       var results = response.results;
       this.setState({_fields: response.results});
     },
@@ -105,7 +101,6 @@ getUsers() {
   restRequest("GET", "/api/user/large/", "application/JSON", null,
   (responseText)=>{
     var response = JSON.parse(responseText);
-    console.log(response);
     let usernameIDMap = [];
     for (var i = 0; i < response.results.length; i++){
       var username = response.results[i].username;
@@ -160,8 +155,6 @@ onAddRow(row) {
   restRequest("POST", "/api/item/asset/", "application/json", jsonResult,
   (responseText)=>{
     var response = JSON.parse(responseText);
-    console.log("Getting add asset response");
-    console.log(response);
     row.id = response.id;
     this.addAssetFields(row);
     this.requestAssets();
@@ -199,8 +192,6 @@ customFieldRequest(type, id, value) {
   restRequest("PATCH", "/api/item/asset/field/" + type + "/" + id, "application/json", jsonResult,
   (responseText)=>{
     var response = JSON.parse(responseText);
-    console.log("Getting Response");
-    console.log(response);
   },
   (status, errResponse)=>{
     handleErrors(errResponse, this._alertchild);

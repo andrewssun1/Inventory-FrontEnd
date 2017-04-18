@@ -52,12 +52,10 @@ class LogComponent extends React.Component {
                     "&max_time=" + this.state.maxTime +
                     "&item_name=" + ((this.props.itemFilter != null) ? this.props.itemFilter : this.state.currentUser) +
                     "&page=" + this.state.currentPage;
-          console.log(url);
           this.setState({currentFilterURL: url});
           restRequest("GET", url, "application/json", null,
                       (responseText)=>{
                         var response = JSON.parse(responseText);
-                        console.log(response);
                         for (var i = 0; i < response.results.length; i++){
                             response.results[i]["action_tag"] = response.results[i].nature.tag;
                             response.results[i]["action_color"] = response.results[i].nature.color;
@@ -80,7 +78,6 @@ class LogComponent extends React.Component {
             restRequest("GET", "/api/logger/action/", "application/json", null,
                         (responseText)=>{
                           var response = JSON.parse(responseText);
-                          // console.log(response)
                           var actions = [];
                           var action_filters = {};
                           for (var i=0; i<response.results.length; i++){
@@ -90,7 +87,6 @@ class LogComponent extends React.Component {
                               actions.push(tag);
                               action_filters[parseInt(id, 10)] = tag;
                           }
-                          // console.log(action_filters);
                           this.setState({
                               action_list: actions,
                               action_filter_obj: action_filters
@@ -120,7 +116,6 @@ class LogComponent extends React.Component {
     }
 
     onFilterChange(filterObj) {
-      console.log(filterObj);
         if (Object.keys(filterObj).length === 0) {
           this.setState({actionURLParam: "", currentPage: 1},
             ()=>{
@@ -141,14 +136,12 @@ class LogComponent extends React.Component {
     }
 
     onRowClick(row){
-      console.log(row);
       this._logchild.openModal(row);
     }
 
     onPageChange(page, sizePerPage) {
         // var page_argument = "page=" + page;
         // var url_param = this.state.currentFilterURL == null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
-        // console.log(url_param);
         this.setState({
             currentPage: page
         }, ()=>{
@@ -159,7 +152,6 @@ class LogComponent extends React.Component {
     }
 
     handleNameChange(value){
-      console.log(value);
       this.setState({currentUser: (value === null) ? "" : value, currentPage: 1}, ()=>{
         this.getRequestForLog("", ()=>{});
       })

@@ -77,8 +77,6 @@ class FieldViewerAndEditor extends React.Component {
     restRequest("PATCH", this.props.apiSource + type + "/" + id, "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Response");
-      console.log(response);
     },
     (status, errResponse)=>{
       handleErrors(errResponse, this.props.alertchild);

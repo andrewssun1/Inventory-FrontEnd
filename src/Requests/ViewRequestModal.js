@@ -71,8 +71,6 @@ class ViewRequestModal extends React.Component {
                 jsonResult,
                 (responseText)=>{
                   var response = JSON.parse(responseText);
-                  console.log("Getting Response");
-                  console.log(response);
                   this.props.updateCallback._alertchild.generateSuccess("Successfully " + dict[type] + " request.");
                   if (typeof this.props.updateCallback.getAllRequests == 'function') {
                       this.props.updateCallback.getAllRequests(null);
@@ -83,7 +81,6 @@ class ViewRequestModal extends React.Component {
                   this.closeModal();
                 }, (status, errResponse)=>{
                   var errorResponse = JSON.parse(errResponse);
-                  console.log("PATCH FAILED!");
                   this.props.updateCallback._alertchild.generateError(errorResponse.detail);
                   if (typeof this.props.updateCallback.getAllRequests == 'function') {
                       this.props.updateCallback.getAllRequests(null);

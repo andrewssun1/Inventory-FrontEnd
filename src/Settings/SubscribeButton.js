@@ -23,17 +23,14 @@ export default class SubscribeButton extends React.Component {
     restRequest("GET", "/api/email/subscribedManagers/current/", "application/json", null,
                   (responseText)=>{
                     let response = JSON.parse(responseText);
-                    console.log(response);
                     this.setState({isSubscribed: true});
                   }, ()=>{
-                    console.log("Error!");
                   });
   }
 
   subscribeManager() {
     restRequest("POST", "/api/email/subscribe/", "application/json", null,
                 (responseText)=>{
-                  console.log("Successfully Subscribed");
                   this.setState({isSubscribed: true});
                   this.props.cb._subscribedManagerTable.getSubscribedManagers();
                   this._alertchild.generateSuccess("Successfully subscribed");
@@ -45,7 +42,6 @@ export default class SubscribeButton extends React.Component {
   unsubscribeManager() {
     restRequest("POST", "/api/email/unsubscribe/", "application/json", null,
                 (responseText)=>{
-                  console.log("Successfully Unsubscribed");
                   this.setState({isSubscribed: false});
                   this.props.cb._subscribedManagerTable.getSubscribedManagers();
                   this._alertchild.generateSuccess("Successfully unsubscribed");

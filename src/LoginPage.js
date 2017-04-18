@@ -66,12 +66,10 @@ export default class LoginPage extends React.Component {
                     var sendString = "grant_type=convert_token&client_id="+CLIENT_ID+"&backend=duke&token="+dukeToken;
                     restRequest("POST", "/auth/convert-token/", "application/x-www-form-urlencoded", sendString,
                                 (xhttpResponse)=>{
-                                  console.log(JSON.parse(xhttpResponse));
                                   this.testSuccessCb(xhttpResponse);
                                 }, (state, xhttpResponse2)=>{this.testErrorCb();
-                                  console.log(JSON.parse(xhttpResponse2));
                                 });
-                  }, (state, xhttpResponse)=>{console.log(JSON.parse(xhttpResponse));});
+                  }, (state, xhttpResponse)=>{});
     }
   }
 
@@ -90,7 +88,6 @@ export default class LoginPage extends React.Component {
                   var currUrl = window.location.href;
                   if (currUrl.includes("code=")){
                   currUrl = currUrl.replace(/(\?code=).*/, "");
-                  console.log(currUrl);
                   window.location.replace(currUrl);
                 }
                 else{
@@ -100,7 +97,6 @@ export default class LoginPage extends React.Component {
   }
 
   testErrorCb(){
-    console.log('Unauthorized!!!!!');
     //localStorage.alert = true;
     this.setState({_alert_both: true});
   }

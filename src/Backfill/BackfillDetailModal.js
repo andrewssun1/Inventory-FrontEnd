@@ -29,7 +29,6 @@ export default class BackfillDetailModal extends React.Component {
     }
     this.setState({backfill_data: row.backfill_loan, modal_data: row}, ()=>{
       // Get all backfills
-      console.log(this.state.backfill_data);
       this.setState({showModal: true});
     });
   }

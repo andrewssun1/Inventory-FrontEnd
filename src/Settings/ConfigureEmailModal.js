@@ -30,8 +30,6 @@ class ConfigureEmailModal extends React.Component {
       //Get Subject
       restRequest("GET", "/api/email/subjectTag/", "application/json", null,
       (responseText)=>{
-        console.log("Successfully got the subject tag");
-        console.log(JSON.parse(responseText));
         this.setState({subjectTag: JSON.parse(responseText).subject_tag});
       }, ()=>{});
     }
@@ -39,8 +37,6 @@ class ConfigureEmailModal extends React.Component {
     //Get Body
     restRequest("GET", "/api/email/prependedBody/", "application/json", null,
     (responseText)=>{
-      console.log("Successfully got the prepended body");
-      console.log(JSON.parse(responseText));
       this.setState({prependedBody: JSON.parse(responseText).prepended_body});
     }, ()=>{});
   }
@@ -64,8 +60,6 @@ class ConfigureEmailModal extends React.Component {
       var otherHasSuceeded = false;
       restRequest("PATCH", "/api/email/subjectTag/modify/", "application/json", jsonResult,
       (responseText)=>{
-        console.log("Successfully updated request body!");
-        console.log(JSON.parse(responseText));
         if(otherHasSuceeded) {
           this.props.alertchild.generateSuccess("Successfully updated email configuration");
           this.closeModal();
@@ -85,8 +79,6 @@ class ConfigureEmailModal extends React.Component {
     let jsonResult = JSON.stringify(requestBody);
     restRequest("PATCH", "/api/email/prependedBody/modify/", "application/json", jsonResult,
     (responseText)=>{
-      console.log("Successfully updated request body!");
-      console.log(JSON.parse(responseText));
       if(otherHasSuceeded) {
         this.props.alertchild.generateSuccess("Successfully updated email configuration");
         this.closeModal();

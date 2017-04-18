@@ -59,11 +59,9 @@ class MinimumStockModal extends React.Component {
           var response = JSON.parse(responseText);
           // this.setState({successStr: this.state.successStr + response.name + ", "
           // });
-          console.log(response);
         },
         (status, errResponse)=>{
           let errs = JSON.parse(errResponse);
-          console.log('PATCH Failed!!');
           this.state.errItems.push(errs);
           if(errs.quantity != null) {
             for(var i = 0; i < this.state.errs.quantity.length; i ++) {

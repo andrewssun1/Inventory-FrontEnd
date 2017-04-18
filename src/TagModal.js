@@ -45,7 +45,7 @@ class TagModal extends React.Component {
                     allTags.push({label: tagList[i].tag, value: tagList[i].tag});
                   }
                   this.setState({tagOptions: allTags, showModal: true});
-                }, ()=>{console.log('GET Failed!!');});
+                }, ()=>{});
   }
 
   saveModal(){
@@ -58,12 +58,10 @@ class TagModal extends React.Component {
   }
 
   handleSelectChangeIncluded (value) {
-    console.log('You\'ve selected:', value);
     this.setState({ includedValue: value });
   }
 
   handleSelectChangeExcluded (value) {
-    console.log('You\'ve selected:', value);
     this.setState({ excludedValue: value });
   }
 
@@ -74,8 +72,6 @@ class TagModal extends React.Component {
   }
 
   handleSearch() {
-    // console.log(this.state.includedValue);
-    // console.log(this.state.excludedValue);
     var includedString = this.state.includedValue.length === 0 ? "" : "tag_included=" + this.state.includedValue + "&";
     var excludedString = this.state.excludedValue.length === 0 ? "" : "tag_excluded=" + this.state.excludedValue + "&";
     var completeString = includedString + excludedString + "operator=AND";
@@ -84,7 +80,6 @@ class TagModal extends React.Component {
     var formatExcluded = this.state.excludedValue.length === 0 ? "" : " Excluded Tags: " + this.state.excludedValue;
     var completeFormat = formatIncluded + ((includedString===""||excludedString==="") ? "" : this.state.selectedOption) + formatExcluded;
 
-    console.log(completeFormat);
     var url_parameter = "?" + completeString
       this.props.updateCallback.setState({
           currentSearchURL: url_parameter
