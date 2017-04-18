@@ -17,7 +17,8 @@ class ViewRequestModal extends React.Component {
     super(props);
     this.state = {
       showModal: false,
-      shouldRenderButtons: false
+      shouldRenderButtons: false,
+      bodyHasUnselectedAsset: false
     }
     this.openModal = this.openModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -106,7 +107,7 @@ class ViewRequestModal extends React.Component {
         <br /> <br /> <br /> <br /> </div>);
         if(this._viewRequestBody.state.requestProblemString === "") {
           buttons.push(<Button key="approve" onClick={this.approve}
-          disabled={this._viewRequestBody.state.hasUnselectedAsset} bsStyle="success">Approve Cart</Button>);
+          disabled={this.state.bodyHasUnselectedAsset} bsStyle="success">Approve Cart</Button>);
         }
         buttons.push(<Button key="deny" onClick={this.deny} bsStyle="danger">Deny Cart</Button>);
       } else {

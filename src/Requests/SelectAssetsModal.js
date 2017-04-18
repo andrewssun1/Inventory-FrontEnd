@@ -55,11 +55,40 @@ class SelectAssetsModal extends React.Component {
       case SelectionType.RETURN:
         this.makeReturn(selectedAssets);
         break;
+      case SelectionType.SATISFY:
+        this.satisfy(selectedAssets);
+        break;
       default:
         this.clearSelection(()=> {
           this.makeRegularSelection(selectedAssets);
         });
     }
+  }
+
+  satisfy(selectedAssets) {
+    var assetIDs = [];
+    for(var i = 0; i < selectedAssets.length; i ++) {
+      assetIDs.push({"asset_id": selectedAssets[i]});
+    }
+    var requestBody = {
+      "asset_ids":assetIDs
+    };
+    console.log(requestBody);
+    let jsonResult = JSON.stringify(requestBody);
+    restRequest("PATCH", "/api/request/backfill/satisfy/" + this.state.backfillID + "/", "application/json", jsonResult,
+    (responseText)=>{
+      var response = JSON.parse(responseText);
+      console.log("Getting satisfy response");
+      console.log(response);
+      this.closeModal();
+      if(this.props.updateCallback != null) {
+        this.props.updateCallback.didFinishSelection();
+      }
+    },
+    (status, errResponse)=>{
+      handleErrors(errResponse, this._alertchild);
+    }
+    );
   }
 
   makeReturn(selectedAssets) {
@@ -74,7 +103,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting return loan response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);
@@ -117,7 +148,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting make selection response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);
@@ -140,7 +173,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting change selection loan/disbursement response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);

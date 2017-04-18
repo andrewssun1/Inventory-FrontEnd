@@ -105,9 +105,8 @@ export default class HomePage extends React.Component {
 
 
   onRowClick(row){
-    this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
-      this._viewRequestModal.openModal();
-    });
+    this._viewRequestModal.setState({id: row.cart_id});
+    this._viewRequestModal.openModal();
   }
 
   onPageChangeLoan(page, sizePerPage){

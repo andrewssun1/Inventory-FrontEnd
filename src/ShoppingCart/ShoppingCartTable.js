@@ -14,9 +14,18 @@ import ShoppingCartModal from './ShoppingCartModal';
 import CartQuantityChooser from './CartQuantityChooser';
 import AlertComponent from '../AlertComponent';
 import BackfillModal from '../Backfill/BackfillModal';
+import SelectAssetsModal from "../Requests/SelectAssetsModal.js"
+import SelectionType from '../Requests/SelectionEnum.js'
+import SelectAssetsButton from "../Requests/SelectAssetsButton.js"
 
 // import { hashHistory } from 'react-router';
 import { checkAuthAndAdmin, restRequest } from '../Utilities';
+
+  const AssetSelectStatus = {
+    NOT_ASSET: 0,
+    SELECT_ASSETS: 1,
+    CHANGE_ASSETS: 2
+  }
 
 export default class ShoppingCartTable extends React.Component {
 
@@ -32,7 +41,8 @@ export default class ShoppingCartTable extends React.Component {
         "tags": [{"tag": "first tag"}, {"tag": "second tag"}],
         "cart_quantity": 1
       }],
-      isStaff : false
+      isStaff : false,
+      hasUnselectedAsset: false
     }
     this.onDeleteRow = this.onDeleteRow.bind(this);
     this.openCartModal = this.openCartModal.bind(this);
@@ -40,6 +50,8 @@ export default class ShoppingCartTable extends React.Component {
     this.createBackfillButton = this.createBackfillButton.bind(this);
     this.openBackfillModal = this.openBackfillModal.bind(this);
     this.deleteBackfill = this.deleteBackfill.bind(this);
+    this.selectAssetsButton = this.selectAssetsButton.bind(this);
+    this.didFinishSelection = this.didFinishSelection.bind(this);
   }
 
 
@@ -67,6 +79,7 @@ export default class ShoppingCartTable extends React.Component {
 
   getCart() {
     // get active cart
+    this.setState({hasUnselectedAsset: false});
     const isStaff = (localStorage.isStaff === "true");
     var url = "/api/request/active/";
     restRequest("GET", url, "application/JSON", null,
@@ -77,6 +90,7 @@ export default class ShoppingCartTable extends React.Component {
                   var loanRequest = this.iterateRequests(response.cart_loans, "loan");
                   var allRequest = disburseRequest.concat(loanRequest);
                   localStorage.setItem("cart_quantity", allRequest.length);
+                  console.log(allRequest);
                   this.setState({_cart: allRequest});
                   this.refs.shoppingCart.forceUpdate();
                 }, (status, responseText)=>{console.log(JSON.parse(responseText))});
@@ -89,6 +103,14 @@ export default class ShoppingCartTable extends React.Component {
       requestArray[i].shouldUpdate = false;
       requestArray[i].inCart = true;
       requestArray[i].status = type;
+      if(requestArray[i].item.is_asset && requestArray[i].assets.length < requestArray[i].quantity) {
+        requestArray[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
+        this.setState({hasUnselectedAsset: true});
+      } else if (requestArray[i].item.is_asset && requestArray[i].assets.length > 0) {
+        requestArray[i].assetSelect = AssetSelectStatus.CHANGE_ASSETS;
+      } else {
+        requestArray[i].assetSelect = AssetSelectStatus.NOT_ASSET;
+      }
     }
     return requestArray;
   }
@@ -99,7 +121,6 @@ export default class ShoppingCartTable extends React.Component {
       return rows.indexOf(product.id) !== -1;
     });
     for (let i = 0; i < itemsToDelete.length; i++){
-      console.log(itemsToDelete);
       var url = "/api/request/" + itemsToDelete[i].status + "/deleteItem/"+itemsToDelete[i].id+"/";
       restRequest("DELETE", url, "application/json", null,
                   ()=>{
@@ -115,6 +136,8 @@ export default class ShoppingCartTable extends React.Component {
       })
     });
   }
+
+  bodyHasMounted() {}
 
   openCartModal(){
     this._cartchild.openModal()
@@ -135,7 +158,6 @@ export default class ShoppingCartTable extends React.Component {
       restRequest("GET", "/api/request/backfill/active/" + row.id + "/", "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    // console.log(response);
                     restRequest("DELETE", "/api/request/backfill/delete/"+response.id+"/", "application/json", null,
                                 ()=>{
                                   this.resetTable();
@@ -149,13 +171,31 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   createBackfillButton(cell, row){
-    // console.log(row);
     return(
       <div>
       {row.status === "loan" ? <Button bsStyle={row.has_active_backfill ? "warning" : "primary"} onClick={()=>{this.openBackfillModal(row)}}>{row.has_active_backfill ? "View Backfill" : "Create Backfill"}</Button> : null}
       {(row.status === "loan" && row.has_active_backfill) ? <Button bsStyle="danger" onClick={()=>{this.deleteBackfill(row)}}>&times;</Button> : null}
       </div>
     );
+  }
+
+  didFinishSelection() {
+    this.resetTable();
+  }
+
+  selectAssetsButton(cell, row) {
+    switch (row.assetSelect) {
+      case AssetSelectStatus.SELECT_ASSETS:
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="primary" name="Select Assets"/>);
+        break;
+      case AssetSelectStatus.CHANGE_ASSETS:
+        return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
+          numAssetsNeeded={row.quantity} assets={row.assets} cb={this} style="warning" name="Change Assets"/>);
+      break
+      default:
+        return null;
+    }
   }
 
   render(){
@@ -171,13 +211,17 @@ export default class ShoppingCartTable extends React.Component {
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ShoppingCartModal ref={(child) => {this._cartchild = child; }} updateCallback={this}/>
       <BackfillModal ref={(child) => {this._backfillchild = child; }} cb={this}/>
+      <SelectAssetsModal cartID={this.state._cart.id} updateCallback={this}
+      ref={(child) => { this._selectAssetsModal = child; }}/>
       <BootstrapTable ref="shoppingCart" selectRow={selectRow} options={options} data={this.state._cart} deleteRow striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>
       <TableHeaderColumn ref="backfill" width="150px" hidden={isStaff} dataField='button' dataFormat={this.createBackfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>
       <TableHeaderColumn ref="chooser" width="300px" dataField='button' dataFormat={this.createChooserAndButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'>Quantity</TableHeaderColumn>
+      <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
+      hidden={!isStaff}></TableHeaderColumn>
     </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0"} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || this.state.hasUnselectedAsset} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
       </div>
     );
   }

@@ -23,10 +23,7 @@ class SelectAssetsButton extends React.Component {
     this.props.cb._selectAssetsModal.setState({dispensementID: this.props.dispensementID});
     this.props.cb._selectAssetsModal.setState({numAssetsNeeded: this.props.numAssetsNeeded});
     this.props.cb._selectAssetsModal.setState({assets: this.props.assets});
-    console.log("Setting selection type to default!");
-    this.props.cb._selectAssetsModal.setState({selectionType: SelectionType.DEFAULT}, ()=> {
-      console.log("It's set!");
-    });
+    this.props.cb._selectAssetsModal.setState({selectionType: SelectionType.DEFAULT});
     this.props.cb._selectAssetsModal.openModal();
   }
 
