@@ -218,9 +218,8 @@ logItemQuantityChange() {
 }
 
 onRowClickCart(row, isSelected, e) {
-  this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
-    this._viewRequestModal.openModal();
-  });
+  this._viewRequestModal.setState({id: row.id});
+  this._viewRequestModal.openModal();
 }
 
 clearAlert() {
