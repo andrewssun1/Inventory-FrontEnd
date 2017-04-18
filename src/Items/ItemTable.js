@@ -68,7 +68,8 @@ class ItemTable extends React.Component {
         this.openBulkImportModal = this.openBulkImportModal.bind(this);
         this.openMinimumStockModal= this.openMinimumStockModal.bind(this);
         this.cleanFilter = this.cleanFilter.bind(this);
-        this.getAllItem = this.getAllItem.bind(this)
+        this.getAllItem = this.getAllItem.bind(this);
+        this.minimumQuantityValidator = this.minimumQuantityValidator.bind(this)
     }
 
     getAllItem(url_parameter){
@@ -190,6 +191,14 @@ class ItemTable extends React.Component {
                 // Deep clone the object so we don't have to convert the tags twice
                 var a = JSON.parse(JSON.stringify(row));
                 this.state._products.push(row);
+                if(a.minimum_stock){
+                    if (parseInt(a.minimum_stock, 10) > 0){
+                        a.track_minimum_stock = true;
+                    }
+                }
+                else{
+                    a.minimum_stock = 0;
+                }
 
                 // Formats the row to a JSON object to send to database
                 a.tags = this.listToTags(a.tags);
@@ -288,6 +297,13 @@ class ItemTable extends React.Component {
             return 'Quantity must be a integer!';
         } else if (intValue < 0) {
             return 'Quantity must be non-negative!';
+        }
+        return true;
+    }
+
+    minimumQuantityValidator(value) {
+        if (value){
+            return this.quantityValidator(value)
         }
         return true;
     }
@@ -426,7 +442,7 @@ class ItemTable extends React.Component {
         cols.push(<TableHeaderColumn key="idCol" isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="nameCol" dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="quantityCol" width="100px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>);
-        cols.push(<TableHeaderColumn key="minStockCol" width="100px" dataField='minimum_stock' filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.threshold } } editable={ { validator: this.quantityValidator} } ref={(child) => { this._minStockFilter = child; }}>Min Quantity</TableHeaderColumn>);
+        cols.push(<TableHeaderColumn key="minStockCol" width="100px" dataField='minimum_stock' filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.threshold } } editable={ { validator: this.minimumQuantityValidator} } ref={(child) => { this._minStockFilter = child; }}>Min Quantity</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="modelNumberCol" dataField='model_number'>Model Number</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="descriptionCol" dataField='description'>Description</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="tagsCol" dataField='tags'>Tags</TableHeaderColumn>);
