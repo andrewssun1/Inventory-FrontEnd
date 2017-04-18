@@ -18,6 +18,7 @@ class SelectAssetsButton extends React.Component {
   }
 
   onButtonClick() {
+    console.log(this.props.cb);
     this.props.cb._selectAssetsModal.setState({itemID: this.props.itemID});
     this.props.cb._selectAssetsModal.setState({type: this.props.type});
     this.props.cb._selectAssetsModal.setState({dispensementID: this.props.dispensementID});
