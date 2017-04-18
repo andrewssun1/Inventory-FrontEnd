@@ -243,6 +243,7 @@ class ViewRequestBody extends React.Component {
             <Button bsSize="small"
                             bsStyle="warning"
                             style={{marginTop: "3px"}}
+                            disabled={row.max_return_quantity === 0}
                             onClick={()=>{this.returnItem(row)}}>
                             Return</Button>
           : null}
@@ -250,6 +251,7 @@ class ViewRequestBody extends React.Component {
           <Button bsSize="small"
                     bsStyle="primary"
                     style={{marginTop: "3px"}}
+                    disabled={row.max_return_quantity === 0}
                     onClick={()=>{this.changeRequestType(row)}}>
                     Convert</Button></OverlayTrigger>
         </div>
@@ -267,6 +269,7 @@ class ViewRequestBody extends React.Component {
       <OverlayTrigger placement="bottom" overlay={tooltip}>
       <Button bsSize="xsmall" style={{marginLeft: "5px", marginTop: "1px", fontSize: "9.5px"}}
               bsStyle="primary"
+              disabled={row.max_return_quantity === 0}
               onClick={()=>{this.changeRequestType(row)}}>
               <strong> Swap </strong>
               </Button>
