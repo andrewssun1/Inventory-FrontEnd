@@ -47,16 +47,17 @@ export default class BackfillDetailTable extends React.Component {
 
   renderBackfillState(cell, row){
     if (this.props.requestState === "fulfilled" && row.status === "backfill_request") {
+      return(
       <div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("approve", row)}}>Approve</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("deny", row)}}>Deny</Button>
-      </div>
+      </div>);
     }
     else if (row.status === "backfill_transit" && (this.props.requestState === "fulfilled" || this.props.requestState === "approved")) {
-      <div>
+      return(<div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("satisfy", row)}}>Satisfy</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("fail", row)}}>Fail</Button>
-      </div>
+      </div>);
     }
     return null;
   }
