@@ -199,7 +199,7 @@ class ItemTable extends React.Component {
                 else{
                     a.minimum_stock = 0;
                 }
-
+                a.is_asset = (a.is_asset === "Y");
                 // Formats the row to a JSON object to send to database
                 a.tags = this.listToTags(a.tags);
                 delete a.id; // deletes id since object does not need it
@@ -451,6 +451,7 @@ class ItemTable extends React.Component {
         cols.push(<TableHeaderColumn key="buttonCol" dataField='button' dataFormat={this.cartFormatter} dataAlign="center" hiddenOnInsert columnClassName='my-class'></TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="tagsDataCol" dataField='tags_data' hidden hiddenOnInsert>tags_data</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="cartIDCol" dataField='cartId' hidden hiddenOnInsert>cart_id</TableHeaderColumn>);
+        cols.push(<TableHeaderColumn key="is_asset" dataField='is_asset' hidden editable={ { type: 'checkbox', options: { values: 'Y:N' } } }>is_asset</TableHeaderColumn>);
         for(var i = 0; i < this.state._fields.length; i++) {
             let name = this.state._fields[i].name;
             cols.push(<TableHeaderColumn key={name + "Col"} dataField={name} hidden>{name}</TableHeaderColumn>);
