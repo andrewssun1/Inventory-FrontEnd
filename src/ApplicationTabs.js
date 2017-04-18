@@ -145,9 +145,6 @@ export default class ApplicationTabs extends React.Component {
                    <NavItem eventKey="cart">
                      <Glyphicon style={{marginRight: "8px"}} glyph="shopping-cart" />{"Cart ("+this.state.cart_quantity+")"}
                    </NavItem>
-                   <NavItem eventKey="about_us">
-                     <Glyphicon style={{marginRight: "8px"}} glyph="fire" />About Us
-                   </NavItem>
                </Nav>
              </Col>
              <Col sm={9}>
@@ -179,9 +176,6 @@ export default class ApplicationTabs extends React.Component {
                  </Tab.Pane>
                  <Tab.Pane eventKey="cart">
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
-                 </Tab.Pane>
-                 <Tab.Pane eventKey="about_us">
-                   <AboutPage ref="about_us"></AboutPage>
                  </Tab.Pane>
                </Tab.Content>
              </Col>
