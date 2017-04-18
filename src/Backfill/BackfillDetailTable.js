@@ -31,8 +31,6 @@ export default class BackfillDetailTable extends React.Component {
 
   stateBackfill(type, row){
     checkAuthAndAdmin(()=>{
-      console.log(row);
-      console.log(type);
       if (type === "satisfy" && row.is_asset) {
         this._selectAssetsModal.setState({type: "loan"});
         this._selectAssetsModal.setState({dispensementID: row.loan_id});

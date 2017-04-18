@@ -39,7 +39,6 @@ export default class InstaButtons extends React.Component {
       this.props.updateCallback._alertchild.generateSuccess("Successfully made dispensement");
     },
     (status, errResponse)=>{
-      console.log("instance ")
       handleErrors(errResponse, this.props.updateCallback._alertchild);
     }
   );

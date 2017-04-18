@@ -121,7 +121,6 @@ export default class ShoppingCartTable extends React.Component {
       return rows.indexOf(product.id) !== -1;
     });
     for (let i = 0; i < itemsToDelete.length; i++){
-      console.log(itemsToDelete);
       var url = "/api/request/" + itemsToDelete[i].status + "/deleteItem/"+itemsToDelete[i].id+"/";
       restRequest("DELETE", url, "application/json", null,
                   ()=>{
@@ -159,7 +158,6 @@ export default class ShoppingCartTable extends React.Component {
       restRequest("GET", "/api/request/backfill/active/" + row.id + "/", "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    // console.log(response);
                     restRequest("DELETE", "/api/request/backfill/delete/"+response.id+"/", "application/json", null,
                                 ()=>{
                                   this.resetTable();
@@ -173,7 +171,6 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   createBackfillButton(cell, row){
-    // console.log(row);
     return(
       <div>
       {row.status === "loan" ? <Button bsStyle={row.has_active_backfill ? "warning" : "primary"} onClick={()=>{this.openBackfillModal(row)}}>{row.has_active_backfill ? "View Backfill" : "Create Backfill"}</Button> : null}
@@ -187,7 +184,6 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   selectAssetsButton(cell, row) {
-    console.log(row);
     switch (row.assetSelect) {
       case AssetSelectStatus.SELECT_ASSETS:
         return(<SelectAssetsButton itemID={row.item.id} type={row.status} dispensementID={row.id}
