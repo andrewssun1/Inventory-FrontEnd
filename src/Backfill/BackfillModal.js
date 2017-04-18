@@ -33,12 +33,10 @@ export default class BackfillModal extends React.Component {
   openModal(row){
     this.setState({modal_data: row}, ()=>{
       // Check whether or not there is already an active backfill
-      console.log(this.state.modal_data);
       checkAuthAndAdmin(()=>{
         restRequest("GET", "/api/request/backfill/active/" + row.id + "/", "application/json", null,
                     (responseText)=>{
                       var response = JSON.parse(responseText);
-                      console.log(response);
                       row.backfill_quantity = parseInt(response.quantity, 10);
                       this.setState({
                         backfill_quantity: response.quantity,
@@ -97,17 +95,11 @@ export default class BackfillModal extends React.Component {
   }
 
   saveBackfill(){
-    // console.log(this.state.modal_data);
-
     var data = new FormData();
-    // console.log(this.state.curr_file);
     data.append("receipt_pdf", this.state.curr_file);
     this.state.new_backfill ? data.append("loan_id", this.state.modal_data.id) : data.append("backfill_id", this.state.backfill_data.id);
     data.append("quantity", this.state.backfill_quantity);
-    console.log(this.state.new_backfill);
-    this.state.new_backfill ? console.log("new backfill: ", data.get("loan_id")) :  console.log("updating backfill: ", data.get("backfill_id"))
 
-    // this.state.modal_data.send_data = currJSON;
     if (this.state.new_backfill){
       checkAuthAndAdmin(()=>{
         restRequestData("POST", "/api/request/backfill/create/", data,
@@ -117,7 +109,6 @@ export default class BackfillModal extends React.Component {
                         this.props.cb.resetTable();
                       }
                       this.props.cb._alertchild.generateSuccess("Successfully saved backfill");
-                      console.log(response);
                     },(status, errResponse)=>{
                       handleErrors(errResponse, this.props.cb._alertchild);
                     });
@@ -132,7 +123,6 @@ export default class BackfillModal extends React.Component {
                         this.props.cb.resetTable();
                       }
                       this.props.cb._alertchild.generateSuccess("Successfully saved backfill");
-                      console.log(response);
                     }, (status, errResponse)=>{
                       handleErrors(errResponse, this.props.cb._alertchild);
                     });

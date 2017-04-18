@@ -90,10 +90,9 @@ export default class ShoppingCartTable extends React.Component {
                   var loanRequest = this.iterateRequests(response.cart_loans, "loan");
                   var allRequest = disburseRequest.concat(loanRequest);
                   localStorage.setItem("cart_quantity", allRequest.length);
-                  console.log(allRequest);
                   this.setState({_cart: allRequest});
                   this.refs.shoppingCart.forceUpdate();
-                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                }, (status, responseText)=>{});
   }
 
   iterateRequests(requestArray, type){

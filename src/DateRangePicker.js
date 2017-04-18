@@ -104,7 +104,6 @@ export default class DateRangePicker extends React.Component {
         });
       }
     );
-    // console.log(value);
   }
 
   disabledStartDate(endValue) {

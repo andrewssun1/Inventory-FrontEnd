@@ -27,7 +27,6 @@ class TextEntryFormElement extends React.Component {
   }
 
   renderSelectOptions() {
-    console.log(this.props.selectOptions);
     if(this.props.selectOptions != null) {
       let selectOptions = this.props.selectOptions.map((optionString) => {
         return(<option key={optionString} value={optionString}>{optionString}</option>);

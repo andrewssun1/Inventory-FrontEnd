@@ -119,7 +119,7 @@ class ItemTable extends React.Component {
                                 _products: response_results,
                                 totalDataSize: response.count
                             });
-                        }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                        }, (status, responseText)=>{});
                 },
                 ()=>{
                     this.setState({
@@ -141,7 +141,6 @@ class ItemTable extends React.Component {
 
     cleanFilter() {
         if(this._minStockFilter != null) {
-            console.log("Cleaning filter");
             this._minStockFilter.cleanFiltered();
         }
     }
@@ -234,7 +233,7 @@ class ItemTable extends React.Component {
                         this.customFieldRequest(typesArray[i], responseDataArrays[i][j].id, row[responseDataArrays[i][j].field]);
                     }
                 }
-            }, ()=>{console.log('GET Detailed Failed!!');});
+            }, ()=>{});
     }
 
     onAddRow(row) {
@@ -250,11 +249,8 @@ class ItemTable extends React.Component {
         restRequest("PATCH", "/api/item/field/" + type + "/" + id, "application/json", jsonResult,
             (responseText)=>{
                 var response = JSON.parse(responseText);
-                console.log("Getting Response");
-                console.log(response);
             },
             ()=>{
-                console.log('PATCH Failed!!');
             });
     }
 
@@ -278,15 +274,13 @@ class ItemTable extends React.Component {
         restRequest("GET", "/api/item/field/", "application/json", null,
             (responseText)=>{
                 var response = JSON.parse(responseText);
-                console.log("Getting Custom Field Response iin ItemTable");
-                console.log(response);
                 var results = response.results;
                 for(var i = 0; i < results.length; i++) {
                     results[i].type = TypeConstants.RequestToFormatMap[results[i].type];
                 }
                 this.setState({_fields: response.results});
             },
-            ()=>{console.log('GET Failed!!');}
+            ()=>{}
         );
     }
 
@@ -374,7 +368,6 @@ class ItemTable extends React.Component {
         var page_argument = "page=" + page;
         var url_param = this.state.currentFilterURL === null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
         url_param = this.state.currentSearchURL === null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
-        console.log(url_param);
         this.getAllItem(url_param);
         this.setState({
             currentPage: page
@@ -417,13 +410,9 @@ class ItemTable extends React.Component {
                 restRequest("PATCH", "/api/item/" + selected_rows[i], "application/json", jsonResult,
                     (responseText)=>{
                         var response = JSON.parse(responseText);
-                        // this.setState({successStr: this.state.successStr + response.name + ", "
-                        // });
-                        console.log(response);
                     },
                     (status, errResponse)=>{
                         let errs = JSON.parse(errResponse);
-                        console.log('PATCH Failed!!');
                         if(errs.quantity != null) {
                             for(var i = 0; i < this.state.errs.quantity.length; i ++) {
                                 this._alertchild.generateError(errs.quantity[i]);

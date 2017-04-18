@@ -57,20 +57,16 @@ class BulkImportBody extends React.Component {
   downloadTemplate() {
     restRequest("GET", this.props.apiSource + "export/example", "application/json", null,
                 (responseText)=>{
-                  console.log("Successfully got example");
                   fileDownload(responseText, 'ItemTemplate.csv');
                 }, (status, errResponse)=>{
-                  console.log('Failed to get example');
                 });
   }
 
   exportItems() {
     restRequest("GET", this.props.apiSource + "export", "application/json", null,
                 (responseText)=>{
-                  console.log("Successfully got items");
                   fileDownload(responseText, 'InventoryItems.csv');
                 }, (status, errResponse)=>{
-                  console.log('Failed to get items');
                 });
   }
 

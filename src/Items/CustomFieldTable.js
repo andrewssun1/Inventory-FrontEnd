@@ -35,8 +35,6 @@ class CustomFieldTable extends React.Component {
       restRequest("GET", this.props.apiSource, "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting Custom Field Response");
-        console.log(response);
         var results = response.results;
         for(var i = 0; i < results.length; i++) {
           results[i].type = TypeConstants.RequestToFormatMap[results[i].type];
@@ -48,7 +46,7 @@ class CustomFieldTable extends React.Component {
         }
         this.setState({_fields: response.results});
       },
-      ()=>{console.log('GET Failed!!');}
+      ()=>{}
     );
   });
 }
@@ -60,16 +58,13 @@ onAddRow(row) {
       "type"    : TypeConstants.FormattedToRequestMap[row.type],
       "private" : (row.private === 'Private')
     }
-    console.log(requestBody);
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", this.props.apiSource, "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Add Custom Field Response");
-      console.log(response);
       this.getFieldData();
     },
-    ()=>{console.log('Add Failed!!');}
+    ()=>{}
   );
 });
 }
@@ -78,13 +73,12 @@ onDeleteRow(rows) {
   for (var i = 0; i < rows.length; i++) {
     restRequest("DELETE", this.props.apiSource + rows[i], "application/json", null,
     (responseText)=>{ this.getFieldData();},
-    ()=>{console.log('GET Failed!!');}
+    ()=>{}
     );
   }
 }
 
 onRowClick(row) {
-  console.log(row);
   this._detail.openModal(row);
 }
 

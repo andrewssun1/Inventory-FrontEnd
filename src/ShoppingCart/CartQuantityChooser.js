@@ -41,7 +41,6 @@ export default class CartQuantityChooser extends React.Component {
   updateRowQuantity(row){
     checkAuthAndAdmin(()=>{
         row.shouldUpdate = false;
-        // console.log(row);
         var id = (row.cartId ? row.cartId : row.id);
         var Quantity = parseInt(row.quantity_cartitem, 10);
         const isStaff = (localStorage.isStaff === "true");
@@ -53,7 +52,6 @@ export default class CartQuantityChooser extends React.Component {
         var url = "/api/request/modifyQuantityRequested/"+id+"/";
         restRequest("PATCH", url, "application/JSON", updateJSON,
             (responseText)=>{
-                console.log(JSON.parse(responseText));
                 this.forceUpdate();
                 // this.props.cb.forceUpdate();
                 this.props.cb._alertchild.generateSuccess("Successfully updated quantity");
@@ -62,7 +60,6 @@ export default class CartQuantityChooser extends React.Component {
               let errs = JSON.parse(errResponse);
               for (var key in errs){
                 if (errs.hasOwnProperty(key)){
-                  console.log(key);
                   this.props.cb._alertchild.generateError("Error: " + ((key === "email") ? errs[key][0] : errs[key]));
                 }
               }
@@ -84,7 +81,6 @@ export default class CartQuantityChooser extends React.Component {
         restRequest("POST", url, "application/json", addItemJson,
             (responseText)=>{
                 var response = JSON.parse(responseText);
-                console.log(response);
                 //alert("Added " + row.quantity + " of " + row.name + " to cart!");
                 localStorage.setItem("cart_quantity", parseInt(localStorage.cart_quantity, 10) + 1);
                 this.props.cb._alertchild.generateSuccess("Successfully added " + row.quantity_cartitem + " of " + row.name + " to cart!");
@@ -133,9 +129,7 @@ export default class CartQuantityChooser extends React.Component {
 
   render(){
     var row = this.props.row;
-    // if (row.name === "Table"){
-    //   console.log(row);
-    // }
+
     const tooltip = (
       <Tooltip id="tooltip">Click to toggle between loan and disbursement.</Tooltip>
     );

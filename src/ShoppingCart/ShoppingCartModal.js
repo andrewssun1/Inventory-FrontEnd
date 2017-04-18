@@ -76,8 +76,7 @@ export default class ShoppingCartModal extends React.Component {
                   var disburseRequest = response.cart_disbursements;
                   localStorage.activecartid = response.id;
                   localStorage.setItem("cart_quantity", disburseRequest.length);
-                  console.log(response);
-                }, (status, responseText)=>{console.log(JSON.parse(responseText))});
+                }, (status, responseText)=>{});
   }
 
   submitCart(){
@@ -107,7 +106,6 @@ export default class ShoppingCartModal extends React.Component {
 
 
   submitDisbursement(){
-    console.log(this.state.selectedUser);
     var sendJSON = JSON.stringify({
       owner_id: parseInt(this.state.selectedUser, 10),
       staff_comment: this.state.reason

@@ -43,8 +43,6 @@ export default class DateComponent extends React.Component {
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", "/api/email/loanReminderDates/modify/", "application/json", jsonResult,
     (responseText)=>{
-      console.log("Successfully updated loan reminder dates!");
-      console.log(JSON.parse(responseText));
       this.getScheduledEmailDates();
     }, (status, errResponse)=>{
       this._alertchild.generateError("There was an error adding dates. Please make sure you are not adding an date which has already been scheduled.");
@@ -54,8 +52,6 @@ export default class DateComponent extends React.Component {
   getScheduledEmailDates() {
     restRequest("GET", "/api/email/loanReminderDates/", "application/json", null,
     (responseText)=>{
-      console.log("Successfully obtained loan reminder dates!");
-      console.log(JSON.parse(responseText));
       this.setState({scheduledEmailDates: JSON.parse(responseText).results});
     }, ()=>{
       this._alertchild.generateError("There was an error getting the scheduled dates");
@@ -73,8 +69,6 @@ export default class DateComponent extends React.Component {
     var jsonResult = JSON.stringify(requestBody);
     restRequest("POST", "/api/email/loanReminderDates/modify/", "application/json", jsonResult,
     (responseText)=>{
-      console.log("Successfully updated loan reminder dates!");
-      console.log(JSON.parse(responseText));
       this.getScheduledEmailDates();
     }, ()=>{
       this._alertchild.generateError("There was an error deleting dates");

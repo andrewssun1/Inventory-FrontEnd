@@ -38,7 +38,6 @@ export default class DisbursementModal extends React.Component {
                     this.setState({
                       modal_data: response
                     }, ()=>{
-                      console.log(this.state.modal_data)
                       cb();
                     });
                   }, ()=>{});
@@ -50,7 +49,6 @@ export default class DisbursementModal extends React.Component {
       this.setState({modal_data: row, showModal: true});
     }
     else{
-      console.log("should be getting here")
       this.setState({showModal: true});
     }
   }

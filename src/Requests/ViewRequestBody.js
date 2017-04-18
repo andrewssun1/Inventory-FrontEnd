@@ -85,8 +85,6 @@ class ViewRequestBody extends React.Component {
       restRequest("GET", "/api/request/"+id, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
-                    console.log("Getting Response");
-                    console.log(response);
                     var errorItems = [];
                     this.assignCartVariables(response.cart_disbursements, "disbursement", errorItems);
                     this.assignCartVariables(response.cart_loans, "loan", errorItems);
@@ -106,7 +104,7 @@ class ViewRequestBody extends React.Component {
                     }
 
                     this.setState({requestData: response}, cb);
-                  }, ()=>{console.log("Get detailed request failed!");}
+                  }, ()=>{}
                   )
       });
   }
@@ -184,7 +182,6 @@ class ViewRequestBody extends React.Component {
                       try {
                         var valNum = parseInt(e.target.value, 10);
                           row.changeQuantity=valNum;
-                          console.log(row.changeQuantity);
                           row.shouldUpdate=(row.status === "loan" && row.returned_quantity !== 0);
                           this.forceUpdate();
                       } catch (e) {
@@ -196,7 +193,6 @@ class ViewRequestBody extends React.Component {
   }
 
   returnItem(row){
-    console.log(row);
     if(row.assetSelect == AssetSelectStatus.NOT_ASSET) {
       //Return non-asset item
       checkAuthAndAdmin(()=>{
@@ -208,7 +204,6 @@ class ViewRequestBody extends React.Component {
         restRequest("PATCH", url, "application/JSON", returnJSON,
             (responseText)=>{
                 var response = JSON.parse(responseText);
-                console.log(response);
                 // this.forceUpdate();
                 this.getDetailedRequest(this.state.requestData.id, ()=>{});
                 this._alertchild.generateSuccess("Successfully returned");
@@ -298,7 +293,6 @@ class ViewRequestBody extends React.Component {
   backfillButton(cell, row){
     // open modal to show backfill table
     const isStaff = (localStorage.isStaff === "true");
-    // console.log(row);
     return(
       <div>
       {(row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View</Button> : null}

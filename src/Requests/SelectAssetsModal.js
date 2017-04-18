@@ -40,7 +40,6 @@ class SelectAssetsModal extends React.Component {
   closeModal() {
     this.setState({enoughAssetsSelected: false});
     this.setState({showModal: false});
-    console.log("Clearing asset table selected rows");
     if(this._assetTable != null) {
       this._assetTable.setState({selectedRows: []});
     }
@@ -73,13 +72,10 @@ class SelectAssetsModal extends React.Component {
     var requestBody = {
       "asset_ids":assetIDs
     };
-    console.log(requestBody);
     let jsonResult = JSON.stringify(requestBody);
     restRequest("PATCH", "/api/request/backfill/satisfy/" + this.state.backfillID + "/", "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting satisfy response");
-      console.log(response);
       this.closeModal();
       if(this.props.updateCallback != null) {
         this.props.updateCallback.didFinishSelection();
@@ -100,8 +96,6 @@ class SelectAssetsModal extends React.Component {
       restRequest("PATCH", "/api/request/loan/returnAsset/" + this.state.dispensementID + "/", "application/json", jsonResult,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting return loan response");
-        console.log(response);
         this.closeModal();
         if(this.props.updateCallback != null) {
           this.props.updateCallback.didFinishSelection();
@@ -124,8 +118,6 @@ class SelectAssetsModal extends React.Component {
       restRequest("POST", "/api/item/asset/clear", "application/json", jsonResult,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting clear selection response");
-        console.log(response);
         cb();
       },
       (status, errResponse)=>{
@@ -145,8 +137,6 @@ class SelectAssetsModal extends React.Component {
       restRequest("PATCH", "/api/item/asset/" + selectedAssets[i], "application/json", jsonResult,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting make selection response");
-        console.log(response);
         this.closeModal();
         if(this.props.updateCallback != null) {
           this.props.updateCallback.didFinishSelection();
@@ -170,8 +160,6 @@ class SelectAssetsModal extends React.Component {
       restRequest("POST", "/api/request/convertRequestType/", "application/json", jsonResult,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting change selection loan/disbursement response");
-        console.log(response);
         this.closeModal();
         if(this.props.updateCallback != null) {
           this.props.updateCallback.didFinishSelection();

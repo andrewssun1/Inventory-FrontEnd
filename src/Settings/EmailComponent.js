@@ -16,7 +16,6 @@ export default class EmailComponent extends React.Component {
   }
 
   didPressConfigureEmail() {
-    console.log(this._dateRangePicker);
     this._configureEmailModal.openModal();
   }
 

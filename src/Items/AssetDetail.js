@@ -36,8 +36,6 @@ class AssetDetail extends React.Component {
     restRequest("GET", "/api/item/asset/" + tag , "application/json", null,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Asset Response");
-      console.log(response);
       this._fieldViewerAndEditor.populateFieldData(response);
     },
     ()=>{handleServerError(this._alertchild)});

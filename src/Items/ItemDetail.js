@@ -65,8 +65,6 @@ class ItemDetail extends React.Component {
       restRequest("GET", "/api/item/"+id, "application/json", null,
       (responseText)=>{
         var response = JSON.parse(responseText);
-        console.log("Getting Detailed Item Response");
-        console.log(response);
         //Handle assets:
         for (var i = 0; i < response.backfill_requested.length; i++) {
           response.backfill_requested[i].timestamp = moment(response.backfill_requested[i].timestamp).format('lll');
@@ -85,7 +83,7 @@ class ItemDetail extends React.Component {
         this.getCarts(response.name);
         //this.refs.tagComponent.refs.tagTable.forceUpdate();
       },
-      ()=>{console.log('GET Failed!!');}
+      ()=>{}
     );
   });
 }
@@ -112,8 +110,6 @@ saveItem() {
     if(this._isAssetSelect != null) {
       isAssetString = this._isAssetSelect.state.value;
     }
-    console.log(isAssetString);
-    console.log(this.refDict);
     if(localStorage.isSuperUser === "true") {
       requestBody = {
         "name": this.refDict["Name"].state.value,
@@ -141,14 +137,11 @@ saveItem() {
     restRequest("PATCH", "/api/item/" + this.state.itemData.id, "application/json", jsonResult,
     (responseText)=>{
       var response = JSON.parse(responseText);
-      console.log("Getting Response");
-      console.log(response);
       this.toggleEditing();
       this.clearAlert();
     },
     (status, errResponse)=>{
       let errs = JSON.parse(errResponse);
-      console.log('PATCH Failed!!');
       if(errs.quantity != null) {
         for(var i = 0; i < errs.quantity.length; i ++) {
           this._alertchild.generateError(errs.quantity[i]);
@@ -166,12 +159,11 @@ getCarts(item_name){
   restRequest("GET", "/api/request/?status=outstanding&requests__item__name=" + item_name, "application/json", null,
   (responseText)=>{
     var response = JSON.parse(responseText);
-    console.log(response);
     var results = ItemDetail.editGetResponse(response.results);
     this.setState({
       cartData: results
     });
-  }, ()=>{console.log('GET Failed!!');});
+  }, ()=>{});
 }
 
 static editGetResponse(data) {
@@ -185,10 +177,8 @@ static editGetResponse(data) {
 exportAssets() {
   restRequest("GET","/api/item/asset/csv/export?item_id=" + this.state.itemData.id, "application/json", null,
               (responseText)=>{
-                console.log("Successfully got assets");
                 fileDownload(responseText, this.state.itemData.name + 'Assets.csv');
               }, (status, errResponse)=>{
-                console.log('Failed to get assets');
               });
 }
 
@@ -197,7 +187,6 @@ openModal() {
 }
 
 closeModal() {
-  console.log("closeModal called");
   if(this.state.isEditing) {
     this.toggleEditing();
   }
@@ -205,7 +194,6 @@ closeModal() {
     this.props.updateCallback.componentWillMount();
   }
   if(this.props.updateCallback._minStockFilter != null) {
-        console.log("Cleaning filter");
         this.props.updateCallback._minStockFilter.cleanFiltered();
   }
   this.setState({showModal: false});
@@ -263,7 +251,6 @@ renderDisplayFields() {
 
   renderEditFields() {
     if(this.state.fieldData != null) {
-      console.log(this.state.fieldData);
       let editFields = this.state.fieldData.map((field) => {
         if(field.isImmutable) {
           return null;
@@ -299,10 +286,6 @@ renderDisplayFields() {
       <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
       </BootstrapTable>
     );
-  }
-
-  testOnHide() {
-    console.log("TEST ON HIDE");
   }
 
   render() {

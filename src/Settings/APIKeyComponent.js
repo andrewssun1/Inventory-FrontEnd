@@ -32,11 +32,9 @@ export default class APIKeyComponent extends React.Component {
     checkAuthAndAdmin(()=>{
       restRequest("DELETE", "/api/user/auth/token", "application/json", null,
                   (responseText)=>{
-                    // console.log(responseText);
-                    // var response = JSON.parse(responseText);
                     this.setState({apiKey: ""});
                     cb();
-                  }, (status, errResponse)=>{console.log(JSON.parse(errResponse))});
+                  }, (status, errResponse)=>{});
     });
   }
 
