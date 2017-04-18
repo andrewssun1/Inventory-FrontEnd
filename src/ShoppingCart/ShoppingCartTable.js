@@ -221,7 +221,7 @@ export default class ShoppingCartTable extends React.Component {
       <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
       hidden={!isStaff}></TableHeaderColumn>
     </BootstrapTable>
-      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || this.state.hasUnselectedAsset} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
+      <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || (this.isStaff && this.state.hasUnselectedAsset)} className="pull-right" bsStyle="success" onClick={this.openCartModal}>{this.state.isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
       </div>
     );
   }
