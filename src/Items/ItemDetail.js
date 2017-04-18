@@ -96,8 +96,11 @@ populateFieldData(response) {
     {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
     {name: "Quantity Available", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true" || this.state.isAsset)},
     {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
-    {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
+    {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description},
   ];
+  if(localStorage.isStaff === "true"){
+      data.push({name: "Minimum Stock", type: TypeConstants.Enum.INTEGER, value: response.minimum_stock})
+  }
   this._fieldViewerAndEditor.populateFieldData(response);
   this.setState({fieldData: data});
 }
@@ -110,19 +113,27 @@ saveItem() {
       isAssetString = this._isAssetSelect.state.value;
     }
     console.log(isAssetString);
+    console.log(this.refDict);
     if(localStorage.isSuperUser === "true") {
       requestBody = {
         "name": this.refDict["Name"].state.value,
-        "quantity": this.refDict["Quantity"].state.value,
         "model_number": this.refDict["Model Number"].state.value,
         "description": this.refDict["Description"].state.value,
+        "minimum_stock": this.refDict['Minimum Stock'].state.value,
+        "track_minimum_stock": this.refDict['Minimum Stock'].state.value > 0,
         "is_asset": isAssetString
+      };
+      if (!this.state.isAsset){
+        requestBody["quantity"] = this.refDict["Quantity Available"].state.value
       }
     } else {
       requestBody = {
         "name": this.refDict["Name"].state.value,
         "model_number": this.refDict["Model Number"].state.value,
-        "description": this.refDict["Description"].state.value
+        "description": this.refDict["Description"].state.value,
+        "minimum_stock": this.refDict['Minimum Stock'].state.value,
+        "track_minimum_stock": this.refDict['Minimum Stock'].state.value > 0,
+        "is_asset": isAssetString
       }
     }
 
