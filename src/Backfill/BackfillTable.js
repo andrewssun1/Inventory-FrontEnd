@@ -72,9 +72,8 @@ export default class BackfillTable extends React.Component {
                                "fail": "backfill_failed",
                                "satisfy": "backfill_satisfied"};
                     row.status = backfillMap[type];
-                    this.props.cb._alertchild.generateSuccess(type + " success");
+                    this._alertchild.generateSuccess(type + " success");
                     this.forceUpdate();
-                    this._alertchild.generateSuccess("Successfully satisfied");
                   }, (status, errResponse)=>{
                     handleErrors(errResponse, this._alertchild);
                   });
