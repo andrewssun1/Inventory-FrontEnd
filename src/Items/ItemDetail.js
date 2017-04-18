@@ -94,7 +94,7 @@ populateFieldData(response) {
   //Default Fields:
   var data = [
     {name: "Name", type: TypeConstants.Enum.SHORT_STRING, value: response.name},
-    {name: "Quantity", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true" || this.state.isAsset)},
+    {name: "Quantity Available", type: TypeConstants.Enum.INTEGER, value: response.quantity, isImmutable: (localStorage.isSuperUser !== "true" || this.state.isAsset)},
     {name: "Model Number", type: TypeConstants.Enum.SHORT_STRING, value: response.model_number},
     {name: "Description", type: TypeConstants.Enum.LONG_STRING, value: response.description}
   ];
@@ -220,9 +220,8 @@ logItemQuantityChange() {
 }
 
 onRowClickCart(row, isSelected, e) {
-  this._viewRequestModal.getDetailedRequest(row.cart_id, ()=>{
-    this._viewRequestModal.openModal();
-  });
+  this._viewRequestModal.setState({id: row.id});
+  this._viewRequestModal.openModal();
 }
 
 clearAlert() {

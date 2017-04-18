@@ -182,7 +182,7 @@ export default class ApplicationTabs extends React.Component {
                    <ShoppingCartTable ref="shoppingCartTable"></ShoppingCartTable>
                  </Tab.Pane>
                  <Tab.Pane eventKey="about_us">
-                   <AboutPage ref="aboutUs"></AboutPage>
+                   <AboutPage ref="about_us"></AboutPage>
                  </Tab.Pane>
                </Tab.Content>
              </Col>

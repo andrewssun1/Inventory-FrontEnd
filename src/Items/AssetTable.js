@@ -10,6 +10,7 @@ import TypeConstants from '../TypeConstants';
 import Select from 'react-select';
 import InstaButtons from './InstaButtons';
 import AlertComponent from '../AlertComponent';
+import SelectionType from '../Requests/SelectionEnum.js';
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn
 var Button = Bootstrap.Button;
@@ -49,12 +50,11 @@ class AssetTable extends React.Component {
   }
 
   componentDidMount() {
-    if(this.props.preselectedAssets != null && !this.props.isChangingCartType) {
+    if(this.props.preselectedAssets != null && this.props.selectionType==SelectionType.DEFAULT) {
       let array = [];
       for(var i = 0; i < this.props.preselectedAssets.length; i ++) {
         array.push(this.props.preselectedAssets[i].id);
       }
-      console.log("Adding preselected assets");
       this.setState({selectedRows: array});
     }
   }
@@ -68,7 +68,7 @@ class AssetTable extends React.Component {
     if(this.props.lightMode) {
       url = url + "&available=True" + "&" + this.props.filterType + "_available_id=" + this.props.dispensementID;
     }
-    if(this.props.isChangingCartType && this.props.filterType != null) {
+    if(this.props.selectionType != SelectionType.DEFAULT && this.props.filterType != null) {
       url = url + "&" + this.props.filterType + "__id=" + this.props.dispensementID;
     }
     restRequest("GET", url, "application/json", null,
@@ -208,8 +208,6 @@ onDeleteRow(rows) {
   for(var j = 0; j < rows.length; j ++) {
     restRequest("DELETE", "/api/item/asset/"+rows[j], "application/json", null,
         ()=>{
-          console.log("Successfully deleted rows")
-          console.log(j);
           if(k == rows.length) {
             this.requestAssets();
             this.props.updateCallback.getDetailedItem(this.props.id);
