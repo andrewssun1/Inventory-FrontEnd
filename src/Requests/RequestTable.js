@@ -5,8 +5,10 @@ var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import RequestButton from "./RequestButton";
 import ViewRequestModal from './ViewRequestModal.js';
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import Select from 'react-select';
 var moment = require('moment');
 import AlertComponent from "../AlertComponent"
+import {Row, Col} from 'react-bootstrap'
 
 class RequestTable extends React.Component {
   constructor(props){
@@ -22,7 +24,16 @@ class RequestTable extends React.Component {
       selected: [],
       showModal: false,
       selectedRequest: 0,
-      currentValue: null
+      currentValue: null,
+      currentBackfillStatus: "",
+      backfill_statuses: [
+        {label: "backfill_request", value: "backfill_request"},
+        {label: "backfill_transit", value: "backfill_transit"},
+        {label: "backfill_satisfied", value: "backfill_satisfied"},
+        {label: "backfill_failed", value: "backfill_failed"},
+        {label: "backfill_denied", value: "backfill_denied"},
+        {label: "backfill_cancelled", value: "backfill_cancelled"},
+      ]
     }
 
     this.filterFields = {
@@ -173,6 +184,12 @@ class RequestTable extends React.Component {
     }
   }
 
+  // handleBackfillStatusChange(value){
+  //   if (url_parameter !== "?" ) {
+  //
+  //   }
+  // }
+
   onRowClick(row, isSelected, e) {
     // console.log(row.id);
     this._requestModal.setState({id: row.id})
@@ -207,7 +224,23 @@ class RequestTable extends React.Component {
       <ViewRequestModal id={this.state.selectedRequest}
       updateCallback={this}
       ref={(child) => { this._requestModal = child; }} />
-      <RequestButton ref="requestButton" { ...this.state} cb={this}/>
+      <div className="container-fluid">
+          <Row style={{marginBottom: "-10px"}}>
+              <Col md={6} style={{marginLeft: "-5px"}}>
+                <RequestButton ref="requestButton" { ...this.state} cb={this}/>
+              </Col>
+              <Col className="text-right" style={{marginRight: "10px"}}>
+                  <div>
+                    <Select simpleValue
+                          value={this.state.currentBackfillStatus}
+                          placeholder="Filter by backfill status"
+                          options={this.state.backfill_statuses}
+                          onChange={this.handleBackfillStatusChange}
+                          style={{width: "200px", marginLeft: "10px"}} />
+                  </div>
+              </Col>
+          </Row>
+      </div>
       <BootstrapTable ref="logTable"
       data={ this.state.data }
       remote={ true }

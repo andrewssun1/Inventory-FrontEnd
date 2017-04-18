@@ -298,6 +298,7 @@ class ViewRequestBody extends React.Component {
   backfillButton(cell, row){
     // open modal to show backfill table
     const isStaff = (localStorage.isStaff === "true");
+    // console.log(row);
     return(
       <div>
       {(row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View</Button> : null}

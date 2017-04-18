@@ -19,6 +19,7 @@ export default class BackfillTable extends React.Component {
       currentFilterURL: "",
       currentPage: 1,
       totalDataSize: 0,
+      showModal: true
     }
     this.filterFields = {
       status: {
@@ -33,8 +34,7 @@ export default class BackfillTable extends React.Component {
     this.resetTable = this.resetTable.bind(this);
     this.stateBackfill = this.stateBackfill.bind(this);
     this.getAllBackfills = this.getAllBackfills.bind(this);
-    this.renderDenyApprove = this.renderDenyApprove.bind(this);
-    this.renderSatisfyFail = this.renderSatisfyFail.bind(this);
+    this.renderBackfillState = this.renderBackfillState.bind(this);
     this.cleanFilter = this.cleanFilter.bind(this);
 
   }
@@ -97,30 +97,28 @@ export default class BackfillTable extends React.Component {
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     row.request_status = response.status;
+                    // console.log(row);
+                    this.forceUpdate();
                   }, ()=>{console.log("Get detailed request failed!");}
                   )
       });
   }
 
-  renderDenyApprove(cell, row){
-    return(
-      (row.status === "backfill_request" && (row.request_status === "fulfilled" || row.request_status === "approved"))?
-      <div>
+  renderBackfillState(cell, row){
+    if (row.request_status === "fulfilled" && row.status === "backfill_request") {
+      return(
+      <div id="type1" onClick={()=>{this.state.showModal=false}}>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("approve", row)}}>Approve</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("deny", row)}}>Deny</Button>
-      </div> : null
-    )
-  }
-
-  renderSatisfyFail(cell, row){
-    return(
-      (row.status === "backfill_transit" && row.request_status) === "fulfilled"?
-      <div>
+      </div>);
+    }
+    else if (row.status === "backfill_transit" && (row.request_status === "fulfilled" || row.request_status === "approved")) {
+      return(<div id="type2" onClick={()=>{this.state.showModal=false}}>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("satisfy", row)}}>Satisfy</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("fail", row)}}>Fail</Button>
-      </div> :
-      null
-    )
+      </div>);
+    }
+    return null;
   }
 
   onFilterChange(filterObj) {
@@ -147,9 +145,15 @@ export default class BackfillTable extends React.Component {
 
 
   onRowClick(row){
-    console.log(row);
-    this._requestModal.setState({id: row.id});
-    this._requestModal.openModal();
+    console.log(this.state.showModal);
+    if (this.state.showModal){
+      this._requestModal.setState({id: row.cart_id});
+      this._requestModal.openModal();
+    }
+    else{
+      this.setState({showModal: true});
+    }
+
   }
 
   render(){
@@ -182,8 +186,7 @@ export default class BackfillTable extends React.Component {
         <TableHeaderColumn dataField='timestamp'>Timestamp</TableHeaderColumn>
         <TableHeaderColumn dataField='quantity'>Quantity</TableHeaderColumn>
         <TableHeaderColumn dataField='pdf_url' dataAlign="center" dataFormat={this.formatPDF}>PDF</TableHeaderColumn>
-        <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderDenyApprove} hidden={!isStaff}></TableHeaderColumn>
-        <TableHeaderColumn dataField='satisfyFail' dataAlign="center" dataFormat={this.renderSatisfyFail} hidden={!isStaff}></TableHeaderColumn>
+        <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderBackfillState} hidden={!isStaff}></TableHeaderColumn>
         </BootstrapTable>
         </div>
       );
