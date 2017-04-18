@@ -6,6 +6,7 @@ import ConfigureEmailModal from './ConfigureEmailModal.js';
 import SubscribedManagerTable from './SubscribedManagerTable.js';
 import SubscribeButton from './SubscribeButton.js';
 import DateComponent from './DateComponent.js';
+import AlertComponent from '../AlertComponent';
 
 export default class EmailComponent extends React.Component {
 
@@ -28,9 +29,13 @@ export default class EmailComponent extends React.Component {
       <h4> Configure </h4>
       <Button onClick={this.didPressConfigureEmail} bsStyle="primary">Configure Loan Reminder Emails</Button>
       <br/>
-      <ConfigureEmailModal ref={child => this._configureEmailModal = child} />
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+      <ConfigureEmailModal alertchild={this._alertchild} ref={child => this._configureEmailModal = child} />
       <br/>
       <DateComponent />
+      <br/>
+      <br/>
+      <br/>
       </div>
     );
   }

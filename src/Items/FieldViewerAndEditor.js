@@ -19,7 +19,7 @@ class FieldViewerAndEditor extends React.Component {
       itemData: null,
       selectedRequest: null,
       fieldData: null,
-      responseData: null
+      responseData: null,
     }
     this.saveCustomFields = this.saveCustomFields.bind(this);
     this.populateFieldData = this.populateFieldData.bind(this);

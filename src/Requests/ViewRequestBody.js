@@ -47,6 +47,7 @@ class ViewRequestBody extends React.Component {
     this.returnItem = this.returnItem.bind(this);
     this.onDeleteRowLoan = this.onDeleteRowLoan.bind(this);
     this.onDeleteRowDisbursement = this.onDeleteRowDisbursement.bind(this);
+    this.didFinishSelection = this.didFinishSelection.bind(this);
     //Modal methods
     this.renderStaffInfo = this.renderStaffInfo.bind(this);
     this.renderBottomComponents = this.renderBottomComponents.bind(this);
@@ -67,16 +68,19 @@ class ViewRequestBody extends React.Component {
     this.componentDidMount();
   }
 
-
   isOutstanding() {
     return (this.state.requestData.status === "outstanding");
+  }
+
+  didFinishSelection() {
+    this.getDetailedRequest(this.state.requestData.id);
   }
 
   getDetailedRequest(id, cb) {
     checkAuthAndAdmin(()=>{
       this.setState({hasUnselectedAsset: false});
-      if(this.props.activeCartParent != null) {
-        this.props.activeCartParent.setState({bodyHasUnselectedAsset: false});
+      if(this.props.parent != null) {
+        this.props.parent.setState({bodyHasUnselectedAsset: false});
       }
       restRequest("GET", "/api/request/"+id, "application/json", null,
                   (responseText)=>{
@@ -118,8 +122,8 @@ class ViewRequestBody extends React.Component {
       if(cart[i].item.is_asset && cart[i].assets.length < cart[i].quantity) {
         cart[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
         this.setState({hasUnselectedAsset: true});
-        if(this.props.activeCartParent != null) {
-          this.props.activeCartParent.setState({bodyHasUnselectedAsset: true});
+        if(this.props.parent != null) {
+          this.props.parent.setState({bodyHasUnselectedAsset: true});
         }
       } else if (cart[i].item.is_asset && cart[i].assets.length > 0) {
         cart[i].assetSelect = AssetSelectStatus.CHANGE_ASSETS;
@@ -134,8 +138,6 @@ class ViewRequestBody extends React.Component {
   }
 
   isOutstanding() {
-    // console.log("is Outstanding");
-    // console.log(this.state.requestData);
     return (this.state.requestData.status === "outstanding");
   }
 
@@ -282,7 +284,7 @@ class ViewRequestBody extends React.Component {
         <div>
         <FormGroup style={{marginBottom: "0px"}} controlId="formBasicText" >
         <InputGroup>
-          {(this.isOutstanding() || this.props.activeCartMode) ? this.renderOutstandingButton(row):
+          {this.isOutstanding() ? this.renderOutstandingButton(row):
           this.renderReturnButton(row)}
         </InputGroup>
         </FormGroup>
@@ -336,19 +338,10 @@ class ViewRequestBody extends React.Component {
     let canConvert = (this.state.requestData.status === "active") ||
       (isStaff && (this.isOutstanding() ||
       ((this.state.requestData.status === "approved" || this.state.requestData.status === "fulfilled") && type=="loan")));
-    let showAssetSelect = isStaff && (this.isOutstanding() || this.props.activeCartMode);
-
-    //For deleting on active cart
-    var selectRow = {};
-    var options = {};
-    if(this.props.activeCartMode) {
-      selectRow = { mode: 'checkbox' };
-      options = { onDeleteRow: (type=="loan") ? this.onDeleteRowLoan : this.onDeleteRowDisbursement };
-    }
-
+    let showAssetSelect = isStaff && (this.isOutstanding());
 
     return (
-      <BootstrapTable data={data} selectRow={selectRow} options={options} deleteRow striped hover>
+      <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='name' width="120px">Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' width="75px" dataAlign="center">Quantity</TableHeaderColumn>
@@ -416,15 +409,11 @@ class ViewRequestBody extends React.Component {
         {this.renderRequestTable(this.state.requestData.cart_disbursements, "disbursement")}
         <p> <b>Loans: </b> </p>
         {this.renderRequestTable(this.state.requestData.cart_loans, "loan")}
-        {this.props.activeCartMode ?
-          null
-          :
           <div>
           <br />
           <p> <b>Request Reason: </b>{this.state.requestData.reason} </p>
           {this.renderBottomComponents()}
           </div>
-        }
       </div>
     )
   }

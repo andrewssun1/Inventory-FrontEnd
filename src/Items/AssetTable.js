@@ -64,7 +64,11 @@ class AssetTable extends React.Component {
     if(pageParam == null) {
       pageParam = this.state.currentPage
     }
-    var url = "/api/item/asset?item__id=" + this.props.id + "&page=" + pageParam + "&search"
+    var url = "/api/item/asset?page=" + pageParam;
+    if(this.props.id > 0) {
+      url = url + "&item__id="+ this.props.id;
+    }
+    url = url + "&search";
     if(this.props.lightMode) {
       url = url + "&available=True" + "&" + this.props.filterType + "_available_id=" + this.props.dispensementID;
     }
