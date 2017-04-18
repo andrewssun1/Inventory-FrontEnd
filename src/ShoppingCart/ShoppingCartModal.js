@@ -1,7 +1,7 @@
 var React = require('react');
 
 import { Modal, FormGroup, ControlLabel, FormControl, Button} from 'react-bootstrap';
-import {checkAuthAndAdmin} from "../Utilities";
+import {checkAuthAndAdmin, handleErrors} from "../Utilities";
 import {restRequest} from "../Utilities.js";
 import Select from 'react-select';
 
@@ -90,8 +90,7 @@ export default class ShoppingCartModal extends React.Component {
                   this.props.updateCallback.componentDidMount();
                   this.props.updateCallback._alertchild.generateSuccess("Request sent!");
                 }, (status, errResponse)=>{
-                  console.log(JSON.parse(errResponse));
-                  // this.props.updateCallback._alertchild.generateError("Shopping cart sent!");
+                  handleErrors(errResponse, this.props.updateCallback._alertchild);
                 });
     this.closeModal();
   }

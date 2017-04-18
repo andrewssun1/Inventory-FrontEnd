@@ -399,11 +399,11 @@ class ViewRequestBody extends React.Component {
     //if(this.state.requestData.length == 0) return null;
     return (
       <div>
-      <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }} requestState={this.state.requestData.status}></BackfillDetailModal>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
+      <BackfillDetailModal cb={this} ref={(child) => { this._backfillDetailChild = child; }} requestState={this.state.requestData.status}></BackfillDetailModal>
       <BackfillModal ref={(child) => {this._backfillchild = child; }} cb={this}/>
       <SelectAssetsModal cartID={this.state.requestData.id} updateCallback={this}
       ref={(child) => { this._selectAssetsModal = child; }}/>
-      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
         <p style={{color:"red"}}> {this.state.requestProblemString} </p>
         <p> <b>Disbursements: </b> </p>
         {this.renderRequestTable(this.state.requestData.cart_disbursements, "disbursement")}

@@ -1,7 +1,7 @@
 var React = require('react');
 
 import { Modal, Button, Label, FormControl} from 'react-bootstrap';
-import {restRequest, restRequestData, checkAuthAndAdmin} from "../Utilities.js";
+import {restRequest, restRequestData, checkAuthAndAdmin, handleErrors} from "../Utilities.js";
 import AlertComponent from '../AlertComponent';
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
@@ -116,8 +116,11 @@ export default class BackfillModal extends React.Component {
                       if (typeof this.props.cb.resetTable === "function") {
                         this.props.cb.resetTable();
                       }
+                      this.props.cb._alertchild.generateSuccess("Successfully saved backfill");
                       console.log(response);
-                    }, ()=>{});
+                    },(status, errResponse)=>{
+                      handleErrors(errResponse, this.props.cb._alertchild);
+                    });
       });
     }
     else{
@@ -128,8 +131,11 @@ export default class BackfillModal extends React.Component {
                       if (typeof this.props.cb.resetTable === "function") {
                         this.props.cb.resetTable();
                       }
+                      this.props.cb._alertchild.generateSuccess("Successfully saved backfill");
                       console.log(response);
-                    }, ()=>{});
+                    }, (status, errResponse)=>{
+                      handleErrors(errResponse, this.props.cb._alertchild);
+                    });
       });
     }
 
