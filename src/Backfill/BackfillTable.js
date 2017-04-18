@@ -137,9 +137,8 @@ export default class BackfillTable extends React.Component {
 
   onRowClick(row){
     console.log(row);
-    this._requestModal.getDetailedRequest(row.cart_id, ()=>{
-      this._requestModal.openModal();
-    });
+    this._requestModal.setState({id: row.id});
+    this._requestModal.openModal();
   }
 
   render(){
