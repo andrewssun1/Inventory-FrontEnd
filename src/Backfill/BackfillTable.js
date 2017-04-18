@@ -63,7 +63,6 @@ export default class BackfillTable extends React.Component {
                                "satisfy": "backfill_satisfied"};
                     row.status = backfillMap[type];
                     this.forceUpdate();
-                    this.props.cb.closeModal();
                   }, ()=>{});
     });
   }
@@ -82,6 +81,7 @@ export default class BackfillTable extends React.Component {
                     var response = JSON.parse(responseText);
                     for (var i = 0; i < response.results.length; i++) {
                       response.results[i].timestamp = moment(response.results[i].timestamp).format('lll');
+                      this.getRequestStatus(response.results[i]);
                     }
                     this.setState({
                       data: response.results,
@@ -91,9 +91,20 @@ export default class BackfillTable extends React.Component {
     });
   }
 
+  getRequestStatus(row){
+    checkAuthAndAdmin(()=>{
+      restRequest("GET", "/api/request/"+row.cart_id, "application/json", null,
+                  (responseText)=>{
+                    var response = JSON.parse(responseText);
+                    row.request_status = response.status;
+                  }, ()=>{console.log("Get detailed request failed!");}
+                  )
+      });
+  }
+
   renderDenyApprove(cell, row){
     return(
-      row.status === "backfill_request" ?
+      (row.status === "backfill_request" && (row.request_status === "fulfilled" || row.request_status === "approved"))?
       <div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("approve", row)}}>Approve</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("deny", row)}}>Deny</Button>
@@ -103,7 +114,7 @@ export default class BackfillTable extends React.Component {
 
   renderSatisfyFail(cell, row){
     return(
-      row.status === "backfill_transit" ?
+      (row.status === "backfill_transit" && row.request_status) === "fulfilled"?
       <div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("satisfy", row)}}>Satisfy</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("fail", row)}}>Fail</Button>
@@ -153,8 +164,10 @@ export default class BackfillTable extends React.Component {
       page: this.state.currentPage,
     };
 
+    const isStaff = (localStorage.isStaff === "true");
       return(
         <div>
+        <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
         <ViewRequestModal
         updateCallback={this}
         ref={(child) => { this._requestModal = child; }} />
@@ -165,12 +178,13 @@ export default class BackfillTable extends React.Component {
         data={this.state.data} options={options} striped hover>
         <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
         <TableHeaderColumn dataField='cart_id' hiddenOnInsert hidden>cart_id</TableHeaderColumn>
+        <TableHeaderColumn dataField='cart_owner'>Cart Owner</TableHeaderColumn>
         <TableHeaderColumn dataField='status' filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.status } }>Status</TableHeaderColumn>
         <TableHeaderColumn dataField='timestamp'>Timestamp</TableHeaderColumn>
         <TableHeaderColumn dataField='quantity'>Quantity</TableHeaderColumn>
         <TableHeaderColumn dataField='pdf_url' dataAlign="center" dataFormat={this.formatPDF}>PDF</TableHeaderColumn>
-        <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderDenyApprove} hidden={!(this.props.requestState === "fulfilled")}></TableHeaderColumn>
-        <TableHeaderColumn dataField='satisfyFail' dataAlign="center" dataFormat={this.renderSatisfyFail} hidden={!(this.props.requestState === "fulfilled" || this.props.requestState === "approved")}></TableHeaderColumn>
+        <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderDenyApprove} hidden={!isStaff}></TableHeaderColumn>
+        <TableHeaderColumn dataField='satisfyFail' dataAlign="center" dataFormat={this.renderSatisfyFail} hidden={!isStaff}></TableHeaderColumn>
         </BootstrapTable>
         </div>
       );

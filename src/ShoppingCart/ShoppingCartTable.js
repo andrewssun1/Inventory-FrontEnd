@@ -127,9 +127,6 @@ export default class ShoppingCartTable extends React.Component {
   }
 
   openBackfillModal(row){
-    if (row.name === "Trash Cans 6") {
-      console.log(row);
-    }
     this._backfillchild.openModal(row);
   }
 
