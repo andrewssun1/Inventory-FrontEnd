@@ -193,6 +193,10 @@ closeModal() {
   if (typeof this.props.updateCallback.componentWillMount === "function") {
     this.props.updateCallback.componentWillMount();
   }
+  if(this.props.updateCallback._minStockFilter != null) {
+        console.log("Cleaning filter");
+        this.props.updateCallback._minStockFilter.cleanFiltered();
+  }
   this.setState({showModal: false});
 }
 
