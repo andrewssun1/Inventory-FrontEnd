@@ -2,7 +2,7 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import {restRequest, checkAuthAndAdmin, handleErrors} from "../Utilities.js"
 import { Button } from 'react-bootstrap';
 var moment = require('moment');
 
@@ -40,8 +40,11 @@ export default class BackfillDetailTable extends React.Component {
                                "cancel": "backfill_cancelled"};
                     row.status = backfillMap[type];
                     this.forceUpdate();
-                    this.props.cb.closeModal();
-                  }, ()=>{});
+                    this.props.cb._alertchild.generateSuccess(type + " success");
+                    // this.props.cb.closeModal();
+                  }, (status, errResponse)=>{
+                    handleErrors(errResponse, this.props.cb._alertchild);
+                  });
     });
   }
 

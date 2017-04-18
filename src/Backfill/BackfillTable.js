@@ -2,7 +2,7 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import {restRequest, checkAuthAndAdmin, handleErrors} from "../Utilities.js"
 import {Button} from 'react-bootstrap'
 import AlertComponent from "../AlertComponent";
 import ViewRequestModal from '../Requests//ViewRequestModal';
@@ -62,8 +62,11 @@ export default class BackfillTable extends React.Component {
                                "fail": "backfill_failed",
                                "satisfy": "backfill_satisfied"};
                     row.status = backfillMap[type];
+                    this.props.cb._alertchild.generateSuccess(type + " success");
                     this.forceUpdate();
-                  }, ()=>{});
+                  }, (status, errResponse)=>{
+                    handleErrors(errResponse, this.props.cb._alertchild);
+                  });
     });
   }
 

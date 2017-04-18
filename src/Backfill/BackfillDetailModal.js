@@ -44,7 +44,9 @@ export default class BackfillDetailModal extends React.Component {
   render(){
 
     return(
+      <div>
     <Modal bsSize="large" show={this.state.showModal} onHide={this.closeModal}>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
     <Modal.Header>
       <Modal.Title>View BackFill</Modal.Title>
     </Modal.Header>
@@ -55,6 +57,7 @@ export default class BackfillDetailModal extends React.Component {
       <Button bsStyle="danger" onClick={this.closeModal} >Close</Button>
     </Modal.Footer>
   </Modal>
+  </div>
 );
   }
 

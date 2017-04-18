@@ -51,7 +51,7 @@ export default class LogDetail extends React.Component {
     else if (row.request_cart_log.length !== 0){
       this.setState({selectedRequest: row.request_cart_log[0].request_cart.id}, ()=>{
         // get detailed view of shopping cart
-        this._requestModal.getDetailedRequest(row.request_cart_log[0].request_cart.id, ()=>{
+        this._requestModal.setState({id: row.request_cart_log[0].request_cart.id}, ()=>{
           this._requestModal.openModal();
         });
       });

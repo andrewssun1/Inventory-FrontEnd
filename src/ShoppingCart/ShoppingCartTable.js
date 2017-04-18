@@ -139,7 +139,7 @@ export default class ShoppingCartTable extends React.Component {
                     restRequest("DELETE", "/api/request/backfill/delete/"+response.id+"/", "application/json", null,
                                 ()=>{
                                   this.resetTable();
-                                  this._alertchild.generateSuccess("Successfully deleted item from cart.");
+                                  this._alertchild.generateSuccess("Successfully deleted backfill.");
                                 }, (status, errResponse)=>{
                                   this._alertchild.generateError(JSON.parse(errResponse).detail);
                                 });
