@@ -129,7 +129,7 @@ class ViewRequestModal extends React.Component {
       <Modal.Title>View Request</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-      <ViewRequestBody parent={this} id={this.state.id} 
+      <ViewRequestBody parent={this} id={this.state.id}
       ref={(child) => { this._viewRequestBody = child; }}/>
       </Modal.Body>
       <Modal.Footer>
