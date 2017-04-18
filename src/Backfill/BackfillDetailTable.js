@@ -15,8 +15,8 @@ export default class BackfillDetailTable extends React.Component {
       data: []
     }
     this.stateBackfill = this.stateBackfill.bind(this);
-    this.renderDenyApprove = this.renderDenyApprove.bind(this);
-    this.renderSatisfyFail = this.renderSatisfyFail.bind(this);
+    this.renderBackfillState = this.renderBackfillState.bind(this);
+    this.renderCancelButton = this.renderCancelButton.bind(this);
   }
 
   formatPDF(cell, row){
@@ -27,6 +27,9 @@ export default class BackfillDetailTable extends React.Component {
 
   stateBackfill(type, row){
     checkAuthAndAdmin(()=>{
+      if (type === "satisfy" && row.is_asset) {
+
+      }
       restRequest("PATCH", "/api/request/backfill/" + type + "/" + row.id + "/",  "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
@@ -41,38 +44,44 @@ export default class BackfillDetailTable extends React.Component {
     });
   }
 
-  renderDenyApprove(cell, row){
-    return(
-      row.status === "backfill_request" ?
+  renderBackfillState(cell, row){
+    if (this.props.requestState === "fulfilled" && row.status === "backfill_request") {
       <div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("approve", row)}}>Approve</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("deny", row)}}>Deny</Button>
-      </div> : null
-    )
-  }
-
-  renderSatisfyFail(cell, row){
-    return(
-      row.status === "backfill_transit" ?
+      </div>
+    }
+    else if (row.status === "backfill_transit" && (this.props.requestState === "fulfilled" || this.props.requestState === "approved")) {
       <div>
         <Button bsStyle="success" onClick={()=>{this.stateBackfill("satisfy", row)}}>Satisfy</Button>
         <Button bsStyle="danger" onClick={()=>{this.stateBackfill("fail", row)}}>Fail</Button>
-      </div> :
+      </div>
+    }
+    return null;
+  }
+
+  renderCancelButton(cell, row){
+    return(
+      // (row.status === "backfill_request" && this.props.requestState === "fulfilled") ?
+      // <Button bsStyle="danger" onClick={TODO}>Cancel</Button>
       null
     )
   }
 
   render(){
+    const isStaff = (localStorage.isStaff === "true");
+
     return(
       <div>
       <BootstrapTable ref="backfillTable" data={this.props.data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
+      <TableHeaderColumn dataField='cart_owner'>Cart Owner</TableHeaderColumn>
       <TableHeaderColumn dataField='status'>Status</TableHeaderColumn>
       <TableHeaderColumn dataField='timestamp'>Timestamp</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity'>Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='pdf_url' dataAlign="center" dataFormat={this.formatPDF}>PDF</TableHeaderColumn>
-      <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderDenyApprove} hidden={!(this.props.requestState === "fulfilled")}></TableHeaderColumn>
-      <TableHeaderColumn dataField='satisfyFail' dataAlign="center" dataFormat={this.renderSatisfyFail} hidden={!(this.props.requestState === "fulfilled" || this.props.requestState === "approved")}></TableHeaderColumn>
+      <TableHeaderColumn dataField='denyApprove' dataAlign="center" dataFormat={this.renderBackfillState} hidden={!(isStaff)}></TableHeaderColumn>
+      <TableHeaderColumn dataField='cancel' dataAlign="center" dataFormat={this.renderCancelButton} hidden={(isStaff)}></TableHeaderColumn>
       </BootstrapTable>
       </div>
     );

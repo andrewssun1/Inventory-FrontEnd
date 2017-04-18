@@ -8,6 +8,7 @@ import {checkAuthAndAdmin} from "../Utilities";
 import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
 import AlertComponent from "../AlertComponent.js";
+import BackfillModal from "../Backfill/BackfillModal";
 import BackfillDetailModal from "../Backfill/BackfillDetailModal";
 import SelectAssetsModal from "./SelectAssetsModal.js"
 import SelectionType from './SelectionEnum.js'
@@ -148,6 +149,7 @@ class ViewRequestBody extends React.Component {
                   var response = JSON.parse(responseText);
                   // this.forceUpdate();
                   this.getDetailedRequest(this.state.requestData.id, ()=>{});
+                  this._alertchild.generateSucess("Successfully converted to " + row.status);
               }, (status, errResponse)=>{
                 this._alertchild.generateError("Invalid quantity!");
               }
@@ -201,6 +203,7 @@ class ViewRequestBody extends React.Component {
                 console.log(response);
                 // this.forceUpdate();
                 this.getDetailedRequest(this.state.requestData.id, ()=>{});
+                this._alertchild.generateSuccess("Successfully returned");
             }, (status, errResponse)=>{
               this._alertchild.generateError("Invalid quantity!");
             }
@@ -282,7 +285,13 @@ class ViewRequestBody extends React.Component {
 
   backfillButton(cell, row){
     // open modal to show backfill table
-    return((row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View Backfill</Button> : null);
+    const isStaff = (localStorage.isStaff === "true");
+    return(
+      <div>
+      {(row.backfill_loan != null && row.backfill_loan.length > 0) ? <Button onClick={()=>{this._backfillDetailChild.openModal(row)}}>View</Button> : null}
+      {(row.returned_timestamp == null && this.state.requestData.status === "fulfilled" && !isStaff) ? <Button bsStyle="primary" onClick={()=>{this.openBackfillModal(row)}}>Create</Button> : null}
+      </div>
+    )
   }
 
   selectAssetsButton(cell, row) {
@@ -336,6 +345,8 @@ class ViewRequestBody extends React.Component {
       <TableHeaderColumn dataField='total_backfill_quantity'
       hidden={!(this.state.requestData.status === "outstanding" && type === "loan")}
       width="120px" dataAlign="center">Backfills Requested</TableHeaderColumn>
+      <TableHeaderColumn dataField='button1' width="150px" dataFormat={this.backfillButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
+                            hidden={type !== "loan"}>Backfills</TableHeaderColumn>
       <TableHeaderColumn dataField='button' dataFormat={this.changeButton} dataAlign="center" hiddenOnInsert columnClassName='my-class'
                         hidden={!canConvert}></TableHeaderColumn>
       <TableHeaderColumn dataField='assetSelect' width="140px" dataFormat={this.selectAssetsButton}
@@ -385,6 +396,7 @@ class ViewRequestBody extends React.Component {
     return (
       <div>
       <BackfillDetailModal ref={(child) => { this._backfillDetailChild = child; }} requestState={this.state.requestData.status}></BackfillDetailModal>
+      <BackfillModal ref={(child) => {this._backfillchild = child; }} cb={this}/>
       <SelectAssetsModal cartID={this.state.requestData.id} updateCallback={this}
       ref={(child) => { this._selectAssetsModal = child; }}/>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
