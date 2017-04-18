@@ -224,23 +224,13 @@ class RequestTable extends React.Component {
       <ViewRequestModal id={this.state.selectedRequest}
       updateCallback={this}
       ref={(child) => { this._requestModal = child; }} />
-      <div className="container-fluid">
-          <Row style={{marginBottom: "-10px"}}>
-              <Col md={6} style={{marginLeft: "-5px"}}>
-                <RequestButton ref="requestButton" { ...this.state} cb={this}/>
-              </Col>
-              <Col className="text-right" style={{marginRight: "10px"}}>
-                  <div>
-                    <Select simpleValue
-                          value={this.state.currentBackfillStatus}
-                          placeholder="Filter by backfill status"
-                          options={this.state.backfill_statuses}
-                          onChange={this.handleBackfillStatusChange}
-                          style={{width: "200px", marginLeft: "10px"}} />
-                  </div>
-              </Col>
-          </Row>
-      </div>
+      <Select simpleValue
+            value={this.state.currentBackfillStatus}
+            placeholder="Filter by backfill status"
+            options={this.state.backfill_statuses}
+            onChange={this.handleBackfillStatusChange}
+            style={{width: "200px", marginLeft: "10px"}} />
+      <RequestButton ref="requestButton" { ...this.state} cb={this}/>
       <BootstrapTable ref="logTable"
       data={ this.state.data }
       remote={ true }
