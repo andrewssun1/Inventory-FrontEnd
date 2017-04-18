@@ -49,7 +49,7 @@ export default class BackfillDetailTable extends React.Component {
                                  "cancel": "backfill_cancelled"};
                       row.status = backfillMap[type];
                       this.forceUpdate();
-                      this.props.cb.closeModal();
+                      // this.props.cb.closeModal();
                       this._alertchild.generateSuccess(type: " success");
                     }, (status, errResponse)=>{
                       handleErrors(errResponse, this._alertchild);
