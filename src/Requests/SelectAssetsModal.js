@@ -55,6 +55,9 @@ class SelectAssetsModal extends React.Component {
       case SelectionType.RETURN:
         this.makeReturn(selectedAssets);
         break;
+      case SelectionType.SATISFY:
+        console.log("Satisfy");
+        break;
       default:
         this.clearSelection(()=> {
           this.makeRegularSelection(selectedAssets);
@@ -74,7 +77,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting return loan response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);
@@ -117,7 +122,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting make selection response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);
@@ -140,7 +147,9 @@ class SelectAssetsModal extends React.Component {
         console.log("Getting change selection loan/disbursement response");
         console.log(response);
         this.closeModal();
-        this.props.updateCallback.getDetailedRequest(this.props.cartID);
+        if(this.props.updateCallback != null) {
+          this.props.updateCallback.didFinishSelection();
+        }
       },
       (status, errResponse)=>{
         handleErrors(errResponse, this._alertchild);

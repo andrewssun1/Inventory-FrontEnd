@@ -47,6 +47,7 @@ class ViewRequestBody extends React.Component {
     this.returnItem = this.returnItem.bind(this);
     this.onDeleteRowLoan = this.onDeleteRowLoan.bind(this);
     this.onDeleteRowDisbursement = this.onDeleteRowDisbursement.bind(this);
+    this.didFinishSelection = this.didFinishSelection.bind(this);
     //Modal methods
     this.renderStaffInfo = this.renderStaffInfo.bind(this);
     this.renderBottomComponents = this.renderBottomComponents.bind(this);
@@ -61,16 +62,19 @@ class ViewRequestBody extends React.Component {
     });
   }
 
-
   isOutstanding() {
     return (this.state.requestData.status === "outstanding");
+  }
+
+  didFinishSelection() {
+    this.getDetailedRequest(this.state.requestData.id);
   }
 
   getDetailedRequest(id, cb) {
     checkAuthAndAdmin(()=>{
       this.setState({hasUnselectedAsset: false});
-      if(this.props.activeCartParent != null) {
-        this.props.activeCartParent.setState({bodyHasUnselectedAsset: false});
+      if(this.props.parent != null) {
+        this.props.parent.setState({bodyHasUnselectedAsset: false});
       }
       restRequest("GET", "/api/request/"+id, "application/json", null,
                   (responseText)=>{
@@ -112,8 +116,8 @@ class ViewRequestBody extends React.Component {
       if(cart[i].item.is_asset && cart[i].assets.length < cart[i].quantity) {
         cart[i].assetSelect = AssetSelectStatus.SELECT_ASSETS;
         this.setState({hasUnselectedAsset: true});
-        if(this.props.activeCartParent != null) {
-          this.props.activeCartParent.setState({bodyHasUnselectedAsset: true});
+        if(this.props.parent != null) {
+          this.props.parent.setState({bodyHasUnselectedAsset: true});
         }
       } else if (cart[i].item.is_asset && cart[i].assets.length > 0) {
         cart[i].assetSelect = AssetSelectStatus.CHANGE_ASSETS;
@@ -128,8 +132,6 @@ class ViewRequestBody extends React.Component {
   }
 
   isOutstanding() {
-    console.log("is Outstanding");
-    console.log(this.state.requestData);
     return (this.state.requestData.status === "outstanding");
   }
 

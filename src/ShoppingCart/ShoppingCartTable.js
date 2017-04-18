@@ -81,6 +81,8 @@ export default class ShoppingCartTable extends React.Component {
     }
   }
 
+  bodyHasMounted() {}
+
   openCartModal(){
     this._cartchild.openModal()
   }
@@ -109,11 +111,11 @@ export default class ShoppingCartTable extends React.Component {
       <div>
       <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <ShoppingCartModal ref={(child) => {this._cartchild = child; }} updateCallback={this}/>
-      <ViewRequestBody id={localStorage.activecartid} activeCartMode={true} activeCartParent={this}
+      <ViewRequestBody id={localStorage.activecartid} activeCartMode={true} activeCartParent={this} parent={this}
       ref={(child) => {this._viewRequestBody = child; }} />
 
       {this._viewRequestBody != null ?
-        <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || this.state.bodyHasUnselectedAsset}
+        <Button style={{marginTop: "10px", marginRight: "10px"}} disabled={localStorage.cart_quantity === "0" || (isStaff && this.state.bodyHasUnselectedAsset)}
         className="pull-right" bsStyle="success" onClick={this.openCartModal}>{isStaff ? "Checkout Dispensement" : "Checkout Cart"}</Button>
       : null}
       </div>

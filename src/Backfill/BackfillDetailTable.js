@@ -4,6 +4,8 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
 import { Button } from 'react-bootstrap';
+import SelectAssetsModal from "../Requests/SelectAssetsModal.js"
+import SelectionType from '../Requests/SelectionEnum.js';
 var moment = require('moment');
 
 
@@ -28,7 +30,11 @@ export default class BackfillDetailTable extends React.Component {
   stateBackfill(type, row){
     checkAuthAndAdmin(()=>{
       if (type === "satisfy" && row.is_asset) {
-
+        this._selectAssetsModal.setState({type: "loan"});
+        this._selectAssetsModal.setState({dispensementID: row.loan_id});
+        this._selectAssetsModal.setState({numAssetsNeeded: row.quantity});
+        this._selectAssetsModal.setState({selectionType: SelectionType.SATISFY});
+        this._selectAssetsModal.openModal();
       }
       restRequest("PATCH", "/api/request/backfill/" + type + "/" + row.id + "/",  "application/json", null,
                   (responseText)=>{
@@ -73,6 +79,8 @@ export default class BackfillDetailTable extends React.Component {
 
     return(
       <div>
+      <SelectAssetsModal updateCallback={this} />
+      ref={(child) => { this._selectAssetsModal = child; }}/>
       <BootstrapTable ref="backfillTable" data={this.props.data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
       <TableHeaderColumn dataField='cart_owner'>Cart Owner</TableHeaderColumn>
