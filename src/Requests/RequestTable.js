@@ -26,6 +26,8 @@ class RequestTable extends React.Component {
       selectedRequest: 0,
       currentValue: null,
       currentBackfillStatus: "",
+      filterStatus: "",
+      searchStatus: "",
       backfill_statuses: [
         {label: "backfill_request", value: "backfill_request"},
         {label: "backfill_transit", value: "backfill_transit"},
@@ -48,6 +50,7 @@ class RequestTable extends React.Component {
     this.onRowClick = this.onRowClick.bind(this);
     this.resetTable = this.resetTable.bind(this);
     this.cleanFilter = this.cleanFilter.bind(this);
+    this.handleBackfillStatusChange = this.handleBackfillStatusChange.bind(this);
   }
 
   componentWillMount(){
@@ -67,11 +70,11 @@ class RequestTable extends React.Component {
     }
   }
 
-  getAllRequests(url_parameter){
-    var url = url_parameter === null ? "/api/request/" : "/api/request/" + url_parameter;
+  getAllRequests(){
+    // var url = url_parameter === null ? "/api/request/" : "/api/request/" + url_parameter;
     // console.log(url);
     checkAuthAndAdmin(()=>{
-      restRequest("GET", url, "application/json", null,
+      restRequest("GET", "/api/request/?status=" + this.state.filterStatus + "&page=" + this.state.currentPage + "&search="+this.state.searchStatus + "&cart_loans__backfill_loan__status=" + this.state.currentBackfillStatus, "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
                     // console.log(response);
@@ -113,13 +116,12 @@ class RequestTable extends React.Component {
   }
 
   onPageChange(page, sizePerPage) {
-    var page_argument = "page=" + page;
-    var url_param = this.state.currentFilterURL === null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
-    url_param = this.state.currentSearchURL === null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
-    this.getAllRequests(url_param);
+    // var page_argument = "page=" + page;
+    // var url_param = this.state.currentFilterURL === null ? "?" + page_argument : this.state.currentFilterURL + "&" + page_argument;
+    // url_param = this.state.currentSearchURL === null ? url_param : url_param + this.state.currentFilterURL + "&" + page_argument;
     this.setState({
       currentPage: page
-    })
+    }, ()=>{ this.getAllRequests()});
   }
 
   onRowSelect(row, isSelected, e) {
@@ -155,40 +157,42 @@ class RequestTable extends React.Component {
   onSearchChange(searchText, colInfos, multiColumnSearch) {
     if(searchText===''){
       this.setState({
-        currentSearchURL: null
-      });
-      this.getAllRequests(null);
+        searchStatus: "",
+        currentPage: 1
+      }, ()=>{this.getAllRequests()});
     }
     else{
-      var url_parameter = "?search=" + searchText;
       this.setState({
-        currentSearchURL: url_parameter
-      });
-      this.getAllRequests(url_parameter);
+        searchStatus: searchText,
+        currentPage: 1
+      }, ()=>{this.getAllRequests()});
     }
   }
 
   onFilterChange(filterObj) {
     if (Object.keys(filterObj).length === 0) {
       this.setState({
-        currentFilterURL: null
-      });
-      this.getAllRequests(null)
+        filterStatus: "",
+        currentPage: 1
+      }, ()=>{this.getAllRequests()});
     }
     else{
-      var url_parameter = "?";
+      // var url_parameter = "?";
       if(filterObj.status !== null){
-        url_parameter = url_parameter + "status=" + this.filterFields.status[filterObj.status.value];
+        this.setState({
+          filterStatus: this.filterFields.status[filterObj.status.value],
+          currentPage: 1
+        }, ()=>{this.getAllRequests()});
       }
-      this.getAllRequests(url_parameter)
     }
   }
 
-  // handleBackfillStatusChange(value){
-  //   if (url_parameter !== "?" ) {
-  //
-  //   }
-  // }
+  handleBackfillStatusChange(value){
+    console.log(value);
+    this.setState({currentBackfillStatus: (value === null) ? "" : value, currentPage: 1}, ()=>{
+      this.getAllRequests()
+    })
+  }
 
   onRowClick(row, isSelected, e) {
     // console.log(row.id);
@@ -224,23 +228,13 @@ class RequestTable extends React.Component {
       <ViewRequestModal id={this.state.selectedRequest}
       updateCallback={this}
       ref={(child) => { this._requestModal = child; }} />
-      <div className="container-fluid">
-          <Row style={{marginBottom: "-10px"}}>
-              <Col md={6} style={{marginLeft: "-5px"}}>
-                <RequestButton ref="requestButton" { ...this.state} cb={this}/>
-              </Col>
-              <Col className="text-right" style={{marginRight: "10px"}}>
-                  <div>
-                    <Select simpleValue
-                          value={this.state.currentBackfillStatus}
-                          placeholder="Filter by backfill status"
-                          options={this.state.backfill_statuses}
-                          onChange={this.handleBackfillStatusChange}
-                          style={{width: "200px", marginLeft: "10px"}} />
-                  </div>
-              </Col>
-          </Row>
-      </div>
+      <Select simpleValue
+            value={this.state.currentBackfillStatus}
+            placeholder="Filter by backfill status"
+            options={this.state.backfill_statuses}
+            onChange={this.handleBackfillStatusChange}
+            style={{width: "200px", marginLeft: "10px"}} />
+      <RequestButton ref="requestButton" { ...this.state} cb={this}/>
       <BootstrapTable ref="logTable"
       data={ this.state.data }
       remote={ true }
