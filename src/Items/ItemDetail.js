@@ -193,6 +193,10 @@ closeModal() {
   if (typeof this.props.updateCallback.componentWillMount === "function") {
     this.props.updateCallback.componentWillMount();
   }
+  if(this.props.updateCallback._minStockFilter != null) {
+        console.log("Cleaning filter");
+        this.props.updateCallback._minStockFilter.cleanFiltered();
+  }
   this.setState({showModal: false});
 }
 
@@ -220,7 +224,7 @@ logItemQuantityChange() {
 }
 
 onRowClickCart(row, isSelected, e) {
-  this._viewRequestModal.setState({id: row.id});
+  this._viewRequestModal.setState({id: row.cart_id});
   this._viewRequestModal.openModal();
 }
 
@@ -278,7 +282,7 @@ renderDisplayFields() {
       data={ data }
       options={ cartTableOptions }
       striped hover>
-      <TableHeaderColumn dataField='cart_id' isKey hidden autoValue="true">cart_id</TableHeaderColumn>
+      <TableHeaderColumn dataField='cart_id' isKey hidden>cart_id</TableHeaderColumn>
       <TableHeaderColumn dataField='cart_owner'>Requesting User</TableHeaderColumn>
       <TableHeaderColumn dataField='status' hidden>Status</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' >Quantity</TableHeaderColumn>
