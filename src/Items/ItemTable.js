@@ -437,12 +437,14 @@ class ItemTable extends React.Component {
         });
     }
 
-    renderColumns() {
+    renderColumns(isStaff) {
         var cols = [];
         cols.push(<TableHeaderColumn key="idCol" isKey dataField='id' hiddenOnInsert hidden autoValue={true}>id</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="nameCol" dataField='name' editable={ { validator: this.nameValidator} }>Name</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="quantityCol" width="100px" dataField='quantity' editable={ { validator: this.quantityValidator} }>Quantity</TableHeaderColumn>);
-        cols.push(<TableHeaderColumn key="minStockCol" width="100px" dataField='minimum_stock' filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.threshold } } editable={ { validator: this.minimumQuantityValidator} } ref={(child) => { this._minStockFilter = child; }}>Min Quantity</TableHeaderColumn>);
+        if (isStaff) {
+            cols.push(<TableHeaderColumn key="minStockCol" width="100px" dataField='minimum_stock' filter={ { type: 'SelectFilter', defaultValue: this.state.currentValue, options: this.filterFields.threshold } } editable={ { validator: this.minimumQuantityValidator} } ref={(child) => { this._minStockFilter = child; }}>Min Quantity</TableHeaderColumn>);
+        }
         cols.push(<TableHeaderColumn key="modelNumberCol" dataField='model_number'>Model Number</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="descriptionCol" dataField='description'>Description</TableHeaderColumn>);
         cols.push(<TableHeaderColumn key="tagsCol" dataField='tags'>Tags</TableHeaderColumn>);
@@ -501,7 +503,7 @@ class ItemTable extends React.Component {
                 {this.state._loginState ? (<BootstrapTable ref="table1" remote={ true } pagination={ true } options={options}
                                                            fetchInfo={ { dataTotalSize: this.state.totalDataSize } } insertRow={isStaff} selectRow={selectRow}
                                                            data={this.state._products} deleteRow={isSuperUser} search={ true } striped hover>
-                    {this.renderColumns()}
+                    {this.renderColumns(isStaff)}
                 </BootstrapTable>) : null}
 
                 <MinimumStockModal cb={this} item_ids={this.state.selected_rows} ref={(child) => {this._minimumStockChild= child; }} />
