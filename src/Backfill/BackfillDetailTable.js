@@ -50,7 +50,7 @@ export default class BackfillDetailTable extends React.Component {
                       row.status = backfillMap[type];
                       this.forceUpdate();
                       this.props.cb.closeModal();
-                      this._alertchild.generateSuccess("Successfully satisfied");
+                      this._alertchild.generateSuccess(type: " success");
                     }, (status, errResponse)=>{
                       handleErrors(errResponse, this._alertchild);
                     });

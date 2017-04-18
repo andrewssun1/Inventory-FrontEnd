@@ -187,7 +187,7 @@ export default class HomePage extends React.Component {
   }
 
   onOutstandingClick(row){
-    this._viewRequestModal.getDetailedRequest(row.id, ()=>{
+    this._viewRequestModal.setState({id: row.id}, ()=>{
       this._viewRequestModal.openModal();
     });
   }
