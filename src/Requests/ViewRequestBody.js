@@ -4,7 +4,7 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from '../TextEntryFormElement'
-import {checkAuthAndAdmin} from "../Utilities";
+import {checkAuthAndAdmin, handleErrors} from "../Utilities";
 import {restRequest} from "../Utilities.js"
 import TypeConstants from "../TypeConstants.js"
 import AlertComponent from "../AlertComponent.js";
@@ -115,7 +115,7 @@ class ViewRequestBody extends React.Component {
     for (var i = 0; i < cart.length; i++) {
       cart[i].name = cart[i].item.name;
       cart[i].status = status;
-      cart[i].changeQuantity = cart[i].quantity;
+      status === "disbursement" ? cart[i].changeQuantity = cart[i].quantity : cart[i].changeQuantity = cart[i].max_return_quantity;
       cart[i].shouldUpdate = false;
       cart[i].is_asset = cart[i].item.is_asset;
 
@@ -157,9 +157,9 @@ class ViewRequestBody extends React.Component {
                   var response = JSON.parse(responseText);
                   // this.forceUpdate();
                   this.getDetailedRequest(this.state.requestData.id, ()=>{});
-                  this._alertchild.generateSucess("Successfully converted to " + row.status);
+                  this._alertchild.generateSuccess("Successfully converted to " + (row.status === "loan" ? "disbursement" : "loan"));
               }, (status, errResponse)=>{
-                this._alertchild.generateError("Invalid quantity!");
+                handleErrors(errResponse, this._alertchild);
               }
           );
         });
@@ -213,7 +213,7 @@ class ViewRequestBody extends React.Component {
                 this.getDetailedRequest(this.state.requestData.id, ()=>{});
                 this._alertchild.generateSuccess("Successfully returned");
             }, (status, errResponse)=>{
-              this._alertchild.generateError("Invalid quantity!");
+              handleErrors(errResponse, this._alertchild);
             }
         );
       });
@@ -343,7 +343,7 @@ class ViewRequestBody extends React.Component {
     return (
       <BootstrapTable data={data} striped hover>
       <TableHeaderColumn isKey dataField='id' hiddenOnInsert hidden>id</TableHeaderColumn>
-      <TableHeaderColumn dataField='name' width="120px">Name</TableHeaderColumn>
+      <TableHeaderColumn dataField='name' width="200px">Name</TableHeaderColumn>
       <TableHeaderColumn dataField='quantity' width="75px" dataAlign="center">Quantity</TableHeaderColumn>
       <TableHeaderColumn dataField='returned_quantity' hidden={!(this.state.requestData.status === "fulfilled" && type === "loan")} width="80px" dataAlign="center">{"Returned"}</TableHeaderColumn>
       <TableHeaderColumn dataField='total_backfill_quantity'
