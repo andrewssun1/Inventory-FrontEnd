@@ -36,7 +36,8 @@ export default class BackfillDetailTable extends React.Component {
                     var backfillMap = {"approve": "backfill_transit",
                                "deny": "backfill_denied",
                                "fail": "backfill_failed",
-                               "satisfy": "backfill_satisfied"};
+                               "satisfy": "backfill_satisfied",
+                               "cancel": "backfill_cancelled"};
                     row.status = backfillMap[type];
                     this.forceUpdate();
                     this.props.cb.closeModal();
@@ -62,8 +63,8 @@ export default class BackfillDetailTable extends React.Component {
 
   renderCancelButton(cell, row){
     return(
-      // (row.status === "backfill_request" && this.props.requestState === "fulfilled") ?
-      // <Button bsStyle="danger" onClick={TODO}>Cancel</Button>
+      (row.status === "backfill_request" && this.props.requestState === "fulfilled") ?
+      <Button bsStyle="danger" onClick={()=>{this.stateBackfill("cancel", row)}}>Cancel</Button> :
       null
     )
   }
