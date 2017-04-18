@@ -276,7 +276,7 @@ renderDisplayFields() {
       //TODO: Fix placeholder bug
       if(localStorage.isStaff === "true" && !this.state.isAsset) {
         editFields.push(<TextEntryFormElement key="isAsset"  label="Is Asset"
-        type={TypeConstants.Enum.SELECT} selectOptions={["true", "false"]} placeholder="false"
+        type={TypeConstants.Enum.SELECT} selectOptions={["false", "true"]} placeholder="false"
         initialValue="false" ref={child => this._isAssetSelect = child}/>);
       }
 
