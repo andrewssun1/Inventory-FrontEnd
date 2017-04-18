@@ -2,10 +2,12 @@ var React = require('react');
 var ReactBsTable = require('react-bootstrap-table');
 var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
-import {restRequest, checkAuthAndAdmin} from "../Utilities.js"
+import {restRequest, checkAuthAndAdmin, handleErrors} from "../Utilities.js"
 import {Button} from 'react-bootstrap'
 import AlertComponent from "../AlertComponent";
 import ViewRequestModal from '../Requests//ViewRequestModal';
+import SelectAssetsModal from "../Requests/SelectAssetsModal.js"
+import SelectionType from '../Requests/SelectionEnum.js';
 var moment = require('moment');
 
 
@@ -54,6 +56,15 @@ export default class BackfillTable extends React.Component {
 
   stateBackfill(type, row){
     checkAuthAndAdmin(()=>{
+      console.log(row);
+      if (type === "satisfy" && row.is_asset) {
+        this._selectAssetsModal.setState({type: "loan"});
+        this._selectAssetsModal.setState({dispensementID: row.loan_id});
+        this._selectAssetsModal.setState({backfillID: row.id});
+        this._selectAssetsModal.setState({numAssetsNeeded: row.quantity});
+        this._selectAssetsModal.setState({selectionType: SelectionType.SATISFY});
+        this._selectAssetsModal.openModal();
+      } else {
       restRequest("PATCH", "/api/request/backfill/" + type + "/" + row.id + "/",  "application/json", null,
                   (responseText)=>{
                     var response = JSON.parse(responseText);
@@ -63,9 +74,18 @@ export default class BackfillTable extends React.Component {
                                "satisfy": "backfill_satisfied"};
                     row.status = backfillMap[type];
                     this.forceUpdate();
-                  }, ()=>{});
+                    this._alertchild.generateSuccess("Successfully satisfied");
+                  }, (status, errResponse)=>{
+                    handleErrors(errResponse, this._alertchild);
+                  });
+      }
     });
   }
+
+
+    didFinishSelection() {
+      this._alertchild.generateSuccess("Successfully satisfied");
+    }
 
   formatPDF(cell, row){
     return (
@@ -174,6 +194,8 @@ export default class BackfillTable extends React.Component {
         <ViewRequestModal
         updateCallback={this}
         ref={(child) => { this._requestModal = child; }} />
+        <SelectAssetsModal updateCallback={this}
+        ref={(child) => { this._selectAssetsModal = child; }}/>
         <BootstrapTable ref="backfillTable"
         remote={ true }
         pagination={ true }
