@@ -51,6 +51,8 @@ class ViewRequestBody extends React.Component {
     this.renderStaffInfo = this.renderStaffInfo.bind(this);
     this.renderBottomComponents = this.renderBottomComponents.bind(this);
     this.isOutstanding = this.isOutstanding.bind(this);
+    this.openBackfillModal = this.openBackfillModal.bind(this);
+    this.resetTable = this.resetTable.bind(this);
   }
 
   componentDidMount() {
@@ -59,6 +61,10 @@ class ViewRequestBody extends React.Component {
         this.props.parent.bodyHasMounted();
       }
     });
+  }
+
+  resetTable(){
+    this.componentDidMount();
   }
 
 
@@ -231,7 +237,7 @@ class ViewRequestBody extends React.Component {
     }
     else {
       if (row.returned_quantity !== 0 && !row.shouldUpdate) {
-        row.changeQuantity = row.quantity - row.returned_quantity;
+        row.changeQuantity = row.max_return_quantity;
       }
       return(
         <div>
@@ -281,6 +287,10 @@ class ViewRequestBody extends React.Component {
         </InputGroup>
         </FormGroup>
       </div>);
+  }
+
+  openBackfillModal(row){
+    this._backfillchild.openModal(row);
   }
 
   backfillButton(cell, row){
