@@ -4,9 +4,10 @@
 var React = require('react');
 var Bootstrap = require('react-bootstrap');
 import TextEntryFormElement from "../TextEntryFormElement";
-import {restRequest, checkAuthAndAdmin} from "../Utilities";
+import {restRequest, checkAuthAndAdmin, handleErrors} from "../Utilities";
 import DateRangePicker from '../DateRangePicker.js';
 import TypeConstants from '../TypeConstants.js';
+import AlertComponent from '../AlertComponent';
 var Modal = Bootstrap.Modal;
 var Button = Bootstrap.Button;
 var Form = Bootstrap.Form;
@@ -59,11 +60,20 @@ class ConfigureEmailModal extends React.Component {
         "subject_tag" : this._subjectElement.state.value
       }
       let jsonResult = JSON.stringify(requestBody);
+
+      var otherHasSuceeded = false;
       restRequest("PATCH", "/api/email/subjectTag/modify/", "application/json", jsonResult,
       (responseText)=>{
         console.log("Successfully updated request body!");
         console.log(JSON.parse(responseText));
-      }, ()=>{});
+        if(otherHasSuceeded) {
+          this.props.alertchild.generateSuccess("Successfully updated email configuration");
+          this.closeModal();
+        }
+        otherHasSuceeded = !otherHasSuceeded;
+      }, (status, errResponse)=>{
+        handleErrors(errResponse, this._alertchild);
+      });
 
       this.setState({subjectTag: this._subjectElement.state.value});
     }
@@ -77,10 +87,16 @@ class ConfigureEmailModal extends React.Component {
     (responseText)=>{
       console.log("Successfully updated request body!");
       console.log(JSON.parse(responseText));
-    }, ()=>{});
+      if(otherHasSuceeded) {
+        this.props.alertchild.generateSuccess("Successfully updated email configuration");
+        this.closeModal();
+      }
+      otherHasSuceeded = !otherHasSuceeded;
+    }, (status, errResponse)=>{
+      handleErrors(errResponse, this._alertchild);
+    });
 
     this.setState({prependedBody: this._bodyElement.state.value});
-    this.closeModal();
   }
 
   render() {
@@ -88,6 +104,7 @@ class ConfigureEmailModal extends React.Component {
     return (
       <Bootstrap.Modal show={this.state.showModal} onHide={this.closeModal}>
       <Modal.Body>
+      <AlertComponent ref={(child) => { this._alertchild = child; }}></AlertComponent>
       <Form horizontal>
       {isSuperUser ?
       <TextEntryFormElement controlId="formHorizontalSubject"
